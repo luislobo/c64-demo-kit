@@ -1,3 +1,14 @@
+/**
+ * Algorithm: recognize literal DEMO_* assignments with a constrained regex,
+ * translate assembler hexadecimal numerals outside strings, then JSON-decode.
+ * Validate byte ranges, font text, equal voice lengths, and power-of-two masks.
+ * Why: one assembly application file serves both assembler and host, without
+ * executing arbitrary JavaScript or maintaining a second configuration format.
+ * Tradeoff: this is intentionally not a 64tass parser: computed expressions,
+ * macros and general assembly syntax are outside the supported config subset.
+ * Mask-based runtime loops depend on these checks; malformed settings fail early.
+ * Detailed guide: docs/ALGORITHMS.md
+ */
 const fs=require('node:fs');
 // Read literal DEMO_* assignments only. This deliberately does not execute JS
 // or attempt to interpret arbitrary assembler expressions.

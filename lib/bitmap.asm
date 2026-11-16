@@ -1,3 +1,13 @@
+; Algorithm: stream sparse commands into the hidden bitmap. 0 ends the stream;
+; 1..127 skips unchanged bytes; $81..$ff copies 1..127 literal bytes.
+; Why: skips change only the destination pointer, and literal loops use indexed
+; indirect reads/writes. Pointers advance once per run, avoiding per-byte calls.
+; Literal zeros erase old pixels; skips preserve the buffer-specific baseline.
+; Input A is a valid patch index. Clobbers A/X/Y, flags, src/dst and count.
+; Only builder-validated streams are supported: runtime does not bounds-check.
+; Keyboard polling between runs limits latency without checking every byte.
+; Detailed guide: docs/ALGORITHMS.md
+
 ; Patch commands: 0=end, 1..127=skip unchanged bytes,
 ; $81..$ff=copy 1..127 literal bytes, including zero bytes that erase old pixels.
 ; Source and destination pointers advance once per run, not once per pixel byte.

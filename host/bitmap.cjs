@@ -1,3 +1,14 @@
+/**
+ * Algorithm: map pixels to VIC cell order, nearest-neighbor-fit a 320x200 source
+ * into the logo area, stamp 8x8 HUD glyphs, then shift each logo row by
+ * round(amplitude * sin(2*pi*y/wavelength + 2*pi*phase/frameCount)).
+ * Why: precompute sine motion so the C64 only copies patches. Clone the base
+ * and clear only the 23 body rows, preserving controls and reserved ticker space.
+ * Tradeoff: one bit per pixel and integer shifts give hard edges and discrete
+ * phases; this is not antialiasing, resampling for photographs, or multicolor.
+ * Frame generation costs O(frameCount * 320 * logoHeight) time on the host.
+ * Detailed guide: docs/ALGORITHMS.md
+ */
 const WIDTH=320,HEIGHT=200,BYTES=8000;
 const index=(x,y)=>(y>>3)*320+(x>>3)*8+(y&7);
 function fitBitmap(image,height=184){

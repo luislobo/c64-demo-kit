@@ -1,3 +1,14 @@
+; Algorithm: initialize SID presets, advance a note-duration counter at the
+; logic rate, read three PAL/NTSC frequency pairs, write pitch and assert gates.
+; Clear gates one logic tick before the next note; wrap the step with an AND mask.
+; Why: SID generates the actual waveforms/envelopes in hardware. Tables remove
+; floating-point pitch calculations from the C64 and compensate for SID clocks.
+; The three fixed presets are pulse lead, triangle bass and sawtooth arpeggio.
+; Tradeoff: this is a small equal-step note sequencer, not a general SID player.
+; It has no rest opcode, filters, swing or per-note instruments; MIDI 0 is a note.
+; PAL table selection relies on the engine invariant period=5 for PAL, 6 for NTSC.
+; Detailed guide: docs/ALGORITHMS.md
+
 music_init:
     lda #0
     ldx #24

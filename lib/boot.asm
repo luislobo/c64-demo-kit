@@ -1,3 +1,13 @@
+; Algorithm: emit BASIC SYS2064, take over hardware, clear state, initialize
+; both bitmap/color buffers, measure raster length, install vectors, enable IRQ.
+; Why: the BASIC stub loads normally from disk; ROMs are mapped out so the
+; second bitmap can occupy RAM under KERNAL while I/O remains accessible.
+; The startup copy is unrolled by pages: 31*256 + 64 = exactly 8000 bytes.
+; Copying a full 8192 bytes would overwrite the interrupt-vector area.
+; Raster measurement distinguishes standard PAL from NTSC without a ROM flag.
+; Tradeoff: startup owns the machine and exits by reset, not by returning to BASIC.
+; Detailed guide: docs/ALGORITHMS.md
+
 * = $0801
     .word basic_end
     .word 10

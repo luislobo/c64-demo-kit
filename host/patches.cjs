@@ -1,3 +1,14 @@
+/**
+ * Algorithm: compare source/target bytes, emit skip/literal runs of at most 127,
+ * and merge unchanged gaps up to three bytes inside literal runs. Build two
+ * static warm-ups, frame[i-2] -> frame[i] transitions, and a union-based restore.
+ * Why: hidden buffers lag by two phases. The restore includes every location
+ * that any wave can alter, allowing safe stop/restart from any displayed phase.
+ * The JS decoder simulates both buffers for five cycles and checks restoration.
+ * Tradeoff: gap merging is a simple heuristic, not an optimal compression proof;
+ * some unchanged bytes are copied to reduce command overhead. Literal zeros matter.
+ * Detailed guide: docs/ALGORITHMS.md
+ */
 // ABI: zero terminates; 1..127 skips; $81..$ff copies literal bytes.
 function encodePatch(from,to,force){
  if(from.length!==to.length)throw Error('Bitmap sizes differ');

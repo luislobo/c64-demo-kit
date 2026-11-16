@@ -1,3 +1,14 @@
+; Algorithm: select CIA keyboard rows and interpret active-low matrix bits.
+; Track prior Space/M/number states so a held key causes one action per edge.
+; Space toggles a one-bit request; number keys store a mode request; M changes
+; SID master volume while the sequencer continues to advance.
+; Why: scanning in both IRQ and main code catches short taps. PHP/SEI/PLP keeps
+; shared edge state atomic while preserving the caller interrupt-enable state.
+; During decoding scan Space each run, but all keys only once per eight runs.
+; Tradeoff: this is edge suppression, not timed mechanical debouncing or an event
+; queue. Multiple pending Space edges can cancel; number-key priority is 1,2,3.
+; Detailed guide: docs/ALGORITHMS.md
+
 poll_keyboard:
     php                       ; Keep the shared edge detector atomic with the IRQ.
     sei

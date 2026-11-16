@@ -1,3 +1,22 @@
+<#
+.SYNOPSIS
+Convert an image into a headerless 8000-byte monochrome C64 bitmap.
+.DESCRIPTION
+Fit and center with nearest-neighbor sampling; letterbox unused space as black.
+Auto detects transparency among sampled pixels and chooses alpha as the mask;
+otherwise threshold weighted RGB luminance multiplied by opacity. Invert flips
+the foreground decision inside the fitted image, not the letterbox margins.
+Pack each on-pixel into VIC-II 8x8-cell memory order, most significant bit first.
+Why: deterministic one-bit artwork needs no graphics packages beyond Windows
+System.Drawing. Keeping the two passes separate lets Auto inspect all sampled
+pixels before selecting a consistent threshold rule for the entire image.
+Tradeoff: no dithering, antialiasing, gamma-linear luminance or multicolor palette.
+A single partly transparent sampled pixel selects alpha for the entire image;
+choose Luma explicitly when translucent photographic content needs tonal detail.
+This Windows-only helper runs on the host; it is not part of the C64 program.
+.PARAMETER Threshold
+Byte threshold 0..255. Dark artwork may need a lower Luma threshold or Invert.
+#>
 param(
     [Parameter(Mandatory=$true)][string]$InputPath,
     [Parameter(Mandatory=$true)][string]$OutputPath,

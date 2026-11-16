@@ -1,3 +1,13 @@
+/**
+ * Validation algorithm: draw a synthetic ring/diamond image, derive a temporary
+ * application with different text, volume and four frames, then invoke the same
+ * builder and assembler. Finally remove the fixture and rebuild the default.
+ * Why: demonstrate reuse by changing only application configuration and assets,
+ * not the libraries. Finally restores generated files even if the variant fails.
+ * Limit: this is a build/host-patch integration check, not a variant emulator test.
+ * It shares generated/ with the application and must not run concurrently.
+ * Detailed guide: docs/ALGORITHMS.md
+ */
 // Integration check: change only the application assembly/config and image.
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const{build}=require('../build.cjs');

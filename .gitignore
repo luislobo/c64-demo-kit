@@ -1,2 +1,4 @@
+# Build policy: intermediates and local test dumps are regenerated, not versioned.
+# Working demo snapshots are intentionally versioned separately under dist/.
 build/
 generated/

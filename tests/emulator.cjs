@@ -1,3 +1,15 @@
+/**
+ * Validation algorithm: drive a running VICE remote monitor over TCP, load the
+ * PRG, break at renderer/flip boundaries, dump bitmap memory and compare against
+ * host frames. Measure decoder cycles and tick spacing; test restore/restart,
+ * mode requests, sequencer progress and matching nonempty ticker buffers.
+ * Why: actual emulator execution checks assembly contracts and timing that a
+ * host decoder cannot. A short quiet interval coalesces monitor prompt packets.
+ * Limit: default-demo fixture; mode events are queued in RAM, not physical keys.
+ * Sequencer progress is not an audible-quality test; real hardware is untested.
+ * The test quits the target emulator on success; failed runs may need cleanup.
+ * Detailed guide: docs/ALGORITHMS.md
+ */
 const fs=require('node:fs'),path=require('node:path'),net=require('node:net');
 const project=path.resolve(__dirname,'..'),root=path.join(project,'build'),mode=process.argv[2]||'pal',port=Number(process.argv[3]||6522);
 const {readConfig}=require('../host/config.cjs'); const config=readConfig(path.join(project,'demo.asm'));

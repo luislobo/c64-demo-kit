@@ -1,3 +1,14 @@
+; Algorithm: fetch a null-terminated text byte, map it with AND 63, load its
+; eight glyph rows and feed one most-significant glyph bit into each row shift.
+; Propagate carry right-to-left through 40 bitmap cells with ROL, then mirror
+; each result into the other buffer. After eight shifts load another glyph.
+; Why: smooth single-pixel text uses existing bitmap memory and survives flips.
+; The 40-cell inner operation is assembler-unrolled to avoid address arithmetic.
+; Tradeoff: larger code and substantial ISR work; only the 64-glyph uppercase
+; font subset is supported, not arbitrary Unicode or full PETSCII translation.
+; The bottom row is reserved: motion patches must never overwrite ticker bytes.
+; Detailed guide: docs/ALGORITHMS.md
+
 ; Character rows are shifted a column at a time into the right edge of a
 ; one-pixel ticker. Mirror each changed byte into both bitmap buffers.
 scroll_tick:

@@ -1,3 +1,14 @@
+; Algorithm: save A/X/Y, advance ticks, scan keys, service due flips, update one
+; color band, then use an accumulator to schedule approximately 50 logic ticks
+; per second on nominal 50/60 Hz displays. Every other logic tick scrolls text.
+; Why: flips run first to meet the border deadline. Music/ticker scheduling is
+; decoupled from the slower bitmap animation; accumulator arithmetic uses bytes.
+; On NTSC, add 50 and subtract 60 when due: five logic updates per six refreshes.
+; Acknowledge VIC IRQ and restore registers; RTI restores caller flags.
+; Tradeoff: color bands update per refresh, and real crystal rates are approximate;
+; ISR work still consumes the same CPU budget used by the main-thread decoder.
+; Detailed guide: docs/ALGORITHMS.md
+
 irq:
     pha
     txa

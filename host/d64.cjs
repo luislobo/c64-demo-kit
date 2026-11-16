@@ -1,3 +1,14 @@
+/**
+ * Algorithm: allocate a 35-track image, initialize BAM/free bits and directory,
+ * reserve track 18 metadata, select data sectors with ten-sector interleave,
+ * link 254-byte PRG chunks, and emit one closed PRG entry and its block count.
+ * Why: disk packaging works without emulator tooling. Interleave gives a 1541
+ * time to transfer a block before the next block rotates past; SD2IEC ignores
+ * the rotational cost but follows the same chain. The last sector stores used+1.
+ * Tradeoff: single file/directory sector only; not a general disk editor, GEOS
+ * filesystem, extended-track image writer or full Unicode/PETSCII name converter.
+ * Detailed guide: docs/ALGORITHMS.md
+ */
 // Standard 35-track D64, one closed PRG in a single-sector directory.
 // Format reference: https://vice-emu.sourceforge.io/vice_17.html (D64 section).
 const sectors=t=>t<=17?21:t<=24?19:t<=30?18:17;

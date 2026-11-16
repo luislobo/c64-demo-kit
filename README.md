@@ -8,6 +8,11 @@ The assembler is **64tass 1.60.3243**, bundled for Windows with its licenses.
 No npm packages, VICE installation, network connection, or API key is needed to
 build. Node.js must be installed. On another OS set `TASS64` to your 64tass binary.
 
+For implementation explanations, read [Algorithms and design decisions](docs/ALGORITHMS.md).
+Each project source file also has an algorithm/rationale header. The
+[file catalog](docs/FILES.md) covers binary assets, generated outputs, tests and
+unchanged third-party files that cannot use those headers.
+
 ## Build and run
 
 ```console
@@ -87,7 +92,7 @@ state are intentional to retain the original performance and exact PRG bytes.
 | `bitmap.asm` | `render`: decode one sparse patch into the hidden bitmap |
 | `display.asm` | `flip`: request a scheduled flip; `flip_border`: IRQ-only buffer switch |
 | `raster.asm` | `irq`, `nmi`: raster clock, safe flips, music and ticker scheduling |
-| `keyboard.asm` | `poll_keyboard`, `poll_render_keyboard`: atomic debounced input |
+| `keyboard.asm` | `poll_keyboard`, `poll_render_keyboard`: atomic input edge detection |
 | `effects.asm` | `handle_effect`: standard three-mode controller |
 | `colors.asm` | `color_tick`: update one color band per refresh |
 | `scroller.asm` | `scroll_tick`: shift text by one pixel in both buffers |

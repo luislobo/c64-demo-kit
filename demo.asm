@@ -1,3 +1,14 @@
+; Application composition: this is the single place for image/font paths, text,
+; palette, wave geometry, note lists, tempo, volume and output filenames.
+; Algorithm: declare literal DEMO_* constants, include the engine, then append
+; text/font/music and the generated bitmap/patch data in the engine memory map.
+; Why: 64tass and the host builder read the same settings, avoiding a second
+; application-specific JavaScript configuration that could drift out of sync.
+; Use literal values: host/config.cjs is a small reader, not an assembler parser.
+; Lists are powers of two where the runtime wraps indices with AND masks.
+; Binary artwork stays external so it can be replaced without rewriting code.
+; Detailed guide: docs/ALGORITHMS.md
+
 ; Application-specific configuration. Change this file and the referenced assets.
 ; All executable routines live in lib/. No application-specific JavaScript is needed.
 DEMO_NAME = "torqxsendero-c64"

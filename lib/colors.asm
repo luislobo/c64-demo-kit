@@ -1,3 +1,14 @@
+; Algorithm: update 40 screen-color bytes for one body row in both VIC banks.
+; Use the base color for mode 1; otherwise palette[(row + phase) AND 7].
+; After all 23 rows, wrap the row and advance the palette phase.
+; Why: hires bitmap foreground/background colors live in the screen matrix;
+; changing those bytes recolors the logo without touching its bitmap pixels.
+; One row per refresh bounds ISR work; both copies stay valid for future flips.
+; The two text rows remain untouched. The second screen is a fixed $bc00 away.
+; Tradeoff: bands are eight pixels high; a sweep is 23 refreshes, so PAL and NTSC
+; color-cycling speeds differ even though wave/music/ticker timing is normalized.
+; Detailed guide: docs/ALGORITHMS.md
+
 ; Update one eight-pixel-high band per refresh, keeping the IRQ inexpensive.
 color_tick:
     lda color_row

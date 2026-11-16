@@ -1,0 +1,110 @@
+# File catalog
+
+Every project source file explains its algorithm and decisions in its header.
+This catalog also covers data files that cannot hold comments and upstream files
+that are intentionally left unchanged. See [the design guide](ALGORITHMS.md) for
+worked examples and limitations. Generated/local outputs are listed separately
+at the end of that guide, because they are not versioned source.
+
+## Application and build
+
+| File | Algorithm, role and reason |
+| --- | --- |
+| [build.bat](../build.bat) | Directory-safe Windows launcher that propagates the builder exit status and pauses on failure. |
+| [build.cjs](../build.cjs) | Deterministic asset/assembly/disk pipeline with capacity checks; keeps expensive math on the host. |
+| [demo.asm](../demo.asm) | Single application configuration and asset composition. Literal settings are shared by host and assembler; executable routines remain reusable. |
+| [tools/convert-image.ps1](../tools/convert-image.ps1) | Two-pass nearest-neighbor sampling and alpha/luminance thresholding into VIC-II bitmap order. |
+
+## Runtime assembly libraries
+
+| File | Algorithm, role and reason |
+| --- | --- |
+| [lib/assets.asm](../lib/assets.asm) | Algorithm: emit the patch-address table, place the static bitmap at $2000, and place sparse streams at $4000; use assembler errors to reject overlap. Why: fixed locations match VIC bank addressing and avoid runtime relocation. |
+| [lib/bitmap.asm](../lib/bitmap.asm) | Algorithm: stream sparse commands into the hidden bitmap. 0 ends the stream; 1..127 skips unchanged bytes; $81..$ff copies 1..127 literal bytes. Why: skips change only the destination pointer, and literal loops use indexed |
+| [lib/boot.asm](../lib/boot.asm) | Algorithm: emit BASIC SYS2064, take over hardware, clear state, initialize both bitmap/color buffers, measure raster length, install vectors, enable IRQ. Why: the BASIC stub loads normally from disk; ROMs are mapped out so the |
+| [lib/colors.asm](../lib/colors.asm) | Algorithm: update 40 screen-color bytes for one body row in both VIC banks. Use the base color for mode 1; otherwise palette[(row + phase) AND 7]. After all 23 rows, wrap the row and advance the palette phase. |
+| [lib/display.asm](../lib/display.asm) | Algorithm: main-thread flip sets a request and waits. The raster ISR calls flip_border when the deadline is due, selects the other VIC bank/screen, records the tick and clears the request to release the waiting main thread. |
+| [lib/effects.asm](../lib/effects.asm) | Algorithm: atomically consume the pending mode, then set effect and request animation start or stop only if the current active state needs to change. Why: keyboard scanning reports intent; this main-thread controller decides |
+| [lib/engine.asm](../lib/engine.asm) | Algorithm: assemble the runtime modules in a fixed order, then emit the palette and the 23 body-row screen-address words needed by the color updater. Why: source includes add no linking/runtime overhead and preserve layout. |
+| [lib/keyboard.asm](../lib/keyboard.asm) | Algorithm: select CIA keyboard rows and interpret active-low matrix bits. Track prior Space/M/number states so a held key causes one action per edge. Space toggles a one-bit request; number keys store a mode request; M changes |
+| [lib/player.asm](../lib/player.asm) | Algorithm: state machine for idle, two-buffer warm-up, steady playback and static restoration. Render the hidden buffer, request its scheduled flip, advance phase with a power-of-two mask, and add period to the prior deadline. |
+| [lib/raster.asm](../lib/raster.asm) | Algorithm: save A/X/Y, advance ticks, scan keys, service due flips, update one color band, then use an accumulator to schedule approximately 50 logic ticks per second on nominal 50/60 Hz displays. Every other logic tick scrolls text. |
+| [lib/scroller.asm](../lib/scroller.asm) | Algorithm: fetch a null-terminated text byte, map it with AND 63, load its eight glyph rows and feed one most-significant glyph bit into each row shift. Propagate carry right-to-left through 40 bitmap cells with ROL, then mirror |
+| [lib/sid.asm](../lib/sid.asm) | Algorithm: initialize SID presets, advance a note-duration counter at the logic rate, read three PAL/NTSC frequency pairs, write pitch and assert gates. Clear gates one logic tick before the next note; wrap the step with an AND mask. |
+| [lib/state.asm](../lib/state.asm) | Algorithm: assign a shared zero-page ABI; this file emits no runtime bytes. Why: zero-page accesses and indirect pointers keep the 6510 decoder small and fast. Explicit addresses also make memory ownership inspectable in VICE. |
+
+## Host libraries and tests
+
+| File | Algorithm, role and reason |
+| --- | --- |
+| [host/bitmap.cjs](../host/bitmap.cjs) | Algorithm: map pixels to VIC cell order, nearest-neighbor-fit a 320x200 source into the logo area, stamp 8x8 HUD glyphs, then shift each logo row by round(amplitude * sin(2*pi*y/wavelength + 2*pi*phase/frameCount)). |
+| [host/config.cjs](../host/config.cjs) | Algorithm: recognize literal DEMO_* assignments with a constrained regex, translate assembler hexadecimal numerals outside strings, then JSON-decode. Validate byte ranges, font text, equal voice lengths, and power-of-two masks. |
+| [host/d64.cjs](../host/d64.cjs) | Algorithm: allocate a 35-track image, initialize BAM/free bits and directory, reserve track 18 metadata, select data sectors with ten-sector interleave, link 254-byte PRG chunks, and emit one closed PRG entry and its block count. |
+| [host/music.cjs](../host/music.cjs) | Algorithm: MIDI -> Hz via 440 * 2^((note-69)/12), then round(Hz*2^24/clock). Emit low/high-byte tables for each of three voices at PAL and NTSC SID clocks. Why: SID phase accumulators use integer frequency words; host-side math keeps |
+| [host/patches.cjs](../host/patches.cjs) | Algorithm: compare source/target bytes, emit skip/literal runs of at most 127, and merge unchanged gaps up to three bytes inside literal runs. Build two static warm-ups, frame[i-2] -> frame[i] transitions, and a union-based restore. |
+| [tests/emulator.cjs](../tests/emulator.cjs) | Validation algorithm: drive a running VICE remote monitor over TCP, load the PRG, break at renderer/flip boundaries, dump bitmap memory and compare against host frames. Measure decoder cycles and tick spacing; test restore/restart, |
+| [tests/libraries.test.cjs](../tests/libraries.test.cjs) | Validation algorithm: exercise skip/literal boundaries and erasure, simulate four-frame double buffering, then independently walk D64 chains and count BAM free bits at several payload lengths, including exact 254-byte boundaries. |
+| [tests/rebuild-variant.cjs](../tests/rebuild-variant.cjs) | Validation algorithm: draw a synthetic ring/diamond image, derive a temporary application with different text, volume and four frames, then invoke the same builder and assembler. Finally remove the fixture and rebuild the default. |
+
+## Documentation and policy
+
+| File | Algorithm, role and reason |
+| --- | --- |
+| [.gitignore](../.gitignore) | Artifact policy: omit generated/local outputs, retain selected working snapshots under dist/. No executable algorithm. |
+| [assets/README.md](../assets/README.md) | Raw bitmap/font byte layouts and why source PNGs are preserved separately. |
+| [dist/README.md](../dist/README.md) | Meaning and validation limits of committed demo snapshots. |
+| [docs/ALGORITHMS.md](../docs/ALGORITHMS.md) | Per-file algorithms, rationale, examples, cross-file formats and implementation limits. |
+| [docs/FILES.md](../docs/FILES.md) | Complete versioned-file inventory, including data and unchanged vendor material. |
+| [README.md](../README.md) | Usage, configuration and calling/memory contracts; orientation rather than executable code. |
+| [tools/README.md](../tools/README.md) | Converter decisions and the boundary between project code and bundled upstream tools. |
+
+## Binary assets and distribution snapshots
+
+| File | Algorithm, role and reason |
+| --- | --- |
+| [assets/font.bin](../assets/font.bin) | 64 eight-row glyphs; shared encoding for fixed HUD drawing and the one-pixel runtime ticker. |
+| [assets/image.bin](../assets/image.bin) | 8000-byte, one-bit VIC-II cell-order source canvas; consumed by the host fitter and wave generator. |
+| [assets/reference/logo-blue.png](../assets/reference/logo-blue.png) | Recolored artwork reference suitable for the converter, not an automatic build input. |
+| [assets/reference/logo-white.png](../assets/reference/logo-white.png) | Original artwork reference, not an automatic build input. |
+| [dist/preview.png](../dist/preview.png) | Captured emulator frame; evidence of one visual state, not animation/audio validation. |
+| [dist/torqxsendero-c64.d64](../dist/torqxsendero-c64.d64) | Single-PRG disk snapshot with BAM, directory, linked sectors and ten-sector interleave. |
+| [dist/torqxsendero-c64.prg](../dist/torqxsendero-c64.prg) | Assembled native demo with load address, code and generated data; no source algorithm is editable here. |
+| [dist/validation/test-ntsc.json](../dist/validation/test-ntsc.json) | Recorded NTSC frame/cycle samples and integration-check results; does not execute tests. |
+| [dist/validation/test-pal.json](../dist/validation/test-pal.json) | Recorded PAL frame/cycle samples and integration-check results; does not execute tests. |
+
+## Unchanged 64tass distribution
+
+| File | Algorithm, role and reason |
+| --- | --- |
+| [tools/64tass/64tass.exe](../tools/64tass/64tass.exe) | Unmodified upstream multi-pass assembler executable; host-only, not linked into the C64 runtime. |
+| [tools/64tass/examples/45gs02-compatibility.asm](../tools/64tass/examples/45gs02-compatibility.asm) | Upstream assembler example; its algorithm/comments belong to the original distribution. Not included in the demo. |
+| [tools/64tass/examples/ctm7-display.asm](../tools/64tass/examples/ctm7-display.asm) | Upstream assembler example; its algorithm/comments belong to the original distribution. Not included in the demo. |
+| [tools/64tass/examples/ctm7.asm](../tools/64tass/examples/ctm7.asm) | Upstream assembler example; its algorithm/comments belong to the original distribution. Not included in the demo. |
+| [tools/64tass/examples/loading_a_kla_file.asm](../tools/64tass/examples/loading_a_kla_file.asm) | Upstream assembler example; its algorithm/comments belong to the original distribution. Not included in the demo. |
+| [tools/64tass/examples/loading_a_sid_file.asm](../tools/64tass/examples/loading_a_sid_file.asm) | Upstream assembler example; its algorithm/comments belong to the original distribution. Not included in the demo. |
+| [tools/64tass/examples/patching_relocation_at_source.asm](../tools/64tass/examples/patching_relocation_at_source.asm) | Upstream assembler example; its algorithm/comments belong to the original distribution. Not included in the demo. |
+| [tools/64tass/examples/runtime_relocation.asm](../tools/64tass/examples/runtime_relocation.asm) | Upstream assembler example; its algorithm/comments belong to the original distribution. Not included in the demo. |
+| [tools/64tass/examples/shuffling.asm](../tools/64tass/examples/shuffling.asm) | Upstream assembler example; its algorithm/comments belong to the original distribution. Not included in the demo. |
+| [tools/64tass/LICENSE-GPL-2.0](../tools/64tass/LICENSE-GPL-2.0) | Unmodified upstream license/component notice; no executable algorithm. |
+| [tools/64tass/LICENSE-LGPL-2.0](../tools/64tass/LICENSE-LGPL-2.0) | Unmodified upstream license/component notice; no executable algorithm. |
+| [tools/64tass/LICENSE-LGPL-2.1](../tools/64tass/LICENSE-LGPL-2.1) | Unmodified upstream license/component notice; no executable algorithm. |
+| [tools/64tass/LICENSE-my_getopt](../tools/64tass/LICENSE-my_getopt) | Unmodified upstream license/component notice; no executable algorithm. |
+| [tools/64tass/manual.pdf](../tools/64tass/manual.pdf) | Upstream assembler documentation; authoritative reference for the bundled tool, not custom demo code. |
+| [tools/64tass/NEWS](../tools/64tass/NEWS) | Upstream assembler changelog; no executable algorithm. |
+| [tools/64tass/README](../tools/64tass/README) | Upstream assembler documentation; authoritative reference for the bundled tool, not custom demo code. |
+| [tools/64tass/README.html](../tools/64tass/README.html) | Upstream assembler documentation; authoritative reference for the bundled tool, not custom demo code. |
+| [tools/64tass/README.md](../tools/64tass/README.md) | Upstream assembler documentation; authoritative reference for the bundled tool, not custom demo code. |
+| [tools/64tass/syntax/64tass assembler.INI](../tools/64tass/syntax/64tass%20assembler.INI) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
+| [tools/64tass/syntax/64tass/64tass.sublime-build](../tools/64tass/syntax/64tass/64tass.sublime-build) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
+| [tools/64tass/syntax/64tass/64tass.tmLanguage](../tools/64tass/syntax/64tass/64tass.tmLanguage) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
+| [tools/64tass/syntax/assembler.syntax](../tools/64tass/syntax/assembler.syntax) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
+| [tools/64tass/syntax/crimson editor/64tass-asm.key](../tools/64tass/syntax/crimson%20editor/64tass-asm.key) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
+| [tools/64tass/syntax/crimson editor/64tass-asm.spc](../tools/64tass/syntax/crimson%20editor/64tass-asm.spc) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
+| [tools/64tass/syntax/crimson editor/extension.asm](../tools/64tass/syntax/crimson%20editor/extension.asm) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
+| [tools/64tass/syntax/GtkSourceView-6502_64tass.lang](../tools/64tass/syntax/GtkSourceView-6502_64tass.lang) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
+| [tools/64tass/syntax/jedit-assembly-64tass.xml](../tools/64tass/syntax/jedit-assembly-64tass.xml) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
+| [tools/64tass/syntax/katepart-asm6502.xml](../tools/64tass/syntax/katepart-asm6502.xml) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
+| [tools/64tass/syntax/notepadpp-old-64tass.xml](../tools/64tass/syntax/notepadpp-old-64tass.xml) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
+| [tools/64tass/syntax/notepadpp-udl2.1-64tass.xml](../tools/64tass/syntax/notepadpp-udl2.1-64tass.xml) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
+| [tools/64tass/syntax/vim/syntax/64tass.vim](../tools/64tass/syntax/vim/syntax/64tass.vim) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
+

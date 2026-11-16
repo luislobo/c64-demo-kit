@@ -1,3 +1,12 @@
+; Algorithm: assign a shared zero-page ABI; this file emits no runtime bytes.
+; Why: zero-page accesses and indirect pointers keep the 6510 decoder small and
+; fast. Explicit addresses also make memory ownership inspectable in VICE.
+; State groups: animation/scheduling, input edges, audio/ticker clocks, glyph
+; scratch, and src/dst pointers. All participating modules use these symbols.
+; Tradeoff: these modules share an ABI and are not independently relocatable.
+; The boot clear covers $02..$4f; src/dst are initialized by render before use.
+; Detailed guide: docs/ALGORITHMS.md
+
 ; Shared zero-page ABI for the C64 bitmap-demo libraries.
 ; Assemble with 64tass. All code running on the C64 is ordinary 6510 assembly.
 .cpu "6502"

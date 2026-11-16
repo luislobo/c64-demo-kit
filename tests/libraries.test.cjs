@@ -1,3 +1,13 @@
+/**
+ * Validation algorithm: exercise skip/literal boundaries and erasure, simulate
+ * four-frame double buffering, then independently walk D64 chains and count BAM
+ * free bits at several payload lengths, including exact 254-byte boundaries.
+ * Also check SID pitch rounding/config shape and application-free library source.
+ * Why: validate format invariants and cross-component behavior rather than just
+ * asserting the same individual operations used by the implementation.
+ * Limit: host tests do not execute 6510 code or prove analog SID/audio quality.
+ * Detailed guide: docs/ALGORITHMS.md
+ */
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const{readConfig}=require('../host/config.cjs');
 const{encodePatch,applyPatch,makeDoubleBufferedPatches,verifyPatches}=require('../host/patches.cjs');

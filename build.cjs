@@ -1,3 +1,14 @@
+/**
+ * Algorithm: parse the application constants, fit artwork and add HUD, generate
+ * wave frames, encode/verify two-buffer patches, allocate streams, emit assets,
+ * run 64tass, package a D64 and write a build report.
+ * Why: expensive image/sine/pitch work is done once on the host; the C64 plays
+ * validated data. Fixed memory limits fail during build, before producing overlap.
+ * Paths resolve from the application file; compiler selection is overridable.
+ * Tradeoff: generated/ is shared by entries in one project: builds must be serial.
+ * The build report records paths/sizes, not a proof of runtime timing for every image.
+ * Detailed guide: docs/ALGORITHMS.md
+ */
 const fs=require('node:fs'),path=require('node:path'),{execFileSync}=require('node:child_process');
 const{readConfig}=require('./host/config.cjs');
 const{fitBitmap,drawText,waveFrames}=require('./host/bitmap.cjs');
