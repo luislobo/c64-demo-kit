@@ -1,0 +1,114 @@
+{
+  "mode": "ntsc",
+  "framesVerified": 20,
+  "period": 6,
+  "decoderCycles": [
+    77797,
+    80965,
+    87137,
+    86307,
+    86746,
+    83415,
+    87773,
+    86881,
+    87455,
+    83373,
+    87045,
+    86000,
+    86849,
+    83757,
+    87587,
+    86880,
+    87564,
+    83358,
+    87098,
+    86312
+  ],
+  "flips": [
+    {
+      "phase": 0,
+      "tick": 6
+    },
+    {
+      "phase": 1,
+      "tick": 12
+    },
+    {
+      "phase": 2,
+      "tick": 18
+    },
+    {
+      "phase": 3,
+      "tick": 24
+    },
+    {
+      "phase": 4,
+      "tick": 30
+    },
+    {
+      "phase": 5,
+      "tick": 36
+    },
+    {
+      "phase": 6,
+      "tick": 42
+    },
+    {
+      "phase": 7,
+      "tick": 48
+    },
+    {
+      "phase": 0,
+      "tick": 54
+    },
+    {
+      "phase": 1,
+      "tick": 60
+    },
+    {
+      "phase": 2,
+      "tick": 66
+    },
+    {
+      "phase": 3,
+      "tick": 72
+    },
+    {
+      "phase": 4,
+      "tick": 78
+    },
+    {
+      "phase": 5,
+      "tick": 84
+    },
+    {
+      "phase": 6,
+      "tick": 90
+    },
+    {
+      "phase": 7,
+      "tick": 96
+    },
+    {
+      "phase": 0,
+      "tick": 102
+    },
+    {
+      "phase": 1,
+      "tick": 108
+    },
+    {
+      "phase": 2,
+      "tick": 114
+    },
+    {
+      "phase": 3,
+      "tick": 120
+    }
+  ],
+  "stopAndRestart": true,
+  "rainbowMode": true,
+  "colorOnlyMode": true,
+  "musicSequencer": true,
+  "scrollingText": true
+}
