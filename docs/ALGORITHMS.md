@@ -358,4 +358,3 @@ Build products include the PRG, D64, assembler listing, symbol map and JSON
 report. Local emulator tests additionally create memory dumps, screenshots and
 measurement reports in `build/`. These files are reproducible or diagnostic;
 the source of truth remains application settings, asset inputs and libraries.
-

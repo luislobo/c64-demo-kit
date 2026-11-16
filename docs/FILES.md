@@ -107,4 +107,3 @@ at the end of that guide, because they are not versioned source.
 | [tools/64tass/syntax/notepadpp-old-64tass.xml](../tools/64tass/syntax/notepadpp-old-64tass.xml) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
 | [tools/64tass/syntax/notepadpp-udl2.1-64tass.xml](../tools/64tass/syntax/notepadpp-udl2.1-64tass.xml) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
 | [tools/64tass/syntax/vim/syntax/64tass.vim](../tools/64tass/syntax/vim/syntax/64tass.vim) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
-
