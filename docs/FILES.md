@@ -87,7 +87,21 @@ at the end of that guide, because they are not versioned source.
 | [tests/verify-sid.cjs](../tests/verify-sid.cjs) | Execute the imported player on PAL/NTSC and compare VBI calls, pitch writes, memory banking, pause/restart and clock mismatch behavior. |
 | [docs/SID.md](SID.md) | Export configuration, supported player contract and format-author attribution. |
 
-## Source archive
+## Character-effect integration
+
+| File | Algorithm, role and reason |
+| --- | --- |
+| [effects-demo.asm](../effects-demo.asm) | Character-scene application constants, generated asset placement and independent overlap assertions. |
+| [host/character.cjs](../host/character.cjs) | Generate ordered-density glyphs, text slots, sine/polar maps and initial screen/color data; expose the visible mathematical frame for verification. |
+| [lib/character-scene.asm](../lib/character-scene.asm) | Own character-mode hardware, schedule two rendering halves and flip complete buffers only in the border IRQ; compose input, music and text scrolling. |
+| [lib/character-effects.asm](../lib/character-effects.asm) | Render original sine-sum, XOR and polar texture loops into the hidden bank using prepared waves and patched indexed operands. |
+| [lib/charset.asm](../lib/charset.asm) | Adapt c64lib's four-page fill and compact left-shift loops to 64tass, preserving Maciej Małecki's credit and MIT notice. |
+| [tools/build-effects.cjs](../tools/build-effects.cjs) | Read literal scene constants, generate data, validate an exported player, assemble/package PRG/D64 and emit full code/music credits. |
+| [tests/character.test.cjs](../tests/character.test.cjs) | Validate glyph density, font placement, cell ranges, phase wrapping and malformed assets. |
+| [tests/verify-effects.cjs](../tests/verify-effects.cjs) | Compare actual displayed PAL/NTSC cells with the mathematical frames; check banks, two-refresh flips, scroller, pause/music and an alternate configuration. |
+| [docs/CHARACTER.md](CHARACTER.md) | Character builder, equations, calling/memory contract, attribution and verification limits. |
+
+## Collected source archive
 
 The [research collection guide](../research/README.md) describes the survey and
 its limits. [catalog.json](../research/catalog.json) records every archived file

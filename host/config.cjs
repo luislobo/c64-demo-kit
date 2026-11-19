@@ -12,12 +12,16 @@
 const fs=require('node:fs');
 // Read literal DEMO_* assignments only. This deliberately does not execute JS
 // or attempt to interpret arbitrary assembler expressions.
-function readConfig(file){
+function readConstants(file){
  const text=fs.readFileSync(file,'utf8'),config={};
  for(const m of text.matchAll(/^\s*(DEMO_[A-Z_]+)\s*=\s*(\[[\s\S]*?\]|"(?:[^"\\]|\\.)*"|\$[0-9a-f]+|\d+)\s*(?:;[^\n]*)?$/gmi)){
   const value=m[2].startsWith('"')?m[2]:m[2].replace(/\$([0-9a-f]+)/gi,(_,n)=>String(parseInt(n,16)));
   config[m[1]]=JSON.parse(value);
  }
+ return config;
+}
+function readConfig(file){
+ const config=readConstants(file);
  const stringKeys=['NAME','DISK_NAME','DISK_ID','PRG_NAME','IMAGE','FONT_FILE','HUD','SCROLL_TEXT'];
  for(const k of stringKeys)if(typeof config['DEMO_'+k]!=='string')throw Error('Missing string DEMO_'+k);
  if(!/^[a-z0-9_-]+$/i.test(config.DEMO_NAME))throw Error('DEMO_NAME must be a filename stem');
@@ -38,4 +42,4 @@ function readConfig(file){
  for(const k of ['HUD','SCROLL_TEXT'])if(!/^[\x20-\x5f]+$/.test(config['DEMO_'+k]))throw Error('DEMO_'+k+' must use uppercase C64 font characters');
  return config;
 }
-module.exports={readConfig};
+module.exports={readConstants,readConfig};

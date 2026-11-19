@@ -1,0 +1,135 @@
+{
+  "mode": "ntsc",
+  "framesVerified": 24,
+  "effects": [
+    "plasma",
+    "xor",
+    "tunnel"
+  ],
+  "flipsEveryTwoRefreshes": true,
+  "pauseAndResume": true,
+  "musicWhilePaused": true,
+  "sharedScroller": true,
+  "frames": [
+    {
+      "effect": 0,
+      "phase": 0,
+      "tick": 3
+    },
+    {
+      "effect": 0,
+      "phase": 3,
+      "tick": 5
+    },
+    {
+      "effect": 0,
+      "phase": 6,
+      "tick": 7
+    },
+    {
+      "effect": 0,
+      "phase": 9,
+      "tick": 9
+    },
+    {
+      "effect": 0,
+      "phase": 12,
+      "tick": 11
+    },
+    {
+      "effect": 0,
+      "phase": 15,
+      "tick": 13
+    },
+    {
+      "effect": 0,
+      "phase": 18,
+      "tick": 15
+    },
+    {
+      "effect": 0,
+      "phase": 21,
+      "tick": 17
+    },
+    {
+      "effect": 1,
+      "phase": 24,
+      "tick": 19
+    },
+    {
+      "effect": 1,
+      "phase": 27,
+      "tick": 21
+    },
+    {
+      "effect": 1,
+      "phase": 30,
+      "tick": 23
+    },
+    {
+      "effect": 1,
+      "phase": 33,
+      "tick": 25
+    },
+    {
+      "effect": 1,
+      "phase": 36,
+      "tick": 27
+    },
+    {
+      "effect": 1,
+      "phase": 39,
+      "tick": 29
+    },
+    {
+      "effect": 1,
+      "phase": 42,
+      "tick": 31
+    },
+    {
+      "effect": 1,
+      "phase": 45,
+      "tick": 33
+    },
+    {
+      "effect": 2,
+      "phase": 48,
+      "tick": 35
+    },
+    {
+      "effect": 2,
+      "phase": 51,
+      "tick": 37
+    },
+    {
+      "effect": 2,
+      "phase": 54,
+      "tick": 39
+    },
+    {
+      "effect": 2,
+      "phase": 57,
+      "tick": 41
+    },
+    {
+      "effect": 2,
+      "phase": 60,
+      "tick": 43
+    },
+    {
+      "effect": 2,
+      "phase": 63,
+      "tick": 45
+    },
+    {
+      "effect": 2,
+      "phase": 66,
+      "tick": 47
+    },
+    {
+      "effect": 2,
+      "phase": 69,
+      "tick": 49
+    }
+  ]
+}

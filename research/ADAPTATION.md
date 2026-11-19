@@ -8,7 +8,10 @@ larger change to memory and interrupt ownership.
 
 The [PSID integration guide](../docs/SID.md) documents the first implemented
 slice: a restricted tracker-export player interface, build-time memory checks,
-release credits and an original source-built tune. The remaining items below
+release credits and an original source-built tune. The
+[character-effect slice](../docs/CHARACTER.md) adds original plasma, XOR and
+tunnel kernels, host-generated glyph/polar data, border-only bank flips and
+credited c64lib fill/scroll ports. The remaining items below
 are an implementation order, not measured speedups. Source names link to pinned
 code, original creators and license evidence in the [catalogue](SOURCES.md).
 

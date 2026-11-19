@@ -52,7 +52,9 @@ to the author's site; image assets are not archived.
 
 The default runtime still uses the original bitmap engine and sequencer.
 [Optional tracker-export integration](../docs/SID.md) now implements a restricted
-PSID player interface with an original example tune. The archived third-party
+PSID player interface with an original example tune. A separate
+[character scene](../docs/CHARACTER.md) adds three native effects and adapts the
+credited c64lib fill/scroll helpers. The archived third-party
 players and loaders are research inputs. The [adaptation plan](ADAPTATION.md)
 describes their remaining integration requirements.
 

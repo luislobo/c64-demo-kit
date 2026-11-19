@@ -360,6 +360,8 @@ Generated files are outputs of the algorithms, not additional custom code:
 | `music.inc` | PAL/NTSC low/high pitch tables for each voice |
 | `music-config.inc` | Select the built-in sequencer or validated PSID entry points and clock |
 | `sid-payload.bin` | Optional PSID payload without its container header; reserved at its declared load address |
+| `character-*.bin`, `character-config.inc` | Separate character-scene glyphs, polar/sine maps, text/color templates, scroll text and validated music payload/constants; see [the character guide](CHARACTER.md) |
+| `clockwork.sid`, `example-music.inc` | Original example export and its generated PAL/NTSC pitch tables |
 
 Build products include the PRG, D64, assembler listing, symbol map and JSON
 report. Local emulator tests additionally create memory dumps, screenshots and

@@ -13,7 +13,19 @@ mask rule. For semitransparent photographic content, choose Luma explicitly if
 you want tonal detail rather than an alpha silhouette. The weighted RGB formula
 is evaluated directly on the source channel values; it is not gamma-linearized.
 
-## `64tass/`
+## Additional project tools
+
+`build-example-music.cjs` assembles the original Clockwork player and wraps it
+in a PSID container. `build-effects.cjs` generates character assets, assembles
+the standalone effect scene and packages code/music credits. See the
+[SID guide](../docs/SID.md) and [character guide](../docs/CHARACTER.md).
+
+`research.cjs` searches the collected source catalogue and checks original file
+hashes and attribution records. It generates the source and credit indexes
+without downloading or executing upstream code. See the
+[collection guide](../research/README.md).
+
+## Upstream assembler distribution
 
 This is the unchanged upstream 64tass 1.60.3243 Windows distribution. The
 assembler encodes instructions and resolves symbols through assembly passes;

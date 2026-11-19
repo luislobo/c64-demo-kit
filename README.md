@@ -1,7 +1,8 @@
 # C64 demo libraries
 
-Reusable 6502/6510 assembly libraries, a portable Node.js asset builder, and one
-application file: **`demo.asm`**. The runtime is native C64 machine code; Node.js
+Reusable 6502/6510 assembly libraries and portable Node.js asset builders.
+**`demo.asm`** is the default application; `sid-demo.asm` and `effects-demo.asm`
+demonstrate optional music and character scenes. The runtime is native C64 machine code; Node.js
 and PowerShell run only on the build computer.
 
 The assembler is **64tass 1.60.3243**, bundled for Windows with its licenses.
@@ -27,6 +28,18 @@ with PAL/NTSC pitch tables and recorded music credits:
 node tools/build-example-music.cjs
 node build.cjs --entry sid-demo.asm --out build/sid
 ```
+
+The [character-effect library and example](docs/CHARACTER.md) add native plasma,
+XOR interference and a polar tunnel, with two screen buffers, a scroller,
+keyboard controls and music:
+
+```console
+node tools/build-example-music.cjs
+node tools/build-effects.cjs
+```
+
+[Additional ready-to-run examples](dist/examples/README.md) include PRG/D64
+files, captured frames, source attribution and PAL/NTSC validation reports.
 
 ## Build and run
 
@@ -94,7 +107,7 @@ rejects oversized patch data rather than overlapping screen RAM.
 
 ## Assembly libraries
 
-These are **source/include libraries with one shared zero-page ABI**. Include
+These bitmap-engine modules are **source/include libraries with one shared zero-page ABI**. Include
 `lib/engine.asm` once after the application constants. They are not independently
 linked objects or automatically relocatable modules. Their placement and shared
 state are intentional to retain the original performance and exact PRG bytes.
@@ -157,11 +170,13 @@ The palette has eight non-black foreground colors with a black background.
 
 | File | Exports |
 | --- | --- |
-| `host/config.cjs` | `readConfig(file)` and validation |
+| `host/config.cjs` | `readConfig(file)` with bitmap validation; `readConstants(file)` for other scene validators |
 | `host/bitmap.cjs` | `index`, `fitBitmap`, `drawText`, `waveFrames` |
 | `host/patches.cjs` | `encodePatch`, `applyPatch`, `makeDoubleBufferedPatches`, `verifyPatches` |
 | `host/music.cjs` | `sidFrequency`, `musicTables` for PAL/NTSC |
 | `host/d64.cjs` | `createD64`, `offset`, `sectors` for a standard 35-track, single-PRG disk |
+| `host/sid.cjs` | `parseSid`, `prepareSid`, `sidConstants` for the supported tracker-export subset |
+| `host/character.cjs` | `characterAssets`, `characterFrame` for character-scene data and its mathematical reference |
 | `build.cjs` | `build({entry, outDir, compiler})` or command-line entry point |
 
 After asset generation, the assembly is also usable directly with 64tass:
