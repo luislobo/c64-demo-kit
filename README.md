@@ -13,6 +13,12 @@ Each project source file also has an algorithm/rationale header. The
 [file catalog](docs/FILES.md) covers binary assets, generated outputs, tests and
 unchanged third-party files that cannot use those headers.
 
+The [C64 source collection](research/README.md) gathers demo effects, music tools,
+compression, loaders and asset pipelines with author credits, license evidence,
+pinned source links and original source snapshots. Its
+[adaptation plan](research/ADAPTATION.md) maps useful candidates to this kit.
+These are research inputs; they are not included in the default runtime.
+
 ## Build and run
 
 ```console

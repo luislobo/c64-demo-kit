@@ -72,7 +72,25 @@ at the end of that guide, because they are not versioned source.
 | [dist/validation/test-ntsc.json](../dist/validation/test-ntsc.json) | Recorded NTSC frame/cycle samples and integration-check results; does not execute tests. |
 | [dist/validation/test-pal.json](../dist/validation/test-pal.json) | Recorded PAL frame/cycle samples and integration-check results; does not execute tests. |
 
-## Unchanged 64tass distribution
+## Collected upstream sources
+
+The [research collection guide](../research/README.md) describes the survey and
+its limits. [catalog.json](../research/catalog.json) records every archived file
+by original path, author/source entry, revision, URL and SHA-256 value.
+[SOURCES.md](../research/SOURCES.md) and [CREDITS.md](../research/CREDITS.md) are
+generated views of that manifest. [ADAPTATION.md](../research/ADAPTATION.md)
+records candidate additions and their integration requirements.
+
+All files under `research/upstream/` are unmodified original source subsets,
+not runtime build inputs. Their original headers and license files take the
+place of this project's algorithm/rationale headers. The manifest is the
+per-file catalog for these sources, articles and instrument exports.
+
+`tools/research.cjs` searches that data, checks provenance/hash records and
+generates the two indexes. `tests/research.test.cjs` verifies that modified
+source, missing attribution/licenses and lost commit pins are rejected.
+
+## Unchanged 64tass distribution files
 
 | File | Algorithm, role and reason |
 | --- | --- |
