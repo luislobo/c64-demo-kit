@@ -40,6 +40,7 @@ refresh_hz = $1d
 number_down = $1e
 row_keys = $1f
 poll_counter = $20
+music_supported = $21
 glyph_rows = $40
 glyph_ptr = $48
 text_ptr = $4a

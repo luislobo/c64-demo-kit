@@ -8,6 +8,7 @@
 ; Detailed guide: docs/ALGORITHMS.md
 
 ; Include once, after the DEMO_* application configuration.
+.include "../generated/music-config.inc"
 .include "state.asm"
 .include "boot.asm"
 .include "player.asm"
@@ -18,7 +19,11 @@
 .include "effects.asm"
 .include "colors.asm"
 .include "scroller.asm"
-.include "sid.asm"
+.if DEMO_EXTERNAL_SID
+    .include "sid-player.asm"
+.else
+    .include "sid.asm"
+.endif
 
 rainbow:
     .byte DEMO_PALETTE

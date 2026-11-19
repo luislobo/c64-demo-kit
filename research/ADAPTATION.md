@@ -6,8 +6,10 @@ extend capabilities that the current bitmap animation and equal-step sequencer
 do not provide. Streaming loaders and cycle-critical border effects need a
 larger change to memory and interrupt ownership.
 
-This is a proposed implementation order. No item below is claimed to be an
-implemented library module or a measured speedup. Source names link to pinned
+The [PSID integration guide](../docs/SID.md) documents the first implemented
+slice: a restricted tracker-export player interface, build-time memory checks,
+release credits and an original source-built tune. The remaining items below
+are an implementation order, not measured speedups. Source names link to pinned
 code, original creators and license evidence in the [catalogue](SOURCES.md).
 
 ## Start with host tools and independent routines

@@ -16,3 +16,8 @@ patch_pointers:
 * = $4000
     .binary "../generated/patches.bin"
     .cerror * > $c000, "Patch data overlaps second screen RAM"
+.if DEMO_EXTERNAL_SID
+* = SID_LOAD
+    .binary "../generated/sid-payload.bin"
+    .cerror SID_LOAD < $c400 || * > $d000, "SID overlaps screen or I/O"
+.endif

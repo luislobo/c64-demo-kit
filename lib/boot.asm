@@ -59,7 +59,9 @@ clear_state:
     sta text_ptr
     lda #>scroll_text
     sta text_ptr+1
-    jsr music_init
+    .if !DEMO_EXTERNAL_SID
+        jsr music_init
+    .endif
 
     ; Initialize the hidden bitmap once. Only 8000 bytes, not the IRQ vectors.
     ldx #0
@@ -122,6 +124,9 @@ detected:
     lda #60
 refresh_detected:
     sta refresh_hz
+    .if DEMO_EXTERNAL_SID
+        jsr music_init
+    .endif
     lda #<irq
     sta $fffe
     lda #>irq

@@ -50,9 +50,11 @@ values are recorded in the manifest. These files are research inputs, not
 artwork and tunes and will not build on their own. Markdown images still refer
 to the author's site; image assets are not archived.
 
-The runtime still uses the original bitmap engine and sequencer. No third-party
-effect, music player or loader has been wired into the default demo. The
-[adaptation plan](ADAPTATION.md) describes the changes that each addition needs.
+The default runtime still uses the original bitmap engine and sequencer.
+[Optional tracker-export integration](../docs/SID.md) now implements a restricted
+PSID player interface with an original example tune. The archived third-party
+players and loaders are research inputs. The [adaptation plan](ADAPTATION.md)
+describes their remaining integration requirements.
 
 The categories describe evidence at the inspected revision, not a replacement
 for the source's actual terms:

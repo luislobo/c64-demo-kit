@@ -72,7 +72,22 @@ at the end of that guide, because they are not versioned source.
 | [dist/validation/test-ntsc.json](../dist/validation/test-ntsc.json) | Recorded NTSC frame/cycle samples and integration-check results; does not execute tests. |
 | [dist/validation/test-pal.json](../dist/validation/test-pal.json) | Recorded PAL frame/cycle samples and integration-check results; does not execute tests. |
 
-## Collected upstream sources
+## SID export integration
+
+| File | Algorithm, role and reason |
+| --- | --- |
+| [host/sid.cjs](../host/sid.cjs) | Parse big-endian PSID headers and optional little-endian load prefixes; validate the payload, clock, selected speed bit, declared zero page and release credits before emission. |
+| [lib/sid-player.asm](../lib/sid-player.asm) | Call a compatible exported init/play routine with the specified bank mapping, preserve mapping/flags and skip calls while muted or on the wrong machine clock. |
+| [sid-demo.asm](../sid-demo.asm) | Compose the existing bitmap engine with an original PSID export and its attribution declarations. |
+| [examples/music/clockwork.asm](../examples/music/clockwork.asm) | Original three-voice sequencer, pitch-table selection and 50 Hz accumulator; state stays inside its payload. |
+| [examples/music/README.md](../examples/music/README.md) | Original example attribution and CC0 grant. |
+| [tools/build-example-music.cjs](../tools/build-example-music.cjs) | Assemble the original player and wrap raw bytes in a PSID header with creator, clock and model fields. |
+| [tests/sid.test.cjs](../tests/sid.test.cjs) | Check malformed containers, load-prefix byte order, timing, address limits, zero page and attribution at the host boundary. |
+| [tests/vice.cjs](../tests/vice.cjs) | Launch an isolated emulator and serialize remote-monitor commands and raw memory dumps, with process cleanup. |
+| [tests/verify-sid.cjs](../tests/verify-sid.cjs) | Execute the imported player on PAL/NTSC and compare VBI calls, pitch writes, memory banking, pause/restart and clock mismatch behavior. |
+| [docs/SID.md](SID.md) | Export configuration, supported player contract and format-author attribution. |
+
+## Source archive
 
 The [research collection guide](../research/README.md) describes the survey and
 its limits. [catalog.json](../research/catalog.json) records every archived file

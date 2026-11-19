@@ -1,0 +1,8 @@
+{
+  "mode": "pal",
+  "supported": true,
+  "callsPer16Refreshes": 16,
+  "bankRestored": true,
+  "pitchWritesVerified": true,
+  "pauseAndRestart": true
+}

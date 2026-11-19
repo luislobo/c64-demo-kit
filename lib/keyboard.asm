@@ -101,7 +101,11 @@ mute_pressed:
     sta $d418
     rts
 unmute:
-    lda #DEMO_VOLUME
-    sta $d418
+    .if DEMO_EXTERNAL_SID
+        jsr music_init       ; Restart the export to restore its SID/filter state.
+    .else
+        lda #DEMO_VOLUME
+        sta $d418
+    .endif
 scan_return:
     rts

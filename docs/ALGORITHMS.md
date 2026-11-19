@@ -285,6 +285,11 @@ or guarantee 10 fps. Measure again in VICE and, ideally, on the target hardware.
 
 ## SID note generation
 
+The optional exported-player path is described in [SID integration](SID.md).
+It validates a restricted PSID payload and reserves `$c400..$cfff`, calls the
+player at native VBI cadence and emits release credits. The original sequencer
+below remains the default and retains its generated program bytes.
+
 The host converts each MIDI pitch into an integer SID frequency word:
 
 ```text
@@ -353,6 +358,8 @@ Generated files are outputs of the algorithms, not additional custom code:
 | `patches.bin` | Encoded warm-up, steady and universal-restore streams |
 | `patch-pointers.inc` | Absolute stream addresses beginning at `$4000` |
 | `music.inc` | PAL/NTSC low/high pitch tables for each voice |
+| `music-config.inc` | Select the built-in sequencer or validated PSID entry points and clock |
+| `sid-payload.bin` | Optional PSID payload without its container header; reserved at its declared load address |
 
 Build products include the PRG, D64, assembler listing, symbol map and JSON
 report. Local emulator tests additionally create memory dumps, screenshots and

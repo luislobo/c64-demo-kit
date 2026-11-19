@@ -26,6 +26,9 @@ irq:
     jsr flip_border
 no_flip:
     jsr color_tick
+    .if DEMO_EXTERNAL_SID
+        jsr music_tick       ; Exported VBI player runs once per native refresh.
+    .endif
     lda logic_acc
     clc
     adc #50
@@ -34,7 +37,9 @@ no_flip:
     sec
     sbc refresh_hz
     sta logic_acc
-    jsr music_tick
+    .if !DEMO_EXTERNAL_SID
+        jsr music_tick
+    .endif
     inc scroll_div
     lda scroll_div
     and #1

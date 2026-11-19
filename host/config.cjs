@@ -24,8 +24,10 @@ function readConfig(file){
  for(const [k,max]of [['DISK_NAME',16],['PRG_NAME',16],['DISK_ID',2]])if(config['DEMO_'+k].length<1||config['DEMO_'+k].length>max)throw Error('Invalid DEMO_'+k+' length');
  const pow2=n=>Number.isInteger(n)&&n>0&&(n&(n-1))===0;
  if(!pow2(config.DEMO_FRAMES)||config.DEMO_FRAMES<2||config.DEMO_FRAMES>32)throw Error('DEMO_FRAMES must be a power of two from 2 to 32');
- if(!pow2(config.DEMO_LEAD?.length)||config.DEMO_LEAD.length>128)throw Error('Tune length must be a power of two up to 128');
- for(const k of ['LEAD','BASS','ARP'])if(config['DEMO_'+k]?.length!==config.DEMO_LEAD.length||!config['DEMO_'+k].every(n=>Number.isInteger(n)&&n>=0&&n<=95))throw Error('Tune voices must have equal lengths and MIDI notes 0..95');
+ if(config.DEMO_SID_FILE===undefined){
+  if(!pow2(config.DEMO_LEAD?.length)||config.DEMO_LEAD.length>128)throw Error('Tune length must be a power of two up to 128');
+  for(const k of ['LEAD','BASS','ARP'])if(config['DEMO_'+k]?.length!==config.DEMO_LEAD.length||!config['DEMO_'+k].every(n=>Number.isInteger(n)&&n>=0&&n<=95))throw Error('Tune voices must have equal lengths and MIDI notes 0..95');
+ }
  if(config.DEMO_PALETTE?.length!==8||!config.DEMO_PALETTE.every(n=>Number.isInteger(n)&&n>=16&&n<=240&&n%16===0))throw Error('Palette needs eight foreground-color bytes with black background');
  for(const k of ['LOGO_COLOR','TEXT_COLOR'])if(!Number.isInteger(config['DEMO_'+k])||config['DEMO_'+k]<1||config['DEMO_'+k]>15)throw Error('Invalid DEMO_'+k);
  if(!Number.isInteger(config.DEMO_VOLUME)||config.DEMO_VOLUME<0||config.DEMO_VOLUME>15)throw Error('Volume must be 0..15');

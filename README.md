@@ -19,6 +19,15 @@ pinned source links and original source snapshots. Its
 [adaptation plan](research/ADAPTATION.md) maps useful candidates to this kit.
 These are research inputs; they are not included in the default runtime.
 
+[Tracker-exported PSID music](docs/SID.md) is available as an optional player.
+The original [Clockwork example](examples/music/README.md) demonstrates this
+with PAL/NTSC pitch tables and recorded music credits:
+
+```console
+node tools/build-example-music.cjs
+node build.cjs --entry sid-demo.asm --out build/sid
+```
+
 ## Build and run
 
 ```console
