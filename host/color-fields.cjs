@@ -1,0 +1,26 @@
+// Original sine-sum, XOR and polar fields recolor the 40x23 bitmap logo.
+// Precompute trigonometry on the host; the IRQ uses byte arithmetic and tables.
+// Both screen matrices receive identical foreground bytes with black backgrounds.
+const sine = phase => Math.round(63.5 * (1 + Math.sin((phase & 255) * 2 * Math.PI / 256)));
+function polar(x, y) {
+  const dx = (x - 19.5) / 2, dy = y - 11;
+  return [Math.round(160 / Math.max(1, Math.hypot(dx, dy))) & 255, Math.round(Math.atan2(dy, dx) * 128 / Math.PI) & 255];
+}
+function colorFieldAssets() {
+  const radius = Buffer.alloc(920), angle = Buffer.alloc(920);
+  for (let y = 0; y < 23; y++) for (let x = 0; x < 40; x++) [radius[y * 40 + x], angle[y * 40 + x]] = polar(x, y);
+  return Buffer.concat([Buffer.from(Array.from({ length: 256 }, (_, i) => sine(i))), radius, angle]);
+}
+function colorFieldRow(mode, phase, row, palette) {
+  if (![4, 5, 6].includes(mode)) throw Error('Invalid color field mode');
+  if (!Number.isInteger(row) || row < 0 || row >= 23) throw Error('Invalid color field row');
+  const result = Buffer.alloc(40);
+  for (let x = 0; x < 40; x++) {
+    const sx = sine(5 * x + phase), sy = sine(8 * row - phase);
+    let shade = mode === 4 ? (sx + sy) >> 5 : (sx ^ sy) >> 4;
+    if (mode === 6) { const [radius, angle] = polar(x, row); shade = (((radius + phase) & 255) ^ angle) >> 5; }
+    result[x] = palette[shade];
+  }
+  return result;
+}
+module.exports = { colorFieldAssets, colorFieldRow };

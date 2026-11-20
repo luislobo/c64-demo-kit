@@ -1,0 +1,8 @@
+{
+  "mode": "pal",
+  "autostart": true,
+  "eightSecondCycleRefreshes": 400,
+  "wrap": true,
+  "numberHandlerTakesControl": true,
+  "spaceHandlerTakesControl": true
+}

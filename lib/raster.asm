@@ -37,6 +37,9 @@ no_flip:
     sec
     sbc refresh_hz
     sta logic_acc
+    .if KIT_AUTO_SHOW
+        jsr show_tick
+    .endif
     .if !DEMO_EXTERNAL_SID
         jsr music_tick
     .endif

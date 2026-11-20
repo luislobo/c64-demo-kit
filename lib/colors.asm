@@ -1,16 +1,23 @@
 ; Algorithm: update 40 screen-color bytes for one body row in both VIC banks.
-; Use the base color for mode 1; otherwise palette[(row + phase) AND 7].
+; Use the base color for mode 1, row bands for 2/3, or optional fields for 4..6.
 ; After all 23 rows, wrap the row and advance the palette phase.
 ; Why: hires bitmap foreground/background colors live in the screen matrix;
 ; changing those bytes recolors the logo without touching its bitmap pixels.
 ; One row per refresh bounds ISR work; both copies stay valid for future flips.
 ; The two text rows remain untouched. The second screen is a fixed $bc00 away.
-; Tradeoff: bands are eight pixels high; a sweep is 23 refreshes, so PAL and NTSC
+; Tradeoff: cells are eight pixels high; a sweep is 23 refreshes, so PAL and NTSC
 ; color-cycling speeds differ even though wave/music/ticker timing is normalized.
 ; Detailed guide: docs/ALGORITHMS.md
 
 ; Update one eight-pixel-high band per refresh, keeping the IRQ inexpensive.
 color_tick:
+    .if KIT_COLOR_FIELDS
+        lda effect
+        cmp #4
+        bcc color_band
+        jmp color_field_tick
+color_band:
+    .endif
     lda color_row
     asl
     tay
@@ -57,12 +64,24 @@ second_band:
     sta (color_ptr),y
     dey
     bpl second_band
+color_row_done:
     inc color_row
     lda color_row
     cmp #23
     bne color_done
     lda #0
     sta color_row
+    .if KIT_COLOR_FIELDS
+        lda effect
+        cmp #4
+        bcc color_band_phase
+        lda color_phase
+        clc
+        adc #7
+        sta color_phase
+        rts
+color_band_phase:
+    .endif
     inc color_phase
 color_done:
     rts

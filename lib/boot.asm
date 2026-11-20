@@ -53,8 +53,17 @@ clear_state:
     sta $dc03
     lda #$7f
     sta $dc00
-    lda #1
+    lda #KIT_START_EFFECT
     sta effect
+    .if KIT_AUTO_SHOW
+        lda #1
+        sta toggle
+        sta show_enabled
+        lda #50
+        sta show_ticks
+        lda #8
+        sta show_seconds
+    .endif
     lda #<scroll_text
     sta text_ptr
     lda #>scroll_text

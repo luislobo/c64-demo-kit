@@ -26,7 +26,7 @@ input, advances the SID sequencer and shifts the ticker.
 
 [Source](../demo.asm)
 
-Application composition: this is the single place for image/font paths, text, palette, wave geometry, note lists, tempo, volume and output filenames. Algorithm: declare literal DEMO_* constants, include the engine, then append text/font/music and the generated bitmap/patch data in the engine memory map. Why: 64tass and the host builder read the same settings, avoiding a second application-specific JavaScript configuration that could drift out of sync. Use literal values: host/config.cjs is a small reader, not an assembler parser. Lists are powers of two where the runtime wraps indices with AND masks. Binary artwork stays external so it can be replaced without rewriting code.
+Application composition: this is the single place for image/font paths, text, palette, wave geometry, show settings, exported music and output filenames. Algorithm: declare literal DEMO_* constants, include the engine, then append text/font/music and the generated bitmap/patch data in the engine memory map. Why: 64tass and the host builder read the same settings, avoiding a second application-specific JavaScript configuration that could drift out of sync. Use literal values: host/config.cjs is a small reader, not an assembler parser. Lists are powers of two where the runtime wraps indices with AND masks. Binary artwork stays external so it can be replaced without rewriting code.
 
 ## lib/state.asm
 
@@ -80,13 +80,13 @@ Algorithm: select CIA keyboard rows and interpret active-low matrix bits. Track 
 
 [Source](../lib/effects.asm)
 
-Algorithm: atomically consume the pending mode, then set effect and request animation start or stop only if the current active state needs to change. Why: keyboard scanning reports intent; this main-thread controller decides when the player can safely transition and restore its dependent buffers. Modes 1/2 share the same wave frames and differ only in color treatment. Mode 3 stops bitmap motion while the raster-driven palette keeps changing. CMP after PLP tests the request value, not the previously restored flags. Tradeoff: three standard modes are built in; new motion modes need matching data.
+Algorithm: atomically consume the pending mode, then set effect and request animation start or stop only if the current active state needs to change. Why: keyboard scanning reports intent; this main-thread controller decides when the player can safely transition and restore its dependent buffers. Modes 1/2 and optional 4..6 share the same wave frames with different color treatments. Mode 3 stops bitmap motion while the raster-driven palette keeps changing. CMP after PLP tests the request value, not the previously restored flags. Tradeoff: color fields reuse the existing logo; new bitmap motion needs matching data.
 
 ## lib/colors.asm
 
 [Source](../lib/colors.asm)
 
-Algorithm: update 40 screen-color bytes for one body row in both VIC banks. Use the base color for mode 1; otherwise palette[(row + phase) AND 7]. After all 23 rows, wrap the row and advance the palette phase. Why: hires bitmap foreground/background colors live in the screen matrix; changing those bytes recolors the logo without touching its bitmap pixels. One row per refresh bounds ISR work; both copies stay valid for future flips. The two text rows remain untouched. The second screen is a fixed $bc00 away. Tradeoff: bands are eight pixels high; a sweep is 23 refreshes, so PAL and NTSC color-cycling speeds differ even though wave/music/ticker timing is normalized.
+Algorithm: update 40 screen-color bytes for one body row in both VIC banks. Use the base color for mode 1, row bands for 2/3, or optional fields for 4..6. After all 23 rows, wrap the row and advance the palette phase. Why: hires bitmap foreground/background colors live in the screen matrix; changing those bytes recolors the logo without touching its bitmap pixels. One row per refresh bounds ISR work; both copies stay valid for future flips. The two text rows remain untouched. The second screen is a fixed $bc00 away. Tradeoff: bands are eight pixels high; a sweep is 23 refreshes, so PAL and NTSC color-cycling speeds differ even though wave/music/ticker timing is normalized.
 
 ## lib/scroller.asm
 
@@ -266,15 +266,16 @@ through a literal run. This is cooperative main-thread rendering plus interrupt
 scheduling, not concurrent execution on multiple processors.
 
 PAL uses five refreshes per wave frame and NTSC six, yielding approximately
-10 frames/second. Music and ticker use an accumulator: add 50 each refresh and
+10 frames/second. Built-in music, the automatic show and ticker use an accumulator: add 50 each refresh and
 subtract nominal refresh rate 50 or 60 when a logic update is due. The ticker
 runs every second logic update, approximately 25 pixel shifts per second.
-Actual refresh rates vary slightly, and color-band updates run directly on the
+Imported PSID music runs once per native refresh and handles its own musical
+clock. Actual refresh rates vary slightly, and color-row updates run on the
 display refresh rather than this normalized logic clock.
 
 Keyboard polling disables IRQs briefly around shared edge-state updates, then
-restores the previous interrupt state. The decoder prioritizes frequent Space
-checks but scans the other keys only every eighth run. This keeps short-tap
+restores the previous interrupt state. The decoder scans all keys every eighth patch
+command, and the IRQ scans them every refresh. This keeps short-tap
 latency low while preserving CPU time for rendering. Held-key suppression does
 not implement timed electrical debouncing. Requests are small flags, not a
 queue: multiple toggles can coalesce before the player handles them.
@@ -357,7 +358,8 @@ Generated files are outputs of the algorithms, not additional custom code:
 | `frames.bin` | Concatenated full wave frames for host/emulator verification |
 | `patches.bin` | Encoded warm-up, steady and universal-restore streams |
 | `patch-pointers.inc` | Absolute stream addresses beginning at `$4000` |
-| `music.inc` | PAL/NTSC low/high pitch tables for each voice |
+| `music.inc` | Built-in PAL/NTSC low/high pitch tables, or empty with an imported player |
+| `effects-config.inc`, `color-fields.bin` | Enabled modes, initial mode, automatic-show flag and optional logo sine/polar maps |
 | `music-config.inc` | Select the built-in sequencer or validated PSID entry points and clock |
 | `sid-payload.bin` | Optional PSID payload without its container header; reserved at its declared load address |
 | `character-*.bin`, `character-config.inc` | Separate character-scene glyphs, polar/sine maps, text/color templates, scroll text and validated music payload/constants; see [the character guide](CHARACTER.md) |
@@ -367,3 +369,17 @@ Build products include the PRG, D64, assembler listing, symbol map and JSON
 report. Local emulator tests additionally create memory dumps, screenshots and
 measurement reports in `build/`. These files are reproducible or diagnostic;
 the source of truth remains application settings, asset inputs and libraries.
+
+## TORQ color fields and automatic show
+
+The [TORQ guide](TORQ.md) documents the default integration. Original sine-sum,
+XOR and polar fields change foreground colors in each 8x8 logo cell while the
+bitmap wave continues. One row per refresh bounds IRQ work. Both screen matrices
+receive the same row before the next bank flip; text rows retain their color.
+Tables follow sparse patches, and both the builder and assembler check their
+combined end against $c000.
+
+`lib/show.asm` consumes the normalized 50 Hz logic clock and requests an effect
+change every 400 updates. It uses the existing main-thread controller so entering
+static mode restores both bitmaps and leaving it uses normal warm-up patches.
+Number/Space key edges disable automatic changes until reset.

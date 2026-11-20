@@ -2,7 +2,7 @@
 ; and place sparse streams at $4000; use assembler errors to reject overlap.
 ; Why: fixed locations match VIC bank addressing and avoid runtime relocation.
 ; Host allocation and assembler assertions independently enforce the layout.
-; The code/font/music/pointers must fit below $2000; streams must end by $c000.
+; Code/font/pointers fit below $2000; streams plus optional fields end by $c000.
 ; Tradeoff: generated paths and memory regions are a shared project contract;
 ; changing the layout requires coordinated edits to the host allocator and runtime.
 ; Detailed guide: docs/ALGORITHMS.md
@@ -15,6 +15,20 @@ patch_pointers:
     .binary "../generated/static-bitmap.bin"
 * = $4000
     .binary "../generated/patches.bin"
+ .if KIT_COLOR_FIELDS
+field_sine:
+    .binary "../generated/color-fields.bin"
+field_radius = field_sine + 256
+field_angle = field_radius + 920
+field_radius_rows:
+    .for row := 0, row < 23, row += 1
+        .word field_radius + row * 40
+    .endfor
+field_angle_rows:
+    .for row := 0, row < 23, row += 1
+        .word field_angle + row * 40
+    .endfor
+ .endif
     .cerror * > $c000, "Patch data overlaps second screen RAM"
 .if DEMO_EXTERNAL_SID
 * = SID_LOAD

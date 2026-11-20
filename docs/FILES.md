@@ -22,7 +22,7 @@ at the end of that guide, because they are not versioned source.
 | [lib/assets.asm](../lib/assets.asm) | Algorithm: emit the patch-address table, place the static bitmap at $2000, and place sparse streams at $4000; use assembler errors to reject overlap. Why: fixed locations match VIC bank addressing and avoid runtime relocation. |
 | [lib/bitmap.asm](../lib/bitmap.asm) | Algorithm: stream sparse commands into the hidden bitmap. 0 ends the stream; 1..127 skips unchanged bytes; $81..$ff copies 1..127 literal bytes. Why: skips change only the destination pointer, and literal loops use indexed |
 | [lib/boot.asm](../lib/boot.asm) | Algorithm: emit BASIC SYS2064, take over hardware, clear state, initialize both bitmap/color buffers, measure raster length, install vectors, enable IRQ. Why: the BASIC stub loads normally from disk; ROMs are mapped out so the |
-| [lib/colors.asm](../lib/colors.asm) | Algorithm: update 40 screen-color bytes for one body row in both VIC banks. Use the base color for mode 1; otherwise palette[(row + phase) AND 7]. After all 23 rows, wrap the row and advance the palette phase. |
+| [lib/colors.asm](../lib/colors.asm) | Algorithm: update 40 screen-color bytes for one body row in both VIC banks. Use the base color for mode 1, row bands for 2/3, or original color fields for 4..6. After all 23 rows, wrap the row and advance the palette phase. |
 | [lib/display.asm](../lib/display.asm) | Algorithm: main-thread flip sets a request and waits. The raster ISR calls flip_border when the deadline is due, selects the other VIC bank/screen, records the tick and clears the request to release the waiting main thread. |
 | [lib/effects.asm](../lib/effects.asm) | Algorithm: atomically consume the pending mode, then set effect and request animation start or stop only if the current active state needs to change. Why: keyboard scanning reports intent; this main-thread controller decides |
 | [lib/engine.asm](../lib/engine.asm) | Algorithm: assemble the runtime modules in a fixed order, then emit the palette and the 23 body-row screen-address words needed by the color updater. Why: source includes add no linking/runtime overhead and preserve layout. |
@@ -71,6 +71,22 @@ at the end of that guide, because they are not versioned source.
 | [dist/torqxsendero-c64.prg](../dist/torqxsendero-c64.prg) | Assembled native demo with load address, code and generated data; no source algorithm is editable here. |
 | [dist/validation/test-ntsc.json](../dist/validation/test-ntsc.json) | Recorded NTSC frame/cycle samples and integration-check results; does not execute tests. |
 | [dist/validation/test-pal.json](../dist/validation/test-pal.json) | Recorded PAL frame/cycle samples and integration-check results; does not execute tests. |
+
+## Default TORQ integration
+
+| File | Algorithm, role and reason |
+| --- | --- |
+| [host/color-fields.cjs](../host/color-fields.cjs) | Generate sine/inverse-radius/angle tables and mathematical 40-cell logo rows for native comparisons. |
+| [lib/color-fields.asm](../lib/color-fields.asm) | Render one plasma/XOR/polar foreground row in both screen matrices using byte math and patched indexed stores. |
+| [lib/show.asm](../lib/show.asm) | Request enabled modes every 400 logic updates through the existing animation controller. |
+| [assets/torq-credits.txt](../assets/torq-credits.txt) | Release attribution for the original kit/music, PSID format and research references. |
+| [tests/color-fields.test.cjs](../tests/color-fields.test.cjs) | Check color bounds, animation, wrapping and invalid optional application settings. |
+| [tests/verify-torq.cjs](../tests/verify-torq.cjs) | Regenerate default music, verify automatic/manual presentation and run complete bitmap checks on isolated PAL/NTSC emulators. |
+| [docs/TORQ.md](TORQ.md) | Controls, optional configuration, memory/IRQ contracts, attribution and verification. |
+
+The default builder emits `generated/effects-config.inc` and
+`generated/color-fields.bin` alongside its bitmap assets. Build output also
+contains the application `-credits.txt` and `-music-credits.json` notices.
 
 ## SID export integration
 

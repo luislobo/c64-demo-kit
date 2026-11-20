@@ -1,5 +1,11 @@
 # Use tracker-exported SID music
 
+The default TORQ application uses the original Clockwork export. Its
+`DEMO_SID_BUILD = "clockwork"` setting assembles that source during `node build.cjs`;
+no pre-existing generated SID is needed. Omit this setting when importing a
+different player. It only accepts the kit's Clockwork generator and its fixed
+`generated/clockwork.sid` output.
+
 The bitmap builder accepts an optional PSID v1/v2 export with callable init/play
 routines and VBI timing. Export the player and song into `$c400..$cfff`, then
 declare every zero-page byte used by that export. Only `$80..$ef` is available

@@ -2,16 +2,18 @@
  * Validation algorithm: drive a running VICE remote monitor over TCP, load the
  * PRG, break at renderer/flip boundaries, dump bitmap memory and compare against
  * host frames. Measure decoder cycles and tick spacing; test restore/restart,
- * mode requests, sequencer progress and matching nonempty ticker buffers.
+ * mode requests, PSID progress and matching nonempty ticker buffers.
  * Why: actual emulator execution checks assembly contracts and timing that a
  * host decoder cannot. A short quiet interval coalesces monitor prompt packets.
  * Limit: default-demo fixture; mode events are queued in RAM, not physical keys.
- * Sequencer progress is not an audible-quality test; real hardware is untested.
+ * PSID progress is not an audible-quality test; real hardware is untested.
  * The test quits the target emulator on success; failed runs may need cleanup.
  * Detailed guide: docs/ALGORITHMS.md
  */
 const fs=require('node:fs'),path=require('node:path'),net=require('node:net');
 const project=path.resolve(__dirname,'..'),root=path.join(project,'build'),mode=process.argv[2]||'pal',port=Number(process.argv[3]||6522);
+const {readSymbols}=require('./vice.cjs');
+const {colorFieldRow}=require('../host/color-fields.cjs');
 const {readConfig}=require('../host/config.cjs'); const config=readConfig(path.join(project,'demo.asm'));
 const symbols=Object.fromEntries(fs.readFileSync(path.join(root,'symbols.labels'),'utf8').trim().split(/\r?\n/).map(l=>{const [,a,n]=l.split(/\s+/);return[n.slice(1),parseInt(a,16)];}));
 const h=n=>n.toString(16);
@@ -28,12 +30,13 @@ const m=new Monitor();await m.wait();
 await m.command(`load "${path.join(root,config.DEMO_NAME+'.prg').replaceAll('\\','/')}" 0`);
 await m.command('break '+h(symbols.idle));await m.command('g 810');await m.command('delete 1');
 let state=await m.bytes(2,13,'state');
+await m.command('> 28 00'); // Test manual modes without automatic scene changes.
 if(state[7] !== (mode==='pal'?5:6))throw Error('Incorrect refresh detection: '+state[7]);
 const base=fs.readFileSync(path.join(project,'generated/static-bitmap.bin'));
 for(const start of [0x2000,0xe000])if(!(await m.bytes(start,start+7999,'initial-'+h(start))).subarray(0,7680).equals(base.subarray(0,7680)))throw Error('Initial bitmap mismatch');
 const index=(x,y)=>(y>>3)*320+(x>>3)*8+(y&7);
 const allFrames=fs.readFileSync(path.join(project,'generated/frames.bin'));
-const frames=Array.from({length:8},(_,i)=>allFrames.subarray(i*8000,(i+1)*8000));
+const frames=Array.from({length:config.DEMO_FRAMES},(_,i)=>allFrames.subarray(i*8000,(i+1)*8000));
 await m.command('> 06 01');
 const times=[],flips=[];
 for(let i=0;i<20;i++){
@@ -66,11 +69,13 @@ if(!colors.subarray(0,920).some(v=>v!==0x60))throw Error('Rainbow mode did not c
 if(!colors.subarray(920).every(v=>v===0x10))throw Error('Controls/ticker colors were altered');
 await m.command(`screenshot "${path.join(root,mode+'-rainbow-demo.png').replaceAll('\\','/')}" 2`);
 await m.command('> 10 03');await m.until('idle');
+const music=readSymbols(path.join(root,'example-music/symbols.labels'));
+const callsBefore=(await m.bytes(music.sample_calls,music.sample_calls+1,'music-before')).readUInt16LE();
 const before=await m.bytes(0x0f,0x20,'demo-before');
 for(let i=0;i<32;i++)await m.until('scroll_done');
 const after=await m.bytes(0x0f,0x20,'demo-after');
 if(after[0]!==3)throw Error('Color-only mode was not selected');
-if(before[0x16-0x0f]===after[0x16-0x0f])throw Error('Music sequencer did not advance');
+if(callsBefore===(await m.bytes(music.sample_calls,music.sample_calls+1,'music-after')).readUInt16LE())throw Error('SID player did not advance');
 const ticker=await m.bytes(0x3e00,0x3f3f,'ticker');
 if(!ticker.some(v=>v!==0))throw Error('Ticker stayed blank');
 if(!(await m.bytes(0xfe00,0xff3f,'ticker-secondary')).equals(ticker))throw Error('Ticker buffers disagree');
@@ -78,7 +83,42 @@ await m.command(`screenshot "${path.join(root,mode+'-full-demo.png').replaceAll(
 await m.command('> 10 01');
 for(let i=0;i<8;i++)await m.until('flip_record');
 if(!(await m.bytes(0x400,0x797,'blue-colors')).every(v=>v===0x60))throw Error('Blue mode did not restore colors');
-const report={mode,framesVerified:20,period:mode==='pal'?5:6,decoderCycles:times,flips,stopAndRestart:true,rainbowMode:true,colorOnlyMode:true,musicSequencer:true,scrollingText:true};
+// Compare every native color cell in all new modes, including a phase wrap.
+const fieldResults=[];
+for(const effect of [4,5,6]){
+ await m.command('> 10 '+h(effect));await m.until('effect_return');
+ if((await m.bytes(0x0f,0x0f,'effect'))[0]!==effect)throw Error('Field request was not consumed');
+ await m.command('> 19 00 f9');
+ const seenRows=new Set();
+ for(let i=0;i<46;i++){
+  await m.until('color_row_done');
+  const [row,phase]=await m.bytes(0x19,0x1a,'field-state');
+  const expected=colorFieldRow(effect,phase,row,config.DEMO_PALETTE);
+  for(const screen of [0x400,0xc000]){
+   if(!(await m.bytes(screen+row*40,screen+row*40+39,'field-row')).equals(expected))throw Error(`Field ${effect} row ${row} phase ${phase} differs`);
+  }
+  seenRows.add(row);
+ }
+ if(seenRows.size!==23)throw Error('Field did not cover every logo row');
+ for(const screen of [0x400,0xc000])if(!(await m.bytes(screen+920,screen+999,'field-hud')).every(v=>v===0x10))throw Error('Field altered text colors');
+ const fieldFlips=[];
+ for(let i=0;i<8;i++){
+  await m.until('flip_record');const state=await m.bytes(2,13,'field-flip');
+  const start=state[3]?0xe000:0x2000;
+  if(!(await m.bytes(start,start+7359,'field-bitmap')).equals(frames[state[0]].subarray(0,7360)))throw Error('Field corrupted wave bitmap');
+  fieldFlips.push(state[5]);
+ }
+ for(let i=1;i<fieldFlips.length;i++)if(((fieldFlips[i]-fieldFlips[i-1])&255)!==(mode==='pal'?5:6))throw Error('Field delayed bitmap flips');
+ await m.command(`screenshot "${path.join(root,mode+'-logo-'+['plasma','xor','tunnel'][effect-4]+'.png')}" 2`);
+ fieldResults.push({effect,rowsVerified:46,bitmapFramesVerified:8,phaseWrap:true});
+}
+// Native VBI calls remain one per IRQ with the most expensive field enabled.
+await m.until('irq');const tick=(await m.bytes(7,7,'call-tick'))[0];
+const sidCalls=(await m.bytes(music.sample_calls,music.sample_calls+1,'call-start')).readUInt16LE();
+for(let i=0;i<16;i++)await m.until('irq');
+if((((await m.bytes(7,7,'call-tick-end'))[0]-tick)&255)!==16)throw Error('Raster tick drift');
+if((((await m.bytes(music.sample_calls,music.sample_calls+1,'call-end')).readUInt16LE()-sidCalls)&65535)!==16)throw Error('SID call drift');
+const report={mode,framesVerified:44,colorFields:fieldResults,sidCallsPer16Refreshes:16,period:mode==='pal'?5:6,decoderCycles:times,flips,stopAndRestart:true,rainbowMode:true,colorOnlyMode:true,psidPlayback:true,scrollingText:true};
 fs.writeFileSync(path.join(root,'test-'+mode+'.json'),JSON.stringify(report,null,2));
 fs.writeFileSync(path.join(root,'monitor-'+mode+'.txt'),m.log);
 console.log(JSON.stringify(report,null,2));m.socket.end('quit\n');

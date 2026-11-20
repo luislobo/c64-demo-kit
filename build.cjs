@@ -16,24 +16,35 @@ const{makeDoubleBufferedPatches,verifyPatches}=require('./host/patches.cjs');
 const{musicTables}=require('./host/music.cjs');
 const{parseSid,prepareSid,sidConstants}=require('./host/sid.cjs');
 const{createD64}=require('./host/d64.cjs');
+const{colorFieldAssets}=require('./host/color-fields.cjs');
 function build({entry=path.join(__dirname,'demo.asm'),outDir=path.join(__dirname,'build'),compiler=process.env.TASS64||path.join(__dirname,'tools/64tass/64tass.exe')}={}){
  entry=path.resolve(entry);outDir=path.resolve(outDir);const project=path.dirname(entry),c=readConfig(entry),generated=path.join(project,'generated');
  if(c.DEMO_SID_FILE!==undefined&&(typeof c.DEMO_SID_FILE!=='string'||!c.DEMO_SID_FILE.trim()))throw Error('DEMO_SID_FILE must name a PSID file');
+ if(c.DEMO_SID_BUILD==='clockwork'){
+  if(project!==__dirname)throw Error('Clockwork source generation requires an entry beside build.cjs');
+  require('./tools/build-example-music.cjs').buildExampleMusic(compiler);
+ }
  const sid=c.DEMO_SID_FILE===undefined?null:prepareSid(parseSid(fs.readFileSync(path.resolve(project,c.DEMO_SID_FILE))),c);
  fs.mkdirSync(generated,{recursive:true});fs.mkdirSync(outDir,{recursive:true});
+ const releaseCredits=c.DEMO_CREDITS_FILE===undefined?null:fs.readFileSync(path.resolve(project,c.DEMO_CREDITS_FILE));
  const image=fs.readFileSync(path.resolve(project,c.DEMO_IMAGE)),font=fs.readFileSync(path.resolve(project,c.DEMO_FONT_FILE));
  const base=drawText(fitBitmap(image,c.DEMO_LOGO_HEIGHT),font,c.DEMO_HUD);
  const frames=waveFrames(base,{frames:c.DEMO_FRAMES,amplitude:c.DEMO_WAVE_AMPLITUDE,wavelength:c.DEMO_WAVE_LENGTH,height:c.DEMO_LOGO_HEIGHT});
  const patches=makeDoubleBufferedPatches(base,frames);verifyPatches(base,frames,patches);
  let end=0x4000;const pointers=patches.map(p=>{const a=end;end+=p.bytes.length;return a;});
- if(end>0xc000)throw Error(`Image patches need ${end-0x4000} bytes; only 32768 fit. Simplify the image or wave before rebuilding.`);
+ const fields=c.DEMO_COLOR_FIELDS?colorFieldAssets():Buffer.alloc(0),fieldBytes=fields.length+(c.DEMO_COLOR_FIELDS?92:0);
+ if(end+fieldBytes>0xc000)throw Error(`Image patches and color fields need ${end-0x4000+fieldBytes} bytes; only 32768 fit. Simplify the image or wave before rebuilding.`);
+ fs.writeFileSync(path.join(generated,'color-fields.bin'),fields);
+ fs.writeFileSync(path.join(generated,'effects-config.inc'),`KIT_COLOR_FIELDS = ${c.DEMO_COLOR_FIELDS}\nKIT_START_EFFECT = ${c.DEMO_START_EFFECT}\nKIT_AUTO_SHOW = ${c.DEMO_AUTO_SHOW}\n`);
  for(const[name,data]of[['static-bitmap.bin',base],['frames.bin',Buffer.concat(frames)],['patches.bin',Buffer.concat(patches.map(p=>p.bytes))],['patch-pointers.inc',pointers.map(p=>'    .word $'+p.toString(16)).join('\n')+'\n'],['music-config.inc',sidConstants(sid)],['music.inc',sid?'':musicTables({lead:c.DEMO_LEAD,bass:c.DEMO_BASS,arp:c.DEMO_ARP})]])fs.writeFileSync(path.join(generated,name),data);
  if(sid)fs.writeFileSync(path.join(generated,'sid-payload.bin'),sid.data);else fs.rmSync(path.join(generated,'sid-payload.bin'),{force:true});
  const prg=path.join(outDir,c.DEMO_NAME+'.prg'),d64=path.join(outDir,c.DEMO_NAME+'.d64');
  execFileSync(compiler,['--cbm-prg','-a','-o',prg,'--labels='+path.join(outDir,'symbols.labels'),'--vice-labels','-L',path.join(outDir,'assembly.list'),entry],{cwd:project,stdio:'inherit'});
  const program=fs.readFileSync(prg);fs.writeFileSync(d64,createD64(program,{diskName:c.DEMO_DISK_NAME,diskId:c.DEMO_DISK_ID,filename:c.DEMO_PRG_NAME}));
- const report={entry,frames:c.DEMO_FRAMES,programBytes:program.length,patchBytes:end-0x4000,prg,d64,patches:patches.map(p=>({bytes:p.bytes.length,writes:p.written}))};
+ const report={entry,frames:c.DEMO_FRAMES,effects:c.DEMO_COLOR_FIELDS?6:3,startEffect:c.DEMO_START_EFFECT,colorFieldBytes:fieldBytes,programBytes:program.length,patchBytes:end-0x4000,prg,d64,patches:patches.map(p=>({bytes:p.bytes.length,writes:p.written}))};
  const creditsFile=path.join(outDir,c.DEMO_NAME+'-music-credits.json');
+ const noticeFile=path.join(outDir,c.DEMO_NAME+'-credits.txt');
+ if(releaseCredits)fs.writeFileSync(noticeFile,releaseCredits);else fs.rmSync(noticeFile,{force:true});
  if(sid){const{data,...credits}=sid;report.music=credits;fs.writeFileSync(creditsFile,JSON.stringify(credits,null,2)+'\n');}else fs.rmSync(creditsFile,{force:true});
  fs.writeFileSync(path.join(outDir,'build-report.json'),JSON.stringify(report,null,2));return report;
 }

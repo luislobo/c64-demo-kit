@@ -22,6 +22,14 @@ function readConstants(file){
 }
 function readConfig(file){
  const config=readConstants(file);
+ config.DEMO_COLOR_FIELDS ??= 0;
+ config.DEMO_START_EFFECT ??= 1;
+ config.DEMO_AUTO_SHOW ??= 0;
+ if(![0,1].includes(config.DEMO_AUTO_SHOW))throw Error('DEMO_AUTO_SHOW must be 0 or 1');
+ if(![0,1].includes(config.DEMO_COLOR_FIELDS))throw Error('DEMO_COLOR_FIELDS must be 0 or 1');
+ if(!Number.isInteger(config.DEMO_START_EFFECT)||config.DEMO_START_EFFECT<1||config.DEMO_START_EFFECT>(config.DEMO_COLOR_FIELDS?6:3))throw Error('Invalid DEMO_START_EFFECT for enabled modes');
+ if(config.DEMO_SID_BUILD!==undefined&&(config.DEMO_SID_BUILD!=='clockwork'||config.DEMO_SID_FILE!=='generated/clockwork.sid'))throw Error('DEMO_SID_BUILD supports clockwork with generated/clockwork.sid only');
+ if(config.DEMO_CREDITS_FILE!==undefined&&(typeof config.DEMO_CREDITS_FILE!=='string'||!config.DEMO_CREDITS_FILE.trim()))throw Error('DEMO_CREDITS_FILE must name a text notice');
  const stringKeys=['NAME','DISK_NAME','DISK_ID','PRG_NAME','IMAGE','FONT_FILE','HUD','SCROLL_TEXT'];
  for(const k of stringKeys)if(typeof config['DEMO_'+k]!=='string')throw Error('Missing string DEMO_'+k);
  if(!/^[a-z0-9_-]+$/i.test(config.DEMO_NAME))throw Error('DEMO_NAME must be a filename stem');

@@ -1,0 +1,8 @@
+{
+  "mode": "ntsc",
+  "autostart": true,
+  "eightSecondCycleRefreshes": 480,
+  "wrap": true,
+  "numberHandlerTakesControl": true,
+  "spaceHandlerTakesControl": true
+}

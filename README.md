@@ -1,8 +1,9 @@
 # C64 demo libraries
 
 Reusable 6502/6510 assembly libraries and portable Node.js asset builders.
-**`demo.asm`** is the default application; `sid-demo.asm` and `effects-demo.asm`
-demonstrate optional music and character scenes. The runtime is native C64 machine code; Node.js
+**`demo.asm`** presents TORQ X SENDERO with six logo effects, automatic scene
+changes and the original Clockwork SID tune. `sid-demo.asm` and `effects-demo.asm`
+show separate music and character-scene integrations. The runtime is native C64 machine code; Node.js
 and PowerShell run only on the build computer.
 
 The assembler is **64tass 1.60.3243**, bundled for Windows with its licenses.
@@ -18,7 +19,8 @@ The [C64 source collection](research/README.md) gathers demo effects, music tool
 compression, loaders and asset pipelines with author credits, license evidence,
 pinned source links and original source snapshots. Its
 [adaptation plan](research/ADAPTATION.md) maps useful candidates to this kit.
-These are research inputs; they are not included in the default runtime.
+The default demo applies original sine/XOR/polar color fields and PSID playback.
+The collection also contains candidates for future work with their reuse terms.
 
 [Tracker-exported PSID music](docs/SID.md) is available as an optional player.
 The original [Clockwork example](examples/music/README.md) demonstrates this
@@ -61,13 +63,19 @@ Ready-to-run copies are also committed under `dist/`, together with a preview
 and the PAL/NTSC validation reports. `assets/reference/` preserves the source
 logo PNGs; the builder consumes the converted `assets/image.bin`.
 
-1 selects blue wave, 2 rainbow wave, 3 stationary color cycle, Space starts/stops
-the wave, and M toggles music. Reset exits. The default still uses eight frames.
+The demo starts with a plasma-colored wave and changes effects every eight
+nominal seconds. 1 selects blue wave, 2 rainbow wave, 3 stationary color cycle,
+4 plasma, 5 XOR and 6 tunnel. A number key or Space takes manual control until
+reset. Space starts/stops the wave; M pauses/restarts the music. The wave uses
+eight precomputed frames. See the [TORQ integration guide](docs/TORQ.md) for
+configuration, credits and verification.
 
 ## Change the application in one assembly file
 
 `demo.asm` owns all application-specific text, image/font paths, disk names,
-palette, wave geometry, frame count, volume, tempo and the three MIDI-note lists.
+palette, wave geometry, frame count, automatic show and music configuration.
+The default generates Clockwork from source during the same build. Applications
+without `DEMO_SID_FILE` use three MIDI-note lists, volume and tempo settings.
 It also composes the engine and includes the generated data. No melody or brand
 is embedded in `lib/` or `host/`. Binary artwork/font assets remain separate files.
 
@@ -110,7 +118,7 @@ rejects oversized patch data rather than overlapping screen RAM.
 These bitmap-engine modules are **source/include libraries with one shared zero-page ABI**. Include
 `lib/engine.asm` once after the application constants. They are not independently
 linked objects or automatically relocatable modules. Their placement and shared
-state are intentional to retain the original performance and exact PRG bytes.
+state let native rendering fit the C64 memory and raster budget.
 
 | File | Responsibility / public entry points |
 | --- | --- |
@@ -121,8 +129,10 @@ state are intentional to retain the original performance and exact PRG bytes.
 | `display.asm` | `flip`: request a scheduled flip; `flip_border`: IRQ-only buffer switch |
 | `raster.asm` | `irq`, `nmi`: raster clock, safe flips, music and ticker scheduling |
 | `keyboard.asm` | `poll_keyboard`, `poll_render_keyboard`: atomic input edge detection |
-| `effects.asm` | `handle_effect`: standard three-mode controller |
-| `colors.asm` | `color_tick`: update one color band per refresh |
+| `effects.asm` | `handle_effect`: wave/static mode controller |
+| `colors.asm` | `color_tick`: update one logo row per refresh |
+| `color-fields.asm` | Optional plasma/XOR/polar foreground fields in both banks |
+| `show.asm` | Optional eight-second effect sequence on the 50 Hz logic clock |
 | `scroller.asm` | `scroll_tick`: shift text by one pixel in both buffers |
 | `sid.asm` | `music_init`, `music_tick`: three-voice note sequencer |
 | `assets.asm` | Asset pointer table, bitmap/data placement and overlap assertions |
@@ -138,8 +148,9 @@ state are intentional to retain the original performance and exact PRG bytes.
 - `flip`: main-thread blocking request. Set `deadline` first. The IRQ switches the
   buffers when the 8-bit raster tick reaches that deadline. Deadlines must remain
   less than 128 refreshes ahead. Never call this blocking routine from the IRQ.
-- `poll_keyboard` and `poll_render_keyboard`: clobber A, preserve X/Y and restore
-  the caller's interrupt state. The raw `scan_*` routines are internal.
+- `poll_keyboard` and `poll_render_keyboard`: clobber A and restore the caller's
+  interrupt-enable state. X/Y are also clobbered if an imported song is restarted.
+  The raw `scan_*` routines are internal.
 - `music_tick`, `scroll_tick` and `color_tick`: clobber A/X/Y and flags. The IRQ
   wrapper saves/restores A/X/Y and the CPU restores flags through RTI.
 - `toggle`, `effect_request` and `muted` are the input/controller interface.
@@ -153,8 +164,9 @@ state are intentional to retain the original performance and exact PRG bytes.
 | `$0400..$07ff` | Primary color/screen matrix |
 | `$0801..$1fff` | BASIC stub, code, font, text, music, patch pointers |
 | `$2000..$3f3f` | Primary bitmap |
-| `$4000..$bfff` | Generated sparse patch streams |
+| `$4000..$bfff` | Generated sparse patch streams and optional color-field tables |
 | `$c000..$c3ff` | Secondary color/screen matrix |
+| `$c400..$cfff` | Optional imported SID payload |
 | `$e000..$ff3f` | Secondary bitmap, RAM under KERNAL ROM |
 | `$fffa..$ffff` | NMI/IRQ vectors |
 
@@ -163,7 +175,8 @@ low VIC bank-selection bits. It disables CIA interrupts and maps ROMs out with
 `$01=$35`. It is a standalone demo engine, not a BASIC-callable component that
 returns to the OS. Preserve the fixed 320x200 hires layout: logo rows 0..22,
 controls row 23, ticker row 24. `DEMO_LOGO_HEIGHT` may be reduced within that area.
-Frame and song lengths must be powers of two; tune voices have equal lengths.
+Frame counts and built-in song lengths must be powers of two; built-in tune
+voices have equal lengths. Imported music follows the PSID contract.
 The palette has eight non-black foreground colors with a black background.
 
 ## Build-side libraries
@@ -176,6 +189,7 @@ The palette has eight non-black foreground colors with a black background.
 | `host/music.cjs` | `sidFrequency`, `musicTables` for PAL/NTSC |
 | `host/d64.cjs` | `createD64`, `offset`, `sectors` for a standard 35-track, single-PRG disk |
 | `host/sid.cjs` | `parseSid`, `prepareSid`, `sidConstants` for the supported tracker-export subset |
+| `host/color-fields.cjs` | `colorFieldAssets`, `colorFieldRow` for logo fields and native comparisons |
 | `host/character.cjs` | `characterAssets`, `characterFrame` for character-scene data and its mathematical reference |
 | `build.cjs` | `build({entry, outDir, compiler})` or command-line entry point |
 
@@ -188,18 +202,21 @@ tools\64tass\64tass.exe --cbm-prg -a -o build\demo.prg demo.asm
 ## Validation
 
 ```console
-node --test tests/libraries.test.cjs
+node --test tests/*.test.cjs
 node tests/rebuild-variant.cjs
+node tests/verify-torq.cjs
 ```
 
-The second test builds a different image, HUD, ticker, volume and four-frame
-application without editing libraries, then restores the default build.
+The variant check builds different artwork, text and four frames, plus a
+built-in-music configuration without optional fields, then restores the default.
+The TORQ check launches isolated PAL/NTSC VICE instances and verifies the
+automatic show, 44 wave frames, all six modes, field pixels, SID cadence,
+restoration and ticker buffers. VICE and headless Linux `xvfb-run` are required.
 `tests/emulator.cjs pal PORT` (or `ntsc`) runs the default demo's frame, timing,
 stop/restart, music and ticker checks against a running VICE remote monitor.
 Start VICE with `-console -warp +sound -pal -remotemonitor
 -remotemonitoraddress ip4://127.0.0.1:PORT`; use `-ntsc` for the other standard.
 The test closes that emulator when finished.
 
-The default refactor was checked against the previous demo's PRG for exact byte
-equality. The new D64 writer was independently read back with VICE c1541. Native
-SD2IEC/C64 hardware was not available for testing.
+The D64 writer is checked against allocation chains and VICE c1541 readback.
+Native SD2IEC/C64 hardware was not available for testing.

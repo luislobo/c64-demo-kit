@@ -1,28 +1,49 @@
 {
   "mode": "ntsc",
-  "framesVerified": 20,
+  "framesVerified": 44,
+  "colorFields": [
+    {
+      "effect": 4,
+      "rowsVerified": 46,
+      "bitmapFramesVerified": 8,
+      "phaseWrap": true
+    },
+    {
+      "effect": 5,
+      "rowsVerified": 46,
+      "bitmapFramesVerified": 8,
+      "phaseWrap": true
+    },
+    {
+      "effect": 6,
+      "rowsVerified": 46,
+      "bitmapFramesVerified": 8,
+      "phaseWrap": true
+    }
+  ],
+  "sidCallsPer16Refreshes": 16,
   "period": 6,
   "decoderCycles": [
-    77797,
-    80965,
-    87137,
-    86307,
-    86746,
-    83415,
-    87773,
-    86881,
-    87455,
-    83373,
-    87045,
-    86000,
-    86849,
-    83757,
-    87587,
-    86880,
-    87564,
-    83358,
-    87098,
-    86312
+    77801,
+    85317,
+    89253,
+    89239,
+    89533,
+    87411,
+    90035,
+    89440,
+    90200,
+    87551,
+    89213,
+    88908,
+    89624,
+    87770,
+    89867,
+    89455,
+    90360,
+    87459,
+    89266,
+    89280
   ],
   "flips": [
     {
@@ -109,6 +130,6 @@
   "stopAndRestart": true,
   "rainbowMode": true,
   "colorOnlyMode": true,
-  "musicSequencer": true,
+  "psidPlayback": true,
   "scrollingText": true
 }

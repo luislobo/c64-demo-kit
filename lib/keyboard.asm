@@ -1,12 +1,12 @@
 ; Algorithm: select CIA keyboard rows and interpret active-low matrix bits.
 ; Track prior Space/M/number states so a held key causes one action per edge.
 ; Space toggles a one-bit request; number keys store a mode request; M changes
-; SID master volume while the sequencer continues to advance.
+; music volume. Built-in music advances muted; an imported player pauses/restarts.
 ; Why: scanning in both IRQ and main code catches short taps. PHP/SEI/PLP keeps
 ; shared edge state atomic while preserving the caller interrupt-enable state.
-; During decoding scan Space each run, but all keys only once per eight runs.
+; During decoding scan all keys once per eight runs; IRQ also scans every refresh.
 ; Tradeoff: this is edge suppression, not timed mechanical debouncing or an event
-; queue. Multiple pending Space edges can cancel; number-key priority is 1,2,3.
+; queue. Multiple pending Space edges can cancel; numbers have ascending priority.
 ; Detailed guide: docs/ALGORITHMS.md
 
 poll_keyboard:
@@ -16,18 +16,12 @@ poll_keyboard:
     plp
     rts
 poll_render_keyboard:
-    php
-    sei
     inc poll_counter
     lda poll_counter
     and #7
-    bne render_space_only
-    jsr scan_keyboard
-    jmp render_poll_done
-render_space_only:
-    jsr scan_space
+    bne render_poll_done
+    jmp poll_keyboard
 render_poll_done:
-    plp
     rts
 scan_space:
     lda #$7f
@@ -44,6 +38,10 @@ pressed:
     bne key_done
     lda #1
     sta space_down
+    .if KIT_AUTO_SHOW
+        lda #0
+        sta show_enabled
+    .endif
     lda toggle
     eor #1
     sta toggle
@@ -60,8 +58,23 @@ scan_keyboard:
     lda #$fd
     sta $dc00
     lda $dc01
+    sta row_keys
     and #1
     beq number_three
+    .if KIT_COLOR_FIELDS
+        lda row_keys
+        and #8
+        beq number_four
+        lda #$fb
+        sta $dc00
+        lda $dc01
+        sta row_keys
+        and #1
+        beq number_five
+        lda row_keys
+        and #8
+        beq number_six
+    .endif
     lda #0
     beq number_check
 number_one:
@@ -72,6 +85,17 @@ number_two:
     bne number_check
 number_three:
     lda #3
+    bne number_check
+    .if KIT_COLOR_FIELDS
+number_four:
+        lda #4
+        bne number_check
+number_five:
+        lda #5
+        bne number_check
+number_six:
+        lda #6
+    .endif
 number_check:
     cmp number_down
     beq scan_mute
@@ -79,6 +103,10 @@ number_check:
     cmp #0
     beq scan_mute
     sta effect_request
+    .if KIT_AUTO_SHOW
+        lda #0
+        sta show_enabled
+    .endif
 scan_mute:
     lda #$ef
     sta $dc00

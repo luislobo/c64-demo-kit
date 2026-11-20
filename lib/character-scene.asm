@@ -3,6 +3,8 @@
 ; charset helpers, keyboard scanning and the PSID adapter; it is not a bitmap
 ; engine include. Reset exits. Detailed ABI, attribution and tests: docs/CHARACTER.md.
 .include "state.asm"
+KIT_COLOR_FIELDS = 0
+KIT_AUTO_SHOW = 0
 char_phase = $22
 char_half = $23
 char_last_tick = $24

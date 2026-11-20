@@ -1,0 +1,25 @@
+TORQ X SENDERO - C64 demo kit
+https://github.com/luislobo/c64-demo-kit
+
+Logo artwork and application: supplied with Luis Lobo's C64 demo kit.
+Bitmap wave engine, plasma/XOR/polar color fields and asset tools:
+C64 demo kit contributors. The field implementations are original kit code.
+
+Clockwork composition and three-voice SID player: C64 demo kit contributors.
+Released under CC0 1.0. This grant covers the original player, composition and
+generated PSID file: https://creativecommons.org/publicdomain/zero/1.0/
+Source: examples/music/clockwork.asm; grant: examples/music/README.md.
+Keep the accompanying music-credits.json for machine-readable attribution.
+
+PSID format: Michael Schwendt, Simon White, Dag Lem, LaLa and Wilfred Bos.
+https://github.com/libsidplayfp/readSID/blob/main/SID_file_format.txt
+
+Research acknowledgments (inspiration and reference, not imported demo code):
+Maciej Małecki / c64lib: https://github.com/c64lib
+Raistlin / Genesis Project: https://c64demo.com/
+The full author, license and pinned-source catalogue is in research/CREDITS.md
+and research/SOURCES.md. The separate character example includes MIT-adapted
+c64lib helpers; this bitmap demo does not include those helper routines.
+
+Build tools: 64tass by Soci; Node.js contributors. Validation: VICE team.
+Individual third-party notices remain with the source collection and tools.

@@ -1,5 +1,5 @@
 ; Application composition: this is the single place for image/font paths, text,
-; palette, wave geometry, note lists, tempo, volume and output filenames.
+; palette, wave geometry, show settings, exported music and output filenames.
 ; Algorithm: declare literal DEMO_* constants, include the engine, then append
 ; text/font/music and the generated bitmap/patch data in the engine memory map.
 ; Why: 64tass and the host builder read the same settings, avoiding a second
@@ -17,8 +17,9 @@ DEMO_DISK_ID = "TQ"
 DEMO_PRG_NAME = "TORQ-LOGO"
 DEMO_IMAGE = "assets/image.bin"
 DEMO_FONT_FILE = "assets/font.bin"
-DEMO_HUD = "1 WAVE  2 RAINBOW  3 COLOR  M MUSIC"
-DEMO_SCROLL_TEXT = "        TORQ X SENDERO ... EIGHT FRAMES, THREE SID VOICES, ONE COMMODORE 64!     1 BLUE WAVE   2 RAINBOW WAVE   3 COLOR CYCLE   SPACE START/STOP   M MUSIC ON/OFF     GREETINGS TO EVERYONE KEEPING THE C64 ALIVE!        "
+DEMO_CREDITS_FILE = "assets/torq-credits.txt"
+DEMO_HUD = "1 WAVE 2 RAIN 3 RGB 4 PLAS 5 XOR 6 TUN"
+DEMO_SCROLL_TEXT = "        TORQ X SENDERO ... SIX LOGO EFFECTS AND THREE SID VOICES!     1 BLUE WAVE   2 RAINBOW WAVE   3 STATIC COLOR   4 PLASMA   5 XOR   6 TUNNEL     SPACE START/STOP WAVE   M PAUSE/RESTART MUSIC     CLOCKWORK MUSIC: C64 DEMO KIT CONTRIBUTORS, CC0     EFFECT RESEARCH: C64LIB BY MACIEJ MALECKI, RAISTLIN AND THE C64 SCENE ... FULL SOURCE CREDITS INCLUDED     GREETINGS TO EVERYONE KEEPING THE C64 ALIVE!        "
 DEMO_FRAMES = 8
 DEMO_WAVE_AMPLITUDE = 8
 DEMO_WAVE_LENGTH = 100
@@ -28,9 +29,16 @@ DEMO_TEXT_COLOR = 1
 DEMO_VOLUME = 12
 DEMO_NOTE_TICKS = 6
 DEMO_PALETTE = [96,224,48,80,208,112,160,64]
-DEMO_LEAD = [67,75,74,72,67,70,72,75,65,68,67,63,65,67,70,74,67,75,79,77,75,74,72,70,65,70,74,77,75,74,70,67,72,75,79,82,79,77,75,72,68,72,75,79,77,75,72,68,67,70,75,79,77,75,74,70,65,70,74,77,75,74,72,67]
-DEMO_BASS = [36,36,48,36,36,36,48,36,32,32,44,32,32,32,44,32,39,39,51,39,39,39,51,39,34,34,46,34,34,34,46,34,36,36,48,36,36,36,48,36,32,32,44,32,32,32,44,32,39,39,51,39,39,39,51,39,34,34,46,34,34,34,46,34]
-DEMO_ARP = [48,55,60,63,48,55,60,63,44,51,56,59,44,51,56,59,51,58,63,66,51,58,63,66,46,53,58,61,46,53,58,61,48,55,60,63,48,55,60,63,44,51,56,59,44,51,56,59,51,58,63,66,51,58,63,66,46,53,58,61,46,53,58,61]
+
+DEMO_COLOR_FIELDS = 1
+DEMO_START_EFFECT = 4
+DEMO_AUTO_SHOW = 1
+DEMO_SID_BUILD = "clockwork"
+DEMO_SID_FILE = "generated/clockwork.sid"
+DEMO_SID_ZP = []
+DEMO_SID_CREDIT = "Clockwork player and composition: C64 demo kit contributors"
+DEMO_SID_LICENSE = "CC0-1.0; examples/music/README.md"
+DEMO_SID_SOURCE = "examples/music/clockwork.asm"
 
 .include "lib/engine.asm"
 

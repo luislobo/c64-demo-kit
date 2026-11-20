@@ -2,10 +2,10 @@
 ; animation start or stop only if the current active state needs to change.
 ; Why: keyboard scanning reports intent; this main-thread controller decides
 ; when the player can safely transition and restore its dependent buffers.
-; Modes 1/2 share the same wave frames and differ only in color treatment.
+; Modes 1/2 and optional 4..6 share wave frames with different color treatment.
 ; Mode 3 stops bitmap motion while the raster-driven palette keeps changing.
 ; CMP after PLP tests the request value, not the previously restored flags.
-; Tradeoff: three standard modes are built in; new motion modes need matching data.
+; Tradeoff: color fields reuse the logo; new bitmap motion needs matching data.
 ; Detailed guide: docs/ALGORITHMS.md
 
 handle_effect:

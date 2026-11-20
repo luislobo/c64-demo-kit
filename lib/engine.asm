@@ -9,6 +9,7 @@
 
 ; Include once, after the DEMO_* application configuration.
 .include "../generated/music-config.inc"
+.include "../generated/effects-config.inc"
 .include "state.asm"
 .include "boot.asm"
 .include "player.asm"
@@ -17,7 +18,13 @@
 .include "raster.asm"
 .include "keyboard.asm"
 .include "effects.asm"
+.if KIT_AUTO_SHOW
+    .include "show.asm"
+.endif
 .include "colors.asm"
+.if KIT_COLOR_FIELDS
+    .include "color-fields.asm"
+.endif
 .include "scroller.asm"
 .if DEMO_EXTERNAL_SID
     .include "sid-player.asm"
