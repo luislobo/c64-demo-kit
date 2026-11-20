@@ -11,6 +11,9 @@ at the end of that guide, because they are not versioned source.
 | File | Algorithm, role and reason |
 | --- | --- |
 | [build.bat](../build.bat) | Directory-safe Windows launcher that propagates the builder exit status and pauses on failure. |
+| [run.sh](../run.sh) | Detect macOS/Linux, install missing dependencies, supply missing Ubuntu ROMs, build and launch VICE; supports offline/build-only operation. |
+| [run.ps1](../run.ps1) | Reuse installed Windows tools or verify/extract portable Node/VICE archives, build from the script directory and launch. |
+| [run.bat](../run.bat) | Forward arguments to the PowerShell launcher with process-local execution policy and propagate errors. |
 | [build.cjs](../build.cjs) | Deterministic asset/assembly/disk pipeline with capacity checks; keeps expensive math on the host. |
 | [demo.asm](../demo.asm) | Single application configuration and asset composition. Literal settings are shared by host and assembler; executable routines remain reusable. |
 | [tools/convert-image.ps1](../tools/convert-image.ps1) | Two-pass nearest-neighbor sampling and alpha/luminance thresholding into VIC-II bitmap order. |
@@ -47,6 +50,10 @@ at the end of that guide, because they are not versioned source.
 | [tests/rebuild-variant.cjs](../tests/rebuild-variant.cjs) | Validation algorithm: draw a synthetic ring/diamond image, derive a temporary application with different text, volume and four frames, then invoke the same builder and assembler. Finally remove the fixture and rebuild the default. |
 
 ## Documentation and policy
+
+The [launcher guide](LAUNCHERS.md) records environment commands, setup sources,
+cache behavior and verification limits. [Launcher tests](../tests/launchers.test.cjs)
+exercise isolated shell/PowerShell behavior without installing system packages.
 
 | File | Algorithm, role and reason |
 | --- | --- |

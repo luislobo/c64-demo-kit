@@ -45,6 +45,21 @@ files, captured frames, source attribution and PAL/NTSC validation reports.
 
 ## Build and run
 
+From a fresh clone, install missing dependencies, build and launch the demo:
+
+| Environment | Command |
+| --- | --- |
+| macOS | `bash run.sh` |
+| Ubuntu 24.04+ desktop | `bash run.sh` |
+| Windows 10/11 x64 | `.\run.bat` |
+
+The launchers reuse installed tools. macOS setup uses Homebrew, Ubuntu setup
+uses apt and includes missing C64 ROMs, and Windows uses verified portable
+downloads plus the bundled assembler. See [launcher options](docs/LAUNCHERS.md)
+for building without a display, offline runs and other Linux distributions.
+
+To build manually with Node.js and 64tass already available:
+
 ```console
 node build.cjs
 ```
