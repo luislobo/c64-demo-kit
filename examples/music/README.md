@@ -23,3 +23,26 @@ The PSID container follows the format by Michael Schwendt, Simon White, Dag Lem,
 LaLa and Wilfred Bos, documented in [the SID integration guide](../../docs/SID.md).
 The player itself is original code. The research catalogue records the other
 creators whose work can inform later tracker and instrument development.
+
+## The Entertainer, SID disco arrangement
+
+Scott Joplin wrote [The Entertainer](https://www.loc.gov/item/2023864238/) in
+1902. The original U.S. score is in the public domain. This 120 BPM
+arrangement uses the first strain from the
+[original sheet music](https://commons.wikimedia.org/wiki/File:Entertainer_2.jpg)
+with a new disco bass line, four-on-the-floor kick, hi-hat and syncopated
+synth stabs. The third SID voice alternates percussion and stabs so the
+pulse lead and bass can stay on their own voices. It loops every 16 seconds.
+
+The arrangement and player are by the C64 demo kit contributors and dedicated
+to the public domain under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
+The preview is a recording of the arranged SID in VICE.
+
+- [Play the preview](../../dist/music/entertainer-disco.mp3)
+- [Download the PAL/NTSC SID](../../dist/music/entertainer-disco.sid)
+- Rebuild with `TASS64=/path/to/64tass node tools/build-entertainer-disco.cjs`.
+- Play with `vsid dist/music/entertainer-disco.sid`.
+
+The PSID loads at `$c400`, requires zero zero-page bytes, and selects pitch
+tables from the machine's video standard. TORQ's default soundtrack is
+Clockwork.
