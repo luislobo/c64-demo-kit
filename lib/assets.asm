@@ -1,8 +1,9 @@
 ; Algorithm: emit the patch-address table, place the static bitmap at $2000,
-; and place sparse streams at $4000; use assembler errors to reject overlap.
+; place streams at $4000 and optionally $1500; reject code/data overlap.
 ; Why: fixed locations match VIC bank addressing and avoid runtime relocation.
 ; Host allocation and assembler assertions independently enforce the layout.
-; Code/font/pointers fit below $2000; streams plus optional fields end by $c000.
+; Code/font/pointers fit below $1500 when low patches are used, else $2000.
+; High streams plus optional fields end by $c000.
 ; Tradeoff: generated paths and memory regions are a shared project contract;
 ; changing the layout requires coordinated edits to the host allocator and runtime.
 ; Detailed guide: docs/ALGORITHMS.md
@@ -10,7 +11,18 @@
 ; Fixed memory layout and generated-asset integration.
 patch_pointers:
     .include "../generated/patch-pointers.inc"
-    .cerror * > $2000, "Code overlaps first bitmap"
+patch_tails:
+    .include "../generated/patch-tails.inc"
+    .include "../generated/patch-layout.inc"
+    .if PATCH_LOW_BYTES
+        .cerror * > PATCH_LOW_START, "Code overlaps low patch region"
+* = PATCH_LOW_START
+patch_low:
+        .binary "../generated/patches-low.bin"
+        .cerror * > $2000, "Low patches overlap first bitmap"
+    .else
+        .cerror * > $2000, "Code overlaps first bitmap"
+    .endif
 * = $2000
     .binary "../generated/static-bitmap.bin"
 * = $4000

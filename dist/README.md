@@ -15,6 +15,7 @@ rebuild and explicitly copy new delivery files when publishing an update.
 | `logo-plasma.png`, `logo-xor.png`, `logo-tunnel.png` | PAL captures of the three new logo color fields. |
 | `validation/test-pal.json` | Recorded default-demo PAL emulator checks and measured decoder-cycle/tick samples. |
 | `validation/test-ntsc.json` | The corresponding NTSC recording. |
+| `validation/frame-stress.json` | Five interleaved trials per fitting profile and video standard, covering 600 bitmap frames and 32-phase memory rejection. |
 
 The reports check decoded image memory, frame spacing, restore/restart, effect
 requests, all new color cells, PSID advancement and matching ticker buffers. Mode requests
@@ -29,3 +30,7 @@ and restarts Clockwork. Preserve both credit files when redistributing it.
 `validation/show-pal.json` and `show-ntsc.json` record automatic startup,
 eight-second cycles, wraparound and the Space handler's manual takeover.
 Source/configuration details are in [the TORQ guide](../docs/TORQ.md).
+
+The wave now has 16 phases at nominal 10 fps, for a 1.6-second cycle. The
+[frame-capacity guide](../docs/FRAME_CAPACITY.md) records the compression and
+RAM changes, repeated timings and the limits of the 32-phase experiment.

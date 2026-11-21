@@ -4,7 +4,8 @@
 ; music volume. Built-in music advances muted; an imported player pauses/restarts.
 ; Why: scanning in both IRQ and main code catches short taps. PHP/SEI/PLP keeps
 ; shared edge state atomic while preserving the caller interrupt-enable state.
-; During decoding scan all keys once per eight runs; IRQ also scans every refresh.
+; IRQ scans every refresh; main polls between frames and while waiting to flip.
+; Optional poll_render_keyboard scans every eight calls for other renderers.
 ; Tradeoff: this is edge suppression, not timed mechanical debouncing or an event
 ; queue. Multiple pending Space edges can cancel; numbers have ascending priority.
 ; Detailed guide: docs/ALGORITHMS.md

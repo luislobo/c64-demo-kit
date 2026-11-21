@@ -39,7 +39,8 @@ const allFrames=fs.readFileSync(path.join(project,'generated/frames.bin'));
 const frames=Array.from({length:config.DEMO_FRAMES},(_,i)=>allFrames.subarray(i*8000,(i+1)*8000));
 await m.command('> 06 01');
 const times=[],flips=[];
-for(let i=0;i<20;i++){
+const frameChecks=config.DEMO_FRAMES*2+4;
+for(let i=0;i<frameChecks;i++){
  await m.until('render');await m.command('stopwatch reset');
  await m.until('render_done');
  const sw=await m.command('stopwatch');
@@ -102,7 +103,7 @@ for(const effect of [4,5,6]){
  if(seenRows.size!==23)throw Error('Field did not cover every logo row');
  for(const screen of [0x400,0xc000])if(!(await m.bytes(screen+920,screen+999,'field-hud')).every(v=>v===0x10))throw Error('Field altered text colors');
  const fieldFlips=[];
- for(let i=0;i<8;i++){
+ for(let i=0;i<config.DEMO_FRAMES+2;i++){
   await m.until('flip_record');const state=await m.bytes(2,13,'field-flip');
   const start=state[3]?0xe000:0x2000;
   if(!(await m.bytes(start,start+7359,'field-bitmap')).equals(frames[state[0]].subarray(0,7360)))throw Error('Field corrupted wave bitmap');
@@ -110,7 +111,7 @@ for(const effect of [4,5,6]){
  }
  for(let i=1;i<fieldFlips.length;i++)if(((fieldFlips[i]-fieldFlips[i-1])&255)!==(mode==='pal'?5:6))throw Error('Field delayed bitmap flips');
  await m.command(`screenshot "${path.join(root,mode+'-logo-'+['plasma','xor','tunnel'][effect-4]+'.png')}" 2`);
- fieldResults.push({effect,rowsVerified:46,bitmapFramesVerified:8,phaseWrap:true});
+ fieldResults.push({effect,rowsVerified:46,bitmapFramesVerified:config.DEMO_FRAMES+2,phaseWrap:true});
 }
 // Native VBI calls remain one per IRQ with the most expensive field enabled.
 await m.until('irq');const tick=(await m.bytes(7,7,'call-tick'))[0];
@@ -118,7 +119,7 @@ const sidCalls=(await m.bytes(music.sample_calls,music.sample_calls+1,'call-star
 for(let i=0;i<16;i++)await m.until('irq');
 if((((await m.bytes(7,7,'call-tick-end'))[0]-tick)&255)!==16)throw Error('Raster tick drift');
 if((((await m.bytes(music.sample_calls,music.sample_calls+1,'call-end')).readUInt16LE()-sidCalls)&65535)!==16)throw Error('SID call drift');
-const report={mode,framesVerified:44,colorFields:fieldResults,sidCallsPer16Refreshes:16,period:mode==='pal'?5:6,decoderCycles:times,flips,stopAndRestart:true,rainbowMode:true,colorOnlyMode:true,psidPlayback:true,scrollingText:true};
+const report={mode,framesVerified:frameChecks+3*(config.DEMO_FRAMES+2),colorFields:fieldResults,sidCallsPer16Refreshes:16,period:mode==='pal'?5:6,decoderCycles:times,flips,stopAndRestart:true,rainbowMode:true,colorOnlyMode:true,psidPlayback:true,scrollingText:true};
 fs.writeFileSync(path.join(root,'test-'+mode+'.json'),JSON.stringify(report,null,2));
 fs.writeFileSync(path.join(root,'monitor-'+mode+'.txt'),m.log);
 console.log(JSON.stringify(report,null,2));m.socket.end('quit\n');

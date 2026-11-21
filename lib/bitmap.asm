@@ -1,11 +1,13 @@
 ; Algorithm: stream sparse commands into the hidden bitmap. 0 ends the stream;
-; 1..127 skips unchanged bytes; $81..$ff copies 1..127 literal bytes.
+; 1..127 skips; $81..$ff copies literals; $80,count,value fills 1..255 bytes.
 ; Why: skips change only the destination pointer, and literal loops use indexed
 ; indirect reads/writes. Pointers advance once per run, avoiding per-byte calls.
 ; Literal zeros erase old pixels; skips preserve the buffer-specific baseline.
-; Input A is a valid patch index. Clobbers A/X/Y, flags, src/dst and count.
+; Input A is a valid patch index. Clobbers A/X/Y, flags, src/dst/count and
+; patch_tail. A low-stream terminator switches source without resetting dst.
 ; Only builder-validated streams are supported: runtime does not bounds-check.
-; Keyboard polling between runs limits latency without checking every byte.
+; IRQ scans keys every refresh; main polls between frames. Avoiding per-command
+; input calls leaves CPU time for the larger set of shorter compressed runs.
 ; Detailed guide: docs/ALGORITHMS.md
 
 ; Patch commands: 0=end, 1..127=skip unchanged bytes,
@@ -18,6 +20,10 @@ render:
     sta src
     lda patch_pointers+1,x
     sta src+1
+    lda patch_tails,x
+    sta patch_tail
+    lda patch_tails+1,x
+    sta patch_tail+1
     lda #0
     sta dst
     lda visible
@@ -29,10 +35,9 @@ target_secondary:
 set_target:
     sta dst+1
 command:
-    jsr poll_render_keyboard
     ldy #0
     lda (src),y
-    beq render_done
+    beq patch_end
     bmi literal
     clc                       ; Skip by pointer arithmetic: no bitmap writes.
     adc dst
@@ -46,6 +51,7 @@ skip_no_carry:
     jmp command
 literal:
     and #$7f
+    beq fill_run
     sta count
     inc src
     bne literal_begin
@@ -65,6 +71,7 @@ literal_loop:
     bcc source_no_carry
     inc src+1
 source_no_carry:
+advance_destination:
     tya
     clc
     adc dst
@@ -72,5 +79,37 @@ source_no_carry:
     bcc command
     inc dst+1
     jmp command
+patch_end:
+    lda patch_tail+1
+    beq render_done
+    sta src+1
+    lda patch_tail
+    sta src
+    lda #0
+    sta patch_tail+1
+    jmp command
 render_done:
     rts
+
+; Repeated-byte runs omit source reads inside the loop. Three header bytes
+; advance the source; the destination advances by count, including page carry.
+fill_run:
+    ldy #1
+    lda (src),y
+    sta count
+    iny
+    lda (src),y
+    ldy #0
+fill_loop:
+    sta (dst),y
+    iny
+    cpy count
+    bne fill_loop
+    lda src
+    clc
+    adc #3
+    sta src
+    bcc fill_source_ready
+    inc src+1
+fill_source_ready:
+    jmp advance_destination

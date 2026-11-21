@@ -22,8 +22,8 @@ at the end of that guide, because they are not versioned source.
 
 | File | Algorithm, role and reason |
 | --- | --- |
-| [lib/assets.asm](../lib/assets.asm) | Algorithm: emit the patch-address table, place the static bitmap at $2000, and place sparse streams at $4000; use assembler errors to reject overlap. Why: fixed locations match VIC bank addressing and avoid runtime relocation. |
-| [lib/bitmap.asm](../lib/bitmap.asm) | Algorithm: stream sparse commands into the hidden bitmap. 0 ends the stream; 1..127 skips unchanged bytes; $81..$ff copies 1..127 literal bytes. Why: skips change only the destination pointer, and literal loops use indexed |
+| [lib/assets.asm](../lib/assets.asm) | Emit initial/continuation pointers, place low/high streams and static bitmap data, and reject code/data/screen overlap independently of the host allocator. |
+| [lib/bitmap.asm](../lib/bitmap.asm) | Decode skip/literal/fill runs into the hidden bitmap and resume split streams while preserving destination progress. |
 | [lib/boot.asm](../lib/boot.asm) | Algorithm: emit BASIC SYS2064, take over hardware, clear state, initialize both bitmap/color buffers, measure raster length, install vectors, enable IRQ. Why: the BASIC stub loads normally from disk; ROMs are mapped out so the |
 | [lib/colors.asm](../lib/colors.asm) | Algorithm: update 40 screen-color bytes for one body row in both VIC banks. Use the base color for mode 1, row bands for 2/3, or original color fields for 4..6. After all 23 rows, wrap the row and advance the palette phase. |
 | [lib/display.asm](../lib/display.asm) | Algorithm: main-thread flip sets a request and waits. The raster ISR calls flip_border when the deadline is due, selects the other VIC bank/screen, records the tick and clears the request to release the waiting main thread. |
@@ -44,7 +44,7 @@ at the end of that guide, because they are not versioned source.
 | [host/config.cjs](../host/config.cjs) | Algorithm: recognize literal DEMO_* assignments with a constrained regex, translate assembler hexadecimal numerals outside strings, then JSON-decode. Validate byte ranges, font text, equal voice lengths, and power-of-two masks. |
 | [host/d64.cjs](../host/d64.cjs) | Algorithm: allocate a 35-track image, initialize BAM/free bits and directory, reserve track 18 metadata, select data sectors with ten-sector interleave, link 254-byte PRG chunks, and emit one closed PRG entry and its block count. |
 | [host/music.cjs](../host/music.cjs) | Algorithm: MIDI -> Hz via 440 * 2^((note-69)/12), then round(Hz*2^24/clock). Emit low/high-byte tables for each of three voices at PAL and NTSC SID clocks. Why: SID phase accumulators use integer frequency words; host-side math keeps |
-| [host/patches.cjs](../host/patches.cjs) | Algorithm: compare source/target bytes, emit skip/literal runs of at most 127, and merge unchanged gaps up to three bytes inside literal runs. Build two static warm-ups, frame[i-2] -> frame[i] transitions, and a union-based restore. |
+| [host/patches.cjs](../host/patches.cjs) | Balance skip/literal/fill bytecode size, written bytes and command count; verify warm-up, two-buffer transitions and universal restoration. |
 | [tests/emulator.cjs](../tests/emulator.cjs) | Validation algorithm: drive a running VICE remote monitor over TCP, load the PRG, break at renderer/flip boundaries, dump bitmap memory and compare against host frames. Measure decoder cycles and tick spacing; test restore/restart, |
 | [tests/libraries.test.cjs](../tests/libraries.test.cjs) | Validation algorithm: exercise skip/literal boundaries and erasure, simulate four-frame double buffering, then independently walk D64 chains and count BAM free bits at several payload lengths, including exact 254-byte boundaries. |
 | [tests/rebuild-variant.cjs](../tests/rebuild-variant.cjs) | Validation algorithm: draw a synthetic ring/diamond image, derive a temporary application with different text, volume and four frames, then invoke the same builder and assembler. Finally remove the fixture and rebuild the default. |
@@ -177,3 +177,13 @@ source, missing attribution/licenses and lost commit pins are rejected.
 | [tools/64tass/syntax/notepadpp-old-64tass.xml](../tools/64tass/syntax/notepadpp-old-64tass.xml) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
 | [tools/64tass/syntax/notepadpp-udl2.1-64tass.xml](../tools/64tass/syntax/notepadpp-udl2.1-64tass.xml) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
 | [tools/64tass/syntax/vim/syntax/64tass.vim](../tools/64tass/syntax/vim/syntax/64tass.vim) | Upstream editor syntax/build definition for assembly tokens; not part of the demo or compiler runtime. |
+
+## Frame-capacity work
+
+| File | Algorithm, role and reason |
+| --- | --- |
+| [host/patch-memory.cjs](../host/patch-memory.cjs) | Pack high/low RAM and split only at command boundaries, with explicit continuation pointers and overlap checks. |
+| [tests/patch-memory.test.cjs](../tests/patch-memory.test.cjs) | Check fills, sparse erasures, allocation bounds and exact reconstruction of split streams. |
+| [tests/stress-frames.cjs](../tests/stress-frames.cjs) | Interleave five real PAL/NTSC trials for fitting 8/16-phase builds, compare displayed bitmaps and reject overflowing 32 phases. |
+| [docs/FRAME_CAPACITY.md](FRAME_CAPACITY.md) | Workload, memory limits, repeatable timing results and phase-count/frame-rate distinction. |
+| [dist/validation/frame-stress.json](../dist/validation/frame-stress.json) | Raw repeated-trial samples and summaries; records emulator evidence, not a real-hardware certification. |

@@ -1,0 +1,3519 @@
+{
+  "runs": 5,
+  "metric": "VICE elapsed CPU cycles from render entry to render_done, including IRQ and VIC stalls",
+  "workload": "same logo/font, plasma color field, Clockwork and ticker active; 20 displayed frames and 16 extra music refreshes per trial",
+  "profiles": [
+    {
+      "name": "optimized-32",
+      "frames": 32,
+      "fits": false,
+      "rejection": "Patch streams and tables need 58086 bytes; only 35584 fit across both memory regions."
+    },
+    {
+      "name": "baseline-8",
+      "frames": 8,
+      "fits": true,
+      "patchBytes": 24415,
+      "colorFieldBytes": 2188,
+      "lowPatchBytes": 0,
+      "highMemoryFree": 6165
+    },
+    {
+      "name": "optimized-8",
+      "frames": 8,
+      "fits": true,
+      "patchBytes": 19715,
+      "colorFieldBytes": 2188,
+      "lowPatchBytes": 0,
+      "highMemoryFree": 10865
+    },
+    {
+      "name": "optimized-16",
+      "frames": 16,
+      "fits": true,
+      "patchBytes": 32988,
+      "colorFieldBytes": 2188,
+      "lowPatchBytes": 2816,
+      "highMemoryFree": 408
+    }
+  ],
+  "trials": [
+    {
+      "profile": "baseline-8",
+      "mode": "pal",
+      "trial": 0,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        73873,
+        81044,
+        85236,
+        84900,
+        85525,
+        83085,
+        86011,
+        85098,
+        86176,
+        83301,
+        85153,
+        84552,
+        85592,
+        83459,
+        85848,
+        85110,
+        86291,
+        83134,
+        85253,
+        84926
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 0,
+          "tick": 45
+        },
+        {
+          "phase": 1,
+          "tick": 50
+        },
+        {
+          "phase": 2,
+          "tick": 55
+        },
+        {
+          "phase": 3,
+          "tick": 60
+        },
+        {
+          "phase": 4,
+          "tick": 65
+        },
+        {
+          "phase": 5,
+          "tick": 70
+        },
+        {
+          "phase": 6,
+          "tick": 75
+        },
+        {
+          "phase": 7,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "baseline-8",
+      "mode": "ntsc",
+      "trial": 0,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        77803,
+        85317,
+        89253,
+        89239,
+        89533,
+        87411,
+        90035,
+        89440,
+        90200,
+        87551,
+        89213,
+        88908,
+        89624,
+        87770,
+        89867,
+        89455,
+        90360,
+        87459,
+        89266,
+        89280
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 0,
+          "tick": 54
+        },
+        {
+          "phase": 1,
+          "tick": 60
+        },
+        {
+          "phase": 2,
+          "tick": 66
+        },
+        {
+          "phase": 3,
+          "tick": 72
+        },
+        {
+          "phase": 4,
+          "tick": 78
+        },
+        {
+          "phase": 5,
+          "tick": 84
+        },
+        {
+          "phase": 6,
+          "tick": 90
+        },
+        {
+          "phase": 7,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-8",
+      "mode": "pal",
+      "trial": 0,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        68627,
+        74003,
+        79629,
+        80268,
+        82562,
+        79799,
+        80986,
+        80153,
+        81677,
+        78980,
+        79529,
+        79959,
+        82622,
+        80130,
+        80761,
+        80154,
+        81776,
+        78845,
+        79625,
+        80266
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 0,
+          "tick": 45
+        },
+        {
+          "phase": 1,
+          "tick": 50
+        },
+        {
+          "phase": 2,
+          "tick": 55
+        },
+        {
+          "phase": 3,
+          "tick": 60
+        },
+        {
+          "phase": 4,
+          "tick": 65
+        },
+        {
+          "phase": 5,
+          "tick": 70
+        },
+        {
+          "phase": 6,
+          "tick": 75
+        },
+        {
+          "phase": 7,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-8",
+      "mode": "ntsc",
+      "trial": 0,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        72517,
+        78021,
+        74722,
+        81127,
+        86508,
+        80711,
+        75834,
+        81129,
+        85689,
+        79694,
+        74607,
+        80890,
+        86595,
+        81060,
+        75893,
+        80996,
+        85799,
+        79670,
+        74699,
+        81238
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 0,
+          "tick": 54
+        },
+        {
+          "phase": 1,
+          "tick": 60
+        },
+        {
+          "phase": 2,
+          "tick": 66
+        },
+        {
+          "phase": 3,
+          "tick": 72
+        },
+        {
+          "phase": 4,
+          "tick": 78
+        },
+        {
+          "phase": 5,
+          "tick": 84
+        },
+        {
+          "phase": 6,
+          "tick": 90
+        },
+        {
+          "phase": 7,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-16",
+      "mode": "pal",
+      "trial": 0,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        68727,
+        74930,
+        65587,
+        70181,
+        66224,
+        71527,
+        66836,
+        72509,
+        67732,
+        72180,
+        66892,
+        71247,
+        66371,
+        72026,
+        67962,
+        72143,
+        66484,
+        72173,
+        65599,
+        70294
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 8,
+          "tick": 45
+        },
+        {
+          "phase": 9,
+          "tick": 50
+        },
+        {
+          "phase": 10,
+          "tick": 55
+        },
+        {
+          "phase": 11,
+          "tick": 60
+        },
+        {
+          "phase": 12,
+          "tick": 65
+        },
+        {
+          "phase": 13,
+          "tick": 70
+        },
+        {
+          "phase": 14,
+          "tick": 75
+        },
+        {
+          "phase": 15,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-16",
+      "mode": "ntsc",
+      "trial": 0,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        72638,
+        78936,
+        69367,
+        74190,
+        69953,
+        75579,
+        70581,
+        76572,
+        71523,
+        76173,
+        70688,
+        75324,
+        70124,
+        76084,
+        71756,
+        76223,
+        70282,
+        76229,
+        69375,
+        74374
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 8,
+          "tick": 54
+        },
+        {
+          "phase": 9,
+          "tick": 60
+        },
+        {
+          "phase": 10,
+          "tick": 66
+        },
+        {
+          "phase": 11,
+          "tick": 72
+        },
+        {
+          "phase": 12,
+          "tick": 78
+        },
+        {
+          "phase": 13,
+          "tick": 84
+        },
+        {
+          "phase": 14,
+          "tick": 90
+        },
+        {
+          "phase": 15,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-16",
+      "mode": "pal",
+      "trial": 1,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        68725,
+        74933,
+        65581,
+        70182,
+        66221,
+        71523,
+        66841,
+        72506,
+        67775,
+        72182,
+        66891,
+        71250,
+        66372,
+        72025,
+        67960,
+        72141,
+        66489,
+        72166,
+        65599,
+        70291
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 8,
+          "tick": 45
+        },
+        {
+          "phase": 9,
+          "tick": 50
+        },
+        {
+          "phase": 10,
+          "tick": 55
+        },
+        {
+          "phase": 11,
+          "tick": 60
+        },
+        {
+          "phase": 12,
+          "tick": 65
+        },
+        {
+          "phase": 13,
+          "tick": 70
+        },
+        {
+          "phase": 14,
+          "tick": 75
+        },
+        {
+          "phase": 15,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-16",
+      "mode": "ntsc",
+      "trial": 1,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        72639,
+        78936,
+        69367,
+        74190,
+        69953,
+        75579,
+        70581,
+        76572,
+        71523,
+        76173,
+        70688,
+        75324,
+        70124,
+        76084,
+        71756,
+        76223,
+        70282,
+        76229,
+        69375,
+        74374
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 8,
+          "tick": 54
+        },
+        {
+          "phase": 9,
+          "tick": 60
+        },
+        {
+          "phase": 10,
+          "tick": 66
+        },
+        {
+          "phase": 11,
+          "tick": 72
+        },
+        {
+          "phase": 12,
+          "tick": 78
+        },
+        {
+          "phase": 13,
+          "tick": 84
+        },
+        {
+          "phase": 14,
+          "tick": 90
+        },
+        {
+          "phase": 15,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-8",
+      "mode": "pal",
+      "trial": 1,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        68630,
+        74005,
+        79631,
+        80270,
+        82558,
+        79802,
+        80983,
+        80153,
+        81677,
+        78981,
+        79532,
+        79960,
+        82616,
+        80124,
+        80760,
+        80153,
+        81776,
+        78853,
+        79633,
+        80261
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 0,
+          "tick": 45
+        },
+        {
+          "phase": 1,
+          "tick": 50
+        },
+        {
+          "phase": 2,
+          "tick": 55
+        },
+        {
+          "phase": 3,
+          "tick": 60
+        },
+        {
+          "phase": 4,
+          "tick": 65
+        },
+        {
+          "phase": 5,
+          "tick": 70
+        },
+        {
+          "phase": 6,
+          "tick": 75
+        },
+        {
+          "phase": 7,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-8",
+      "mode": "ntsc",
+      "trial": 1,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        72517,
+        78021,
+        74722,
+        81127,
+        86508,
+        80711,
+        75834,
+        81129,
+        85689,
+        79694,
+        74607,
+        80890,
+        86595,
+        81060,
+        75893,
+        80996,
+        85799,
+        79670,
+        74699,
+        81238
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 0,
+          "tick": 54
+        },
+        {
+          "phase": 1,
+          "tick": 60
+        },
+        {
+          "phase": 2,
+          "tick": 66
+        },
+        {
+          "phase": 3,
+          "tick": 72
+        },
+        {
+          "phase": 4,
+          "tick": 78
+        },
+        {
+          "phase": 5,
+          "tick": 84
+        },
+        {
+          "phase": 6,
+          "tick": 90
+        },
+        {
+          "phase": 7,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "baseline-8",
+      "mode": "pal",
+      "trial": 1,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        73873,
+        81036,
+        85235,
+        84896,
+        85529,
+        83083,
+        86016,
+        85100,
+        86176,
+        83295,
+        85151,
+        84555,
+        85589,
+        83460,
+        85806,
+        85112,
+        86297,
+        83131,
+        85259,
+        84926
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 0,
+          "tick": 45
+        },
+        {
+          "phase": 1,
+          "tick": 50
+        },
+        {
+          "phase": 2,
+          "tick": 55
+        },
+        {
+          "phase": 3,
+          "tick": 60
+        },
+        {
+          "phase": 4,
+          "tick": 65
+        },
+        {
+          "phase": 5,
+          "tick": 70
+        },
+        {
+          "phase": 6,
+          "tick": 75
+        },
+        {
+          "phase": 7,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "baseline-8",
+      "mode": "ntsc",
+      "trial": 1,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        77803,
+        85317,
+        89253,
+        89239,
+        89533,
+        87411,
+        90035,
+        89440,
+        90200,
+        87551,
+        89213,
+        88908,
+        89624,
+        87770,
+        89867,
+        89455,
+        90360,
+        87459,
+        89266,
+        89280
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 0,
+          "tick": 54
+        },
+        {
+          "phase": 1,
+          "tick": 60
+        },
+        {
+          "phase": 2,
+          "tick": 66
+        },
+        {
+          "phase": 3,
+          "tick": 72
+        },
+        {
+          "phase": 4,
+          "tick": 78
+        },
+        {
+          "phase": 5,
+          "tick": 84
+        },
+        {
+          "phase": 6,
+          "tick": 90
+        },
+        {
+          "phase": 7,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "baseline-8",
+      "mode": "pal",
+      "trial": 2,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        73876,
+        81042,
+        85236,
+        84900,
+        85525,
+        83085,
+        86011,
+        85098,
+        86176,
+        83301,
+        85153,
+        84552,
+        85592,
+        83459,
+        85848,
+        85110,
+        86291,
+        83134,
+        85253,
+        84926
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 0,
+          "tick": 45
+        },
+        {
+          "phase": 1,
+          "tick": 50
+        },
+        {
+          "phase": 2,
+          "tick": 55
+        },
+        {
+          "phase": 3,
+          "tick": 60
+        },
+        {
+          "phase": 4,
+          "tick": 65
+        },
+        {
+          "phase": 5,
+          "tick": 70
+        },
+        {
+          "phase": 6,
+          "tick": 75
+        },
+        {
+          "phase": 7,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "baseline-8",
+      "mode": "ntsc",
+      "trial": 2,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        77800,
+        85317,
+        89253,
+        89239,
+        89533,
+        87411,
+        90035,
+        89440,
+        90200,
+        87551,
+        89213,
+        88908,
+        89624,
+        87770,
+        89867,
+        89455,
+        90360,
+        87459,
+        89266,
+        89280
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 0,
+          "tick": 54
+        },
+        {
+          "phase": 1,
+          "tick": 60
+        },
+        {
+          "phase": 2,
+          "tick": 66
+        },
+        {
+          "phase": 3,
+          "tick": 72
+        },
+        {
+          "phase": 4,
+          "tick": 78
+        },
+        {
+          "phase": 5,
+          "tick": 84
+        },
+        {
+          "phase": 6,
+          "tick": 90
+        },
+        {
+          "phase": 7,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-8",
+      "mode": "pal",
+      "trial": 2,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        68625,
+        74007,
+        79624,
+        80264,
+        82562,
+        79805,
+        80988,
+        80154,
+        81677,
+        78980,
+        79529,
+        79959,
+        82622,
+        80130,
+        80761,
+        80154,
+        81776,
+        78845,
+        79625,
+        80266
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 0,
+          "tick": 45
+        },
+        {
+          "phase": 1,
+          "tick": 50
+        },
+        {
+          "phase": 2,
+          "tick": 55
+        },
+        {
+          "phase": 3,
+          "tick": 60
+        },
+        {
+          "phase": 4,
+          "tick": 65
+        },
+        {
+          "phase": 5,
+          "tick": 70
+        },
+        {
+          "phase": 6,
+          "tick": 75
+        },
+        {
+          "phase": 7,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-8",
+      "mode": "ntsc",
+      "trial": 2,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        72517,
+        78021,
+        74722,
+        81127,
+        86508,
+        80711,
+        75834,
+        81129,
+        85689,
+        79694,
+        74607,
+        80890,
+        86595,
+        81060,
+        75893,
+        80996,
+        85799,
+        79670,
+        74699,
+        81238
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 0,
+          "tick": 54
+        },
+        {
+          "phase": 1,
+          "tick": 60
+        },
+        {
+          "phase": 2,
+          "tick": 66
+        },
+        {
+          "phase": 3,
+          "tick": 72
+        },
+        {
+          "phase": 4,
+          "tick": 78
+        },
+        {
+          "phase": 5,
+          "tick": 84
+        },
+        {
+          "phase": 6,
+          "tick": 90
+        },
+        {
+          "phase": 7,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-16",
+      "mode": "pal",
+      "trial": 2,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        68726,
+        74930,
+        65587,
+        70181,
+        66224,
+        71527,
+        66836,
+        72509,
+        67732,
+        72180,
+        66892,
+        71247,
+        66371,
+        72026,
+        67962,
+        72143,
+        66484,
+        72173,
+        65599,
+        70294
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 8,
+          "tick": 45
+        },
+        {
+          "phase": 9,
+          "tick": 50
+        },
+        {
+          "phase": 10,
+          "tick": 55
+        },
+        {
+          "phase": 11,
+          "tick": 60
+        },
+        {
+          "phase": 12,
+          "tick": 65
+        },
+        {
+          "phase": 13,
+          "tick": 70
+        },
+        {
+          "phase": 14,
+          "tick": 75
+        },
+        {
+          "phase": 15,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-16",
+      "mode": "ntsc",
+      "trial": 2,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        72636,
+        78936,
+        69367,
+        74190,
+        69953,
+        75579,
+        70581,
+        76572,
+        71523,
+        76173,
+        70688,
+        75324,
+        70124,
+        76084,
+        71756,
+        76223,
+        70282,
+        76229,
+        69375,
+        74374
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 8,
+          "tick": 54
+        },
+        {
+          "phase": 9,
+          "tick": 60
+        },
+        {
+          "phase": 10,
+          "tick": 66
+        },
+        {
+          "phase": 11,
+          "tick": 72
+        },
+        {
+          "phase": 12,
+          "tick": 78
+        },
+        {
+          "phase": 13,
+          "tick": 84
+        },
+        {
+          "phase": 14,
+          "tick": 90
+        },
+        {
+          "phase": 15,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-16",
+      "mode": "pal",
+      "trial": 3,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        68726,
+        74930,
+        65587,
+        70181,
+        66224,
+        71527,
+        66836,
+        72509,
+        67732,
+        72180,
+        66892,
+        71247,
+        66371,
+        72026,
+        67962,
+        72143,
+        66484,
+        72173,
+        65599,
+        70294
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 8,
+          "tick": 45
+        },
+        {
+          "phase": 9,
+          "tick": 50
+        },
+        {
+          "phase": 10,
+          "tick": 55
+        },
+        {
+          "phase": 11,
+          "tick": 60
+        },
+        {
+          "phase": 12,
+          "tick": 65
+        },
+        {
+          "phase": 13,
+          "tick": 70
+        },
+        {
+          "phase": 14,
+          "tick": 75
+        },
+        {
+          "phase": 15,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-16",
+      "mode": "ntsc",
+      "trial": 3,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        72639,
+        78936,
+        69367,
+        74190,
+        69953,
+        75579,
+        70581,
+        76572,
+        71523,
+        76173,
+        70688,
+        75324,
+        70124,
+        76084,
+        71756,
+        76223,
+        70282,
+        76229,
+        69375,
+        74374
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 8,
+          "tick": 54
+        },
+        {
+          "phase": 9,
+          "tick": 60
+        },
+        {
+          "phase": 10,
+          "tick": 66
+        },
+        {
+          "phase": 11,
+          "tick": 72
+        },
+        {
+          "phase": 12,
+          "tick": 78
+        },
+        {
+          "phase": 13,
+          "tick": 84
+        },
+        {
+          "phase": 14,
+          "tick": 90
+        },
+        {
+          "phase": 15,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-8",
+      "mode": "pal",
+      "trial": 3,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        68628,
+        74003,
+        79629,
+        80268,
+        82562,
+        79799,
+        80986,
+        80153,
+        81677,
+        78980,
+        79529,
+        79959,
+        82622,
+        80130,
+        80761,
+        80154,
+        81776,
+        78845,
+        79625,
+        80266
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 0,
+          "tick": 45
+        },
+        {
+          "phase": 1,
+          "tick": 50
+        },
+        {
+          "phase": 2,
+          "tick": 55
+        },
+        {
+          "phase": 3,
+          "tick": 60
+        },
+        {
+          "phase": 4,
+          "tick": 65
+        },
+        {
+          "phase": 5,
+          "tick": 70
+        },
+        {
+          "phase": 6,
+          "tick": 75
+        },
+        {
+          "phase": 7,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-8",
+      "mode": "ntsc",
+      "trial": 3,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        72514,
+        78021,
+        74722,
+        81127,
+        86508,
+        80711,
+        75834,
+        81129,
+        85689,
+        79694,
+        74607,
+        80890,
+        86595,
+        81060,
+        75893,
+        80996,
+        85799,
+        79670,
+        74699,
+        81238
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 0,
+          "tick": 54
+        },
+        {
+          "phase": 1,
+          "tick": 60
+        },
+        {
+          "phase": 2,
+          "tick": 66
+        },
+        {
+          "phase": 3,
+          "tick": 72
+        },
+        {
+          "phase": 4,
+          "tick": 78
+        },
+        {
+          "phase": 5,
+          "tick": 84
+        },
+        {
+          "phase": 6,
+          "tick": 90
+        },
+        {
+          "phase": 7,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "baseline-8",
+      "mode": "pal",
+      "trial": 3,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        73873,
+        81044,
+        85236,
+        84900,
+        85525,
+        83085,
+        86011,
+        85098,
+        86176,
+        83301,
+        85153,
+        84552,
+        85592,
+        83459,
+        85848,
+        85110,
+        86291,
+        83134,
+        85253,
+        84926
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 0,
+          "tick": 45
+        },
+        {
+          "phase": 1,
+          "tick": 50
+        },
+        {
+          "phase": 2,
+          "tick": 55
+        },
+        {
+          "phase": 3,
+          "tick": 60
+        },
+        {
+          "phase": 4,
+          "tick": 65
+        },
+        {
+          "phase": 5,
+          "tick": 70
+        },
+        {
+          "phase": 6,
+          "tick": 75
+        },
+        {
+          "phase": 7,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "baseline-8",
+      "mode": "ntsc",
+      "trial": 3,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        77799,
+        85317,
+        89253,
+        89239,
+        89533,
+        87411,
+        90035,
+        89440,
+        90200,
+        87551,
+        89213,
+        88908,
+        89624,
+        87770,
+        89867,
+        89455,
+        90360,
+        87459,
+        89266,
+        89280
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 0,
+          "tick": 54
+        },
+        {
+          "phase": 1,
+          "tick": 60
+        },
+        {
+          "phase": 2,
+          "tick": 66
+        },
+        {
+          "phase": 3,
+          "tick": 72
+        },
+        {
+          "phase": 4,
+          "tick": 78
+        },
+        {
+          "phase": 5,
+          "tick": 84
+        },
+        {
+          "phase": 6,
+          "tick": 90
+        },
+        {
+          "phase": 7,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "baseline-8",
+      "mode": "pal",
+      "trial": 4,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        73873,
+        81044,
+        85236,
+        84900,
+        85525,
+        83085,
+        86011,
+        85098,
+        86176,
+        83301,
+        85153,
+        84552,
+        85592,
+        83459,
+        85848,
+        85110,
+        86291,
+        83134,
+        85253,
+        84926
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 0,
+          "tick": 45
+        },
+        {
+          "phase": 1,
+          "tick": 50
+        },
+        {
+          "phase": 2,
+          "tick": 55
+        },
+        {
+          "phase": 3,
+          "tick": 60
+        },
+        {
+          "phase": 4,
+          "tick": 65
+        },
+        {
+          "phase": 5,
+          "tick": 70
+        },
+        {
+          "phase": 6,
+          "tick": 75
+        },
+        {
+          "phase": 7,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "baseline-8",
+      "mode": "ntsc",
+      "trial": 4,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        77803,
+        85317,
+        89253,
+        89239,
+        89533,
+        87411,
+        90035,
+        89440,
+        90200,
+        87551,
+        89213,
+        88908,
+        89624,
+        87770,
+        89867,
+        89455,
+        90360,
+        87459,
+        89266,
+        89280
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 0,
+          "tick": 54
+        },
+        {
+          "phase": 1,
+          "tick": 60
+        },
+        {
+          "phase": 2,
+          "tick": 66
+        },
+        {
+          "phase": 3,
+          "tick": 72
+        },
+        {
+          "phase": 4,
+          "tick": 78
+        },
+        {
+          "phase": 5,
+          "tick": 84
+        },
+        {
+          "phase": 6,
+          "tick": 90
+        },
+        {
+          "phase": 7,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-8",
+      "mode": "pal",
+      "trial": 4,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        68627,
+        74003,
+        79629,
+        80268,
+        82562,
+        79799,
+        80986,
+        80153,
+        81677,
+        78980,
+        79529,
+        79959,
+        82622,
+        80130,
+        80761,
+        80154,
+        81776,
+        78845,
+        79625,
+        80266
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 0,
+          "tick": 45
+        },
+        {
+          "phase": 1,
+          "tick": 50
+        },
+        {
+          "phase": 2,
+          "tick": 55
+        },
+        {
+          "phase": 3,
+          "tick": 60
+        },
+        {
+          "phase": 4,
+          "tick": 65
+        },
+        {
+          "phase": 5,
+          "tick": 70
+        },
+        {
+          "phase": 6,
+          "tick": 75
+        },
+        {
+          "phase": 7,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-8",
+      "mode": "ntsc",
+      "trial": 4,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        72514,
+        78021,
+        74722,
+        81127,
+        86508,
+        80711,
+        75834,
+        81129,
+        85689,
+        79694,
+        74607,
+        80890,
+        86595,
+        81060,
+        75893,
+        80996,
+        85799,
+        79670,
+        74699,
+        81238
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 0,
+          "tick": 54
+        },
+        {
+          "phase": 1,
+          "tick": 60
+        },
+        {
+          "phase": 2,
+          "tick": 66
+        },
+        {
+          "phase": 3,
+          "tick": 72
+        },
+        {
+          "phase": 4,
+          "tick": 78
+        },
+        {
+          "phase": 5,
+          "tick": 84
+        },
+        {
+          "phase": 6,
+          "tick": 90
+        },
+        {
+          "phase": 7,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-16",
+      "mode": "pal",
+      "trial": 4,
+      "framesVerified": 20,
+      "period": 5,
+      "elapsedRenderCycles": [
+        68727,
+        74930,
+        65587,
+        70181,
+        66224,
+        71527,
+        66836,
+        72509,
+        67732,
+        72180,
+        66892,
+        71247,
+        66371,
+        72026,
+        67962,
+        72143,
+        66484,
+        72173,
+        65599,
+        70294
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 5
+        },
+        {
+          "phase": 1,
+          "tick": 10
+        },
+        {
+          "phase": 2,
+          "tick": 15
+        },
+        {
+          "phase": 3,
+          "tick": 20
+        },
+        {
+          "phase": 4,
+          "tick": 25
+        },
+        {
+          "phase": 5,
+          "tick": 30
+        },
+        {
+          "phase": 6,
+          "tick": 35
+        },
+        {
+          "phase": 7,
+          "tick": 40
+        },
+        {
+          "phase": 8,
+          "tick": 45
+        },
+        {
+          "phase": 9,
+          "tick": 50
+        },
+        {
+          "phase": 10,
+          "tick": 55
+        },
+        {
+          "phase": 11,
+          "tick": 60
+        },
+        {
+          "phase": 12,
+          "tick": 65
+        },
+        {
+          "phase": 13,
+          "tick": 70
+        },
+        {
+          "phase": 14,
+          "tick": 75
+        },
+        {
+          "phase": 15,
+          "tick": 80
+        },
+        {
+          "phase": 0,
+          "tick": 85
+        },
+        {
+          "phase": 1,
+          "tick": 90
+        },
+        {
+          "phase": 2,
+          "tick": 95
+        },
+        {
+          "phase": 3,
+          "tick": 100
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    },
+    {
+      "profile": "optimized-16",
+      "mode": "ntsc",
+      "trial": 4,
+      "framesVerified": 20,
+      "period": 6,
+      "elapsedRenderCycles": [
+        72637,
+        78936,
+        69367,
+        74190,
+        69953,
+        75579,
+        70581,
+        76572,
+        71523,
+        76173,
+        70688,
+        75324,
+        70124,
+        76084,
+        71756,
+        76223,
+        70282,
+        76229,
+        69375,
+        74374
+      ],
+      "flips": [
+        {
+          "phase": 0,
+          "tick": 6
+        },
+        {
+          "phase": 1,
+          "tick": 12
+        },
+        {
+          "phase": 2,
+          "tick": 18
+        },
+        {
+          "phase": 3,
+          "tick": 24
+        },
+        {
+          "phase": 4,
+          "tick": 30
+        },
+        {
+          "phase": 5,
+          "tick": 36
+        },
+        {
+          "phase": 6,
+          "tick": 42
+        },
+        {
+          "phase": 7,
+          "tick": 48
+        },
+        {
+          "phase": 8,
+          "tick": 54
+        },
+        {
+          "phase": 9,
+          "tick": 60
+        },
+        {
+          "phase": 10,
+          "tick": 66
+        },
+        {
+          "phase": 11,
+          "tick": 72
+        },
+        {
+          "phase": 12,
+          "tick": 78
+        },
+        {
+          "phase": 13,
+          "tick": 84
+        },
+        {
+          "phase": 14,
+          "tick": 90
+        },
+        {
+          "phase": 15,
+          "tick": 96
+        },
+        {
+          "phase": 0,
+          "tick": 102
+        },
+        {
+          "phase": 1,
+          "tick": 108
+        },
+        {
+          "phase": 2,
+          "tick": 114
+        },
+        {
+          "phase": 3,
+          "tick": 120
+        }
+      ],
+      "sidCallsPer16Refreshes": 16,
+      "errors": 0
+    }
+  ],
+  "errors": 0,
+  "summary": [
+    {
+      "profile": "baseline-8",
+      "mode": "pal",
+      "runs": 5,
+      "framesVerified": 100,
+      "medianSteadyRenderCycles": 85131.5,
+      "trialMedianRange": [
+        85131.5,
+        85131.5
+      ],
+      "maxRenderCycles": 86297,
+      "nominalFPS": 10,
+      "waveCycleSeconds": 0.8
+    },
+    {
+      "profile": "baseline-8",
+      "mode": "ntsc",
+      "runs": 5,
+      "framesVerified": 100,
+      "medianSteadyRenderCycles": 89273,
+      "trialMedianRange": [
+        89273,
+        89273
+      ],
+      "maxRenderCycles": 90360,
+      "nominalFPS": 10,
+      "waveCycleSeconds": 0.8
+    },
+    {
+      "profile": "optimized-8",
+      "mode": "pal",
+      "runs": 5,
+      "framesVerified": 100,
+      "medianSteadyRenderCycles": 80153.5,
+      "trialMedianRange": [
+        80153,
+        80154
+      ],
+      "maxRenderCycles": 82622,
+      "nominalFPS": 10,
+      "waveCycleSeconds": 0.8
+    },
+    {
+      "profile": "optimized-8",
+      "mode": "ntsc",
+      "runs": 5,
+      "framesVerified": 100,
+      "medianSteadyRenderCycles": 80943,
+      "trialMedianRange": [
+        80943,
+        80943
+      ],
+      "maxRenderCycles": 86595,
+      "nominalFPS": 10,
+      "waveCycleSeconds": 0.8
+    },
+    {
+      "profile": "optimized-16",
+      "mode": "pal",
+      "runs": 5,
+      "framesVerified": 100,
+      "medianSteadyRenderCycles": 69071.5,
+      "trialMedianRange": [
+        69071,
+        69071.5
+      ],
+      "maxRenderCycles": 74933,
+      "nominalFPS": 10,
+      "waveCycleSeconds": 1.6
+    },
+    {
+      "profile": "optimized-16",
+      "mode": "ntsc",
+      "runs": 5,
+      "framesVerified": 100,
+      "medianSteadyRenderCycles": 72973,
+      "trialMedianRange": [
+        72973,
+        72973
+      ],
+      "maxRenderCycles": 78936,
+      "nominalFPS": 10,
+      "waveCycleSeconds": 1.6
+    }
+  ]
+}

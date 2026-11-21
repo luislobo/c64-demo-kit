@@ -1,8 +1,10 @@
 # TORQ X SENDERO demo
 
-The default application combines the supplied logo, its eight-frame bitmap wave,
+The default application combines the supplied logo, its 16-phase bitmap wave,
 three original foreground color fields, a pixel ticker and Clockwork SID music.
 It starts with plasma and automatically changes modes every eight nominal seconds.
+The wave displays 10 frames per second, completing a cycle in 1.6 seconds.
+[Capacity measurements](FRAME_CAPACITY.md) cover 8, 16 and 32 phases.
 
 | Key | Result |
 | --- | --- |
@@ -64,8 +66,12 @@ remain outside the field. This keeps the recognizable logo and its wave visible.
 The host prepares a 256-byte sine table plus two 920-byte polar maps. Their
 23-word row-address tables add 92 bytes, for 2,188 bytes total. These follow the
 patch streams, below `$c000`; host and assembler independently reject overlaps.
-The SID occupies `$c400..$c5d5`. Code, font, text and patch pointers fit below
-`$2000`. IRQ scratch `$22`, `$24..$27` and automatic-show state `$28..$2a` are
+The 16-phase build uses repeated-byte patch compression and `$1500..$1fff`
+for low patch storage. A continuation table lets a stream resume in high RAM
+without resetting its destination. Code/font/text/tables fit below `$1500`;
+`$2e..$2f` holds the pending continuation. High patches plus color tables leave
+408 bytes before `$c000`. The SID occupies `$c400..$c5d5`.
+IRQ scratch `$22`, `$24..$27` and automatic-show state `$28..$2a` are
 disjoint from decoder pointers, ticker state and the imported player's allocation.
 
 Plasma adds horizontal and vertical sine samples; XOR combines them with EOR.
@@ -77,7 +83,8 @@ which makes the patched screen-store operands safe from reentry.
 The automatic show requests modes through the existing controller every 400
 normalized logic updates, or 400 PAL/480 NTSC refreshes. Entering stationary
 mode therefore uses the normal bitmap restoration path. Keyboard scanning runs
-every eighth patch command and every IRQ, leaving time for color and music work.
+every IRQ and between frames. The decoder performs no per-command keyboard
+calls, leaving time for compressed-run dispatch, color and music work.
 
 ## Credits
 
@@ -103,7 +110,7 @@ node tests/verify-torq.cjs
 The native check requires VICE `x64sc`, 64tass and headless Linux `xvfb-run`.
 It rebuilds music from scratch and checks automatic startup, eight-second
 transitions, wraparound and the Space edge handler on PAL/NTSC. It also compares
-44 displayed bitmap frames per machine, 46 color rows per new mode including
+90 displayed bitmap frames per machine, 46 color rows per new mode including
 phase wrap, five/six-refresh flip spacing, text colors, stop/restart, ticker
 buffers and one SID play call per refresh. Results and captures go to `build/`.
 Input events/handlers are exercised directly; physical keyboard scanning,

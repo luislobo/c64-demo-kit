@@ -82,7 +82,8 @@ The demo starts with a plasma-colored wave and changes effects every eight
 nominal seconds. 1 selects blue wave, 2 rainbow wave, 3 stationary color cycle,
 4 plasma, 5 XOR and 6 tunnel. A number key or Space takes manual control until
 reset. Space starts/stops the wave; M pauses/restarts the music. The wave uses
-eight precomputed frames. See the [TORQ integration guide](docs/TORQ.md) for
+16 precomputed phases at 10 displayed frames per second. The wave cycle is
+1.6 seconds. See [frame-capacity measurements](docs/FRAME_CAPACITY.md). See the [TORQ integration guide](docs/TORQ.md) for
 configuration, credits and verification.
 
 ## Change the application in one assembly file
@@ -154,7 +155,7 @@ state let native rendering fit the C64 memory and raster budget.
 
 ### Calling and interrupt contract
 
-- `render`: A = patch index. Clobbers A/X/Y, flags, `src`, `dst`, and `count`.
+- `render`: A = patch index. Clobbers A/X/Y, flags, `src`, `dst`, `count`, and `patch_tail`.
   It does not flip the visible screen. Call from the main thread with IRQ enabled.
 - Patch indices 0 and 1 warm up the two buffers from the static image. Indices
   2 through `DEMO_FRAMES+1` are steady transitions; `DEMO_FRAMES+2` restores the
@@ -177,13 +178,17 @@ state let native rendering fit the C64 memory and raster budget.
 | --- | --- |
 | `$02..$4f`, `$fb..$fe` | Runtime state and pointers; see `state.asm` |
 | `$0400..$07ff` | Primary color/screen matrix |
-| `$0801..$1fff` | BASIC stub, code, font, text, music, patch pointers |
+| `$0801..$14ff` | BASIC stub, code, font, text and patch/continuation pointers |
+| `$1500..$1fff` | Optional low patch storage, used by the 16-phase demo |
 | `$2000..$3f3f` | Primary bitmap |
 | `$4000..$bfff` | Generated sparse patch streams and optional color-field tables |
 | `$c000..$c3ff` | Secondary color/screen matrix |
 | `$c400..$cfff` | Optional imported SID payload |
 | `$e000..$ff3f` | Secondary bitmap, RAM under KERNAL ROM |
 | `$fffa..$ffff` | NMI/IRQ vectors |
+
+Entries that do not need low patch storage can use code/font RAM through `$1fff`.
+The assembler enforces the boundary selected by the generated layout.
 
 The engine takes over VIC-II, SID, the raster IRQ, CIA keyboard ports and the
 low VIC bank-selection bits. It disables CIA interrupts and maps ROMs out with
@@ -201,6 +206,7 @@ The palette has eight non-black foreground colors with a black background.
 | `host/config.cjs` | `readConfig(file)` with bitmap validation; `readConstants(file)` for other scene validators |
 | `host/bitmap.cjs` | `index`, `fitBitmap`, `drawText`, `waveFrames` |
 | `host/patches.cjs` | `encodePatch`, `applyPatch`, `makeDoubleBufferedPatches`, `verifyPatches` |
+| `host/patch-memory.cjs` | `allocatePatches` across high/low RAM with command-aligned continuations |
 | `host/music.cjs` | `sidFrequency`, `musicTables` for PAL/NTSC |
 | `host/d64.cjs` | `createD64`, `offset`, `sectors` for a standard 35-track, single-PRG disk |
 | `host/sid.cjs` | `parseSid`, `prepareSid`, `sidConstants` for the supported tracker-export subset |
@@ -225,7 +231,7 @@ node tests/verify-torq.cjs
 The variant check builds different artwork, text and four frames, plus a
 built-in-music configuration without optional fields, then restores the default.
 The TORQ check launches isolated PAL/NTSC VICE instances and verifies the
-automatic show, 44 wave frames, all six modes, field pixels, SID cadence,
+automatic show, 90 wave frames, all six modes, field pixels, SID cadence,
 restoration and ticker buffers. VICE and headless Linux `xvfb-run` are required.
 `tests/emulator.cjs pal PORT` (or `ntsc`) runs the default demo's frame, timing,
 stop/restart, music and ticker checks against a running VICE remote monitor.

@@ -1,49 +1,65 @@
 {
   "mode": "ntsc",
-  "framesVerified": 44,
+  "framesVerified": 90,
   "colorFields": [
     {
       "effect": 4,
       "rowsVerified": 46,
-      "bitmapFramesVerified": 8,
+      "bitmapFramesVerified": 18,
       "phaseWrap": true
     },
     {
       "effect": 5,
       "rowsVerified": 46,
-      "bitmapFramesVerified": 8,
+      "bitmapFramesVerified": 18,
       "phaseWrap": true
     },
     {
       "effect": 6,
       "rowsVerified": 46,
-      "bitmapFramesVerified": 8,
+      "bitmapFramesVerified": 18,
       "phaseWrap": true
     }
   ],
   "sidCallsPer16Refreshes": 16,
   "period": 6,
   "decoderCycles": [
-    77801,
-    85317,
-    89253,
-    89239,
-    89533,
-    87411,
-    90035,
-    89440,
-    90200,
-    87551,
-    89213,
-    88908,
-    89624,
-    87770,
-    89867,
-    89455,
-    90360,
-    87459,
-    89266,
-    89280
+    72638,
+    78936,
+    69367,
+    74190,
+    69953,
+    75579,
+    70581,
+    76572,
+    71523,
+    76173,
+    70688,
+    75324,
+    70124,
+    76084,
+    71756,
+    76223,
+    70282,
+    76229,
+    69375,
+    74374,
+    70122,
+    75615,
+    70512,
+    76469,
+    71526,
+    76325,
+    70817,
+    75334,
+    70053,
+    75991,
+    71782,
+    76299,
+    70403,
+    76216,
+    69320,
+    74242
   ],
   "flips": [
     {
@@ -79,35 +95,35 @@
       "tick": 48
     },
     {
-      "phase": 0,
+      "phase": 8,
       "tick": 54
     },
     {
-      "phase": 1,
+      "phase": 9,
       "tick": 60
     },
     {
-      "phase": 2,
+      "phase": 10,
       "tick": 66
     },
     {
-      "phase": 3,
+      "phase": 11,
       "tick": 72
     },
     {
-      "phase": 4,
+      "phase": 12,
       "tick": 78
     },
     {
-      "phase": 5,
+      "phase": 13,
       "tick": 84
     },
     {
-      "phase": 6,
+      "phase": 14,
       "tick": 90
     },
     {
-      "phase": 7,
+      "phase": 15,
       "tick": 96
     },
     {
@@ -125,6 +141,70 @@
     {
       "phase": 3,
       "tick": 120
+    },
+    {
+      "phase": 4,
+      "tick": 126
+    },
+    {
+      "phase": 5,
+      "tick": 132
+    },
+    {
+      "phase": 6,
+      "tick": 138
+    },
+    {
+      "phase": 7,
+      "tick": 144
+    },
+    {
+      "phase": 8,
+      "tick": 150
+    },
+    {
+      "phase": 9,
+      "tick": 156
+    },
+    {
+      "phase": 10,
+      "tick": 162
+    },
+    {
+      "phase": 11,
+      "tick": 168
+    },
+    {
+      "phase": 12,
+      "tick": 174
+    },
+    {
+      "phase": 13,
+      "tick": 180
+    },
+    {
+      "phase": 14,
+      "tick": 186
+    },
+    {
+      "phase": 15,
+      "tick": 192
+    },
+    {
+      "phase": 0,
+      "tick": 198
+    },
+    {
+      "phase": 1,
+      "tick": 204
+    },
+    {
+      "phase": 2,
+      "tick": 210
+    },
+    {
+      "phase": 3,
+      "tick": 216
     }
   ],
   "stopAndRestart": true,

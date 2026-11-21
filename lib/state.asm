@@ -44,6 +44,7 @@ music_supported = $21
 show_enabled = $28
 show_ticks = $29
 show_seconds = $2a
+patch_tail = $2e
 glyph_rows = $40
 glyph_ptr = $48
 text_ptr = $4a

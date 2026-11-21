@@ -56,7 +56,7 @@ Algorithm: state machine for idle, two-buffer warm-up, steady playback and stati
 
 [Source](../lib/bitmap.asm)
 
-Algorithm: stream sparse commands into the hidden bitmap. 0 ends the stream; 1..127 skips unchanged bytes; $81..$ff copies 1..127 literal bytes. Why: skips change only the destination pointer, and literal loops use indexed indirect reads/writes. Pointers advance once per run, avoiding per-byte calls. Literal zeros erase old pixels; skips preserve the buffer-specific baseline. Input A is a valid patch index. Clobbers A/X/Y, flags, src/dst and count. Only builder-validated streams are supported: runtime does not bounds-check. Keyboard polling between runs limits latency without checking every byte.
+Algorithm: stream sparse commands into the hidden bitmap. 0 ends the stream; 1..127 skips; $81..$ff copies literals; $80,count,value fills 1..255 bytes. Why: skips change only the destination pointer, and literal loops use indexed indirect reads/writes. Pointers advance once per run, avoiding per-byte calls. Literal zeros erase old pixels; skips preserve the buffer-specific baseline. Input A is a valid patch index. Clobbers A/X/Y, flags, src/dst/count and patch_tail. A low-stream terminator switches source without resetting dst. Only builder-validated streams are supported: runtime does not bounds-check. IRQ scans keys every refresh; main polls between frames. Avoiding per-command input calls leaves CPU time for the larger set of shorter compressed runs.
 
 ## lib/display.asm
 
@@ -74,7 +74,7 @@ Algorithm: save A/X/Y, advance ticks, scan keys, service due flips, update one c
 
 [Source](../lib/keyboard.asm)
 
-Algorithm: select CIA keyboard rows and interpret active-low matrix bits. Track prior Space/M/number states so a held key causes one action per edge. Space toggles a one-bit request; number keys store a mode request; M changes SID master volume while the sequencer continues to advance. Why: scanning in both IRQ and main code catches short taps. PHP/SEI/PLP keeps shared edge state atomic while preserving the caller interrupt-enable state. During decoding scan Space each run, but all keys only once per eight runs. Tradeoff: this is edge suppression, not timed mechanical debouncing or an event queue. Multiple pending Space edges can cancel; number-key priority is 1,2,3.
+Algorithm: select CIA keyboard rows and interpret active-low matrix bits. Track prior Space/M/number states so a held key causes one action per edge. Space toggles a one-bit request; number keys store a mode request; M changes music volume. Built-in music advances muted; an imported player pauses/restarts. Why: scanning in both IRQ and main code catches short taps. PHP/SEI/PLP keeps shared edge state atomic while preserving the caller interrupt-enable state. IRQ scans every refresh; main polls between frames and while waiting to flip. Optional poll_render_keyboard scans every eight calls for other renderers. Tradeoff: this is edge suppression, not timed mechanical debouncing or an event queue. Multiple pending Space edges can cancel; numbers have ascending priority.
 
 ## lib/effects.asm
 
@@ -104,7 +104,7 @@ Algorithm: initialize SID presets, advance a note-duration counter at the logic 
 
 [Source](../lib/assets.asm)
 
-Algorithm: emit the patch-address table, place the static bitmap at $2000, and place sparse streams at $4000; use assembler errors to reject overlap. Why: fixed locations match VIC bank addressing and avoid runtime relocation. Host allocation and assembler assertions independently enforce the layout. The code/font/music/pointers must fit below $2000; streams must end by $c000. Tradeoff: generated paths and memory regions are a shared project contract; changing the layout requires coordinated edits to the host allocator and runtime.
+Algorithm: emit the patch-address table, place the static bitmap at $2000, place streams at $4000 and optionally $1500; reject code/data overlap. Why: fixed locations match VIC bank addressing and avoid runtime relocation. Host allocation and assembler assertions independently enforce the layout. Code/font/pointers fit below $1500 when low patches are used, else $2000. High streams plus optional fields end by $c000. Tradeoff: generated paths and memory regions are a shared project contract; changing the layout requires coordinated edits to the host allocator and runtime.
 
 ## build.cjs
 
@@ -128,7 +128,7 @@ Algorithm: map pixels to VIC cell order, nearest-neighbor-fit a 320x200 source i
 
 [Source](../host/patches.cjs)
 
-Algorithm: compare source/target bytes, emit skip/literal runs of at most 127, and merge unchanged gaps up to three bytes inside literal runs. Build two static warm-ups, frame[i-2] -> frame[i] transitions, and a union-based restore. Why: hidden buffers lag by two phases. The restore includes every location that any wave can alter, allowing safe stop/restart from any displayed phase. The JS decoder simulates both buffers for five cycles and checks restoration. Tradeoff: gap merging is a simple heuristic, not an optimal compression proof; some unchanged bytes are copied to reduce command overhead. Literal zeros matter.
+Algorithm: use dynamic programming to balance bytes and writes across runs of at most 127 and repeated-byte fills of at most 255. Build two static warm-ups, frame[i-2] -> frame[i] transitions, and a union-based restore. Why: hidden buffers lag by two phases. The restore includes every location that any wave can alter, allowing safe stop/restart from any displayed phase. The JS decoder simulates both buffers for five cycles and checks restoration. Score is 5*encodedBytes + writtenBytes + 2*commands. This keeps fills from overwriting large unchanged areas just to save a header byte. The score is a storage/CPU heuristic, not a claim of globally optimal 6510 execution.
 
 ## host/music.cjs
 
@@ -180,30 +180,36 @@ background in its low nibble; those color bytes are separate from bitmap bits.
 
 | Command byte | Meaning | Following data |
 | --- | --- | --- |
-| `$00` | Finish this patch | None |
+| `$00` | End this stream chunk | None |
 | `$01..$7f` | Advance destination by that many bytes | None |
 | `$81..$ff` | Copy `command AND $7f` bytes | That many literal bytes |
-| `$80` | Invalid zero-length literal; never emitted | None |
+| `$80` | Fill repeated bytes | Nonzero count 1..255, then value |
 
 A source bitmap of seven zeros and target `[0,AA,0,0,0,BB,0]` can become:
 
 ```text
-01             skip the first unchanged byte
-85 AA 00 00 00 BB
-               copy five bytes, including the three-byte unchanged gap
-01             skip the last unchanged byte
-00             finish
+01       skip one unchanged byte
+81 AA    copy one byte
+03       skip three unchanged bytes
+81 BB    copy one byte
+00       finish; trailing unchanged bytes need no commands
 ```
 
-Copying the small gap reduces the number of separate run commands, though it
-does not minimize bitmap writes. The threshold of three is a practical heuristic;
-it is not a globally optimal compressor or a universal best value for all images.
-Runs are capped at 127 so one command byte can hold both type and length.
+`80 0A FF` fills ten bytes with FF. Dynamic programming balances encoded bytes,
+written bytes and commands using `5*bytes + writes + 2*commands`. This avoids
+rewriting large unchanged regions merely to save a header byte. The score is a
+CPU/storage heuristic, not a proof of globally optimal compression or runtime.
 
-The host decoder rejects truncated streams and overruns for validation. The
-6510 decoder trusts the generated data and omits those checks from its hot loop.
-Data corruption can therefore overwrite memory; this is a build-time format
-contract, not a general-purpose decoder for untrusted input.
+The host decoder rejects truncated streams, zero fill counts and overruns.
+The 6510 trusts builder-validated data; corrupted streams can overwrite memory.
+New generated streams require the matching updated decoder.
+
+When high RAM is insufficient, the allocator uses `$1500..$1fff`. A stream can
+split between complete commands, with an added terminator in low RAM and a
+separate high-RAM continuation pointer. The native decoder switches source at
+that terminator while retaining destination progress. All other continuations
+are zero. The assembler checks code/font/tables against the low patch start and
+checks high patches plus color tables against `$c000`.
 
 ## Why double-buffer patches start two frames back
 
@@ -274,8 +280,8 @@ clock. Actual refresh rates vary slightly, and color-row updates run on the
 display refresh rather than this normalized logic clock.
 
 Keyboard polling disables IRQs briefly around shared edge-state updates, then
-restores the previous interrupt state. The decoder scans all keys every eighth patch
-command, and the IRQ scans them every refresh. This keeps short-tap
+restores the previous interrupt state. The IRQ scans all keys every refresh, and the main loop polls between frames
+and while waiting for flips. The patch loop makes no input calls. This keeps short-tap
 latency low while preserving CPU time for rendering. Held-key suppression does
 not implement timed electrical debouncing. Requests are small flags, not a
 queue: multiple toggles can coalesce before the player handles them.
@@ -357,7 +363,8 @@ Generated files are outputs of the algorithms, not additional custom code:
 | `static-bitmap.bin` | Fitted image plus fixed HUD; initializes both buffers |
 | `frames.bin` | Concatenated full wave frames for host/emulator verification |
 | `patches.bin` | Encoded warm-up, steady and universal-restore streams |
-| `patch-pointers.inc` | Absolute stream addresses beginning at `$4000` |
+| `patch-pointers.inc`, `patch-tails.inc` | Absolute initial/continuation addresses for both RAM regions |
+| `patches-low.bin`, `patch-layout.inc` | Optional low stream chunks and their overlap boundary |
 | `music.inc` | Built-in PAL/NTSC low/high pitch tables, or empty with an imported player |
 | `effects-config.inc`, `color-fields.bin` | Enabled modes, initial mode, automatic-show flag and optional logo sine/polar maps |
 | `music-config.inc` | Select the built-in sequencer or validated PSID entry points and clock |
