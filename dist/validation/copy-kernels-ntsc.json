@@ -1,0 +1,8 @@
+{
+  "mode": "ntsc",
+  "literal127CrossesPages": true,
+  "fill255CrossesPage": true,
+  "singleByteLiteral": true,
+  "lateDeadlineRecoveryGap": 5,
+  "bitmapAfterRecovery": true
+}

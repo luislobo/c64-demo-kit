@@ -50,13 +50,13 @@ Algorithm: emit BASIC SYS2064, take over hardware, clear state, initialize both 
 
 [Source](../lib/player.asm)
 
-Algorithm: state machine for idle, two-buffer warm-up, steady playback and static restoration. Render the hidden buffer, request its scheduled flip, advance phase with a power-of-two mask, and add period to the prior deadline. Why: absolute deadlines include rendering time instead of adding a delay after drawing; each hidden buffer is two phases behind the next target. Warm-up patches start both buffers from static. The universal restore patches both buffers on stop so the next start has a known baseline and no trails. Tradeoff: arbitrary frame jumps need new patches; missed deadlines can slow playback. The eight-bit signed deadline test assumes less than 128 ticks ahead.
+Algorithm: state machine for idle, two-buffer warm-up, steady playback and static restoration. Render the hidden buffer, request its scheduled flip, advance phase with a mask, and add integer/fractional periods to the deadline. Why: absolute deadlines include rendering time instead of adding a delay after drawing; each hidden buffer is two phases behind the next target. Warm-up patches start both buffers from static. The universal restore patches both buffers on stop so the next start has a known baseline and no trails. Tradeoff: arbitrary frame jumps need new patches; missed deadlines can slow playback. Overdue frames resync at the next refresh and increment a counter, preventing accumulated lateness from wrapping the signed deadline comparison.
 
 ## lib/bitmap.asm
 
 [Source](../lib/bitmap.asm)
 
-Algorithm: stream sparse commands into the hidden bitmap. 0 ends the stream; 1..127 skips; $81..$ff copies literals; $80,count,value fills 1..255 bytes. Why: skips change only the destination pointer, and literal loops use indexed indirect reads/writes. Pointers advance once per run, avoiding per-byte calls. Literal zeros erase old pixels; skips preserve the buffer-specific baseline. Input A is a valid patch index. Clobbers A/X/Y, flags, src/dst/count and patch_tail. A low-stream terminator switches source without resetting dst. Only builder-validated streams are supported: runtime does not bounds-check. IRQ scans keys every refresh; main polls between frames. Avoiding per-command input calls leaves CPU time for the larger set of shorter compressed runs.
+Algorithm: stream sparse commands into the hidden bitmap. 0 ends the stream; 1..127 skips; $81..$ff copies literals; $80,count,value fills 1..255 bytes. Why: skips change only the destination pointer, and literal loops use indexed indirect reads/writes. Literal copies count backward with DEY/BPL; fill loops count down in X. Pointers still advance once per whole run. Literal zeros erase old pixels; skips preserve the buffer-specific baseline. Input A is a valid patch index. Clobbers A/X/Y, flags, src/dst/count and patch_tail. A low-stream terminator switches source without resetting dst. Only builder-validated streams are supported: runtime does not bounds-check. IRQ scans keys every refresh; main polls between frames. Avoiding per-command input calls leaves CPU time for the larger set of shorter compressed runs.
 
 ## lib/display.asm
 
@@ -260,8 +260,11 @@ The memory guard checks capacity; it does not predict every runtime deadline.
 The main loop schedules the next animation frame against the previous deadline:
 
 ```text
-nextDeadline = previousDeadline + period   (modulo 256)
-due          = signed8(ticks - deadline) >= 0
+fraction     += refreshHz % targetFPS
+interval      = floor(refreshHz / targetFPS)
+if fraction >= targetFPS: interval += 1; fraction -= targetFPS
+nextDeadline  = previousDeadline + interval   (modulo 256)
+due           = signed8(ticks - deadline) >= 0
 ```
 
 This avoids adding rendering time to a fixed sleep after each frame. The
@@ -271,8 +274,11 @@ music or ticker work. IRQ register saves protect a decoder interrupted halfway
 through a literal run. This is cooperative main-thread rendering plus interrupt
 scheduling, not concurrent execution on multiple processors.
 
-PAL uses five refreshes per wave frame and NTSC six, yielding approximately
-10 frames/second. Built-in music, the automatic show and ticker use an accumulator: add 50 each refresh and
+The default uses a carried fractional interval for nominal 12 fps: PAL has
+4/5-refresh intervals and NTSC five. Rates above 10 fps start the frame clock
+one refresh after the start event so the first decode has a full preparation
+window. An overdue target is counted and resynchronized; frames are never
+skipped. See [FPS measurements and hypotheses](FPS.md). Built-in music, the automatic show and ticker use an accumulator: add 50 each refresh and
 subtract nominal refresh rate 50 or 60 when a logic update is due. The ticker
 runs every second logic update, approximately 25 pixel shifts per second.
 Imported PSID music runs once per native refresh and handles its own musical

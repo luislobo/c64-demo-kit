@@ -111,7 +111,7 @@ text_colors:
 
     ; Detect actual raster length, rather than trusting a ROM PAL/NTSC flag.
     ; PAL exceeds line 287; standard NTSC variants finish before that.
-    ldx #6                   ; Six NTSC refreshes per animation frame.
+    ldx #6                   ; Marker 6 identifies an NTSC-length raster.
 detect_low:
     bit $d011
     bmi detect_low
@@ -124,15 +124,26 @@ detect_length:
     lda $d012
     cmp #32
     bcc detect_length
-    ldx #5                   ; Five PAL refreshes: approximately 10 fps either way.
+    ldx #5                   ; Marker 5 identifies a PAL-length raster.
 detected:
-    stx period
     lda #50
     cpx #5
     beq refresh_detected
     lda #60
 refresh_detected:
     sta refresh_hz
+    cpx #5
+    bne ntsc_frame_timing
+    lda #KIT_PAL_BASE
+    sta period
+    lda #KIT_PAL_REMAINDER
+    jmp frame_timing_ready
+ntsc_frame_timing:
+    lda #KIT_NTSC_BASE
+    sta period
+    lda #KIT_NTSC_REMAINDER
+frame_timing_ready:
+    sta frame_remainder
     .if DEMO_EXTERNAL_SID
         jsr music_init
     .endif

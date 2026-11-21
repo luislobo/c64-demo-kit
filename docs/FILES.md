@@ -187,3 +187,17 @@ source, missing attribution/licenses and lost commit pins are rejected.
 | [tests/stress-frames.cjs](../tests/stress-frames.cjs) | Interleave five real PAL/NTSC trials for fitting 8/16-phase builds, compare displayed bitmaps and reject overflowing 32 phases. |
 | [docs/FRAME_CAPACITY.md](FRAME_CAPACITY.md) | Workload, memory limits, repeatable timing results and phase-count/frame-rate distinction. |
 | [dist/validation/frame-stress.json](../dist/validation/frame-stress.json) | Raw repeated-trial samples and summaries; records emulator evidence, not a real-hardware certification. |
+
+## Frame-rate scheduling
+
+| File | Algorithm, role and reason |
+| --- | --- |
+| [host/timing.cjs](../host/timing.cjs) | Validate target FPS and derive integer periods, fractional remainders and reference cadence. |
+| [tests/timing.test.cjs](../tests/timing.test.cjs) | Check prefix timing sums, PAL/NTSC 12 fps intervals, defaults and invalid targets. |
+| [tests/stress-fps.cjs](../tests/stress-fps.cjs) | Compare sequential displayed frames across every moving mode, physical IRQ cadence, music, ticker and static restoration. |
+| [tests/verify-kernels.cjs](../tests/verify-kernels.cjs) | Exercise native 127/255-byte boundary runs and intentional late-deadline recovery. |
+| [tests/verify-fps-soak.cjs](../tests/verify-fps-soak.cjs) | Run 144 nominal seconds of automatic scene changes on each standard and check deadline/audio/ticker clocks. |
+| [docs/FPS.md](FPS.md) | Target-FPS behavior, measurements and untested experiment proposals. |
+
+The `dist/validation/fps-*.json` and `copy-kernels-*.json` files record repeated
+frame-rate trials, overload probes, soak clocks and native boundary checks.

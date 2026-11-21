@@ -1,7 +1,8 @@
 ; Algorithm: stream sparse commands into the hidden bitmap. 0 ends the stream;
 ; 1..127 skips; $81..$ff copies literals; $80,count,value fills 1..255 bytes.
 ; Why: skips change only the destination pointer, and literal loops use indexed
-; indirect reads/writes. Pointers advance once per run, avoiding per-byte calls.
+; indirect reads/writes. Literal copies count backward with DEY/BPL; fill
+; loops count down in X. Pointers still advance once per whole run.
 ; Literal zeros erase old pixels; skips preserve the buffer-specific baseline.
 ; Input A is a valid patch index. Clobbers A/X/Y, flags, src/dst/count and
 ; patch_tail. A low-stream terminator switches source without resetting dst.
@@ -57,13 +58,14 @@ literal:
     bne literal_begin
     inc src+1
 literal_begin:
-    ldy #0
+    ldy count
+    dey
 literal_loop:
     lda (src),y
     sta (dst),y
-    iny
-    cpy count
-    bne literal_loop
+    dey
+    bpl literal_loop          ; Literals are at most 127 bytes: signed countdown.
+    ldy count
     tya
     clc
     adc src
@@ -97,13 +99,14 @@ fill_run:
     ldy #1
     lda (src),y
     sta count
+    tax
     iny
     lda (src),y
     ldy #0
 fill_loop:
     sta (dst),y
     iny
-    cpy count
+    dex
     bne fill_loop
     lda src
     clc

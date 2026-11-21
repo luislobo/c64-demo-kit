@@ -18,6 +18,7 @@ const{parseSid,prepareSid,sidConstants}=require('./host/sid.cjs');
 const{createD64}=require('./host/d64.cjs');
 const{colorFieldAssets}=require('./host/color-fields.cjs');
 const{allocatePatches}=require('./host/patch-memory.cjs');
+const{timingConfig}=require('./host/timing.cjs');
 function build({entry=path.join(__dirname,'demo.asm'),outDir=path.join(__dirname,'build'),compiler=process.env.TASS64||path.join(__dirname,'tools/64tass/64tass.exe')}={}){
  entry=path.resolve(entry);outDir=path.resolve(outDir);const project=path.dirname(entry),c=readConfig(entry),generated=path.join(project,'generated');
  if(c.DEMO_SID_FILE!==undefined&&(typeof c.DEMO_SID_FILE!=='string'||!c.DEMO_SID_FILE.trim()))throw Error('DEMO_SID_FILE must name a PSID file');
@@ -38,13 +39,14 @@ function build({entry=path.join(__dirname,'demo.asm'),outDir=path.join(__dirname
  fs.writeFileSync(path.join(generated,'patch-layout.inc'),`PATCH_LOW_BYTES = ${layout.low.length}\nPATCH_LOW_START = $${layout.lowStart.toString(16)}\n`);
  fs.writeFileSync(path.join(generated,'patch-tails.inc'),layout.tails.map(p=>'    .word $'+p.toString(16)).join('\n')+'\n');
  fs.writeFileSync(path.join(generated,'color-fields.bin'),fields);
- fs.writeFileSync(path.join(generated,'effects-config.inc'),`KIT_COLOR_FIELDS = ${c.DEMO_COLOR_FIELDS}\nKIT_START_EFFECT = ${c.DEMO_START_EFFECT}\nKIT_AUTO_SHOW = ${c.DEMO_AUTO_SHOW}\n`);
+ const timing=timingConfig(c.DEMO_FPS);
+ fs.writeFileSync(path.join(generated,'effects-config.inc'),`KIT_COLOR_FIELDS = ${c.DEMO_COLOR_FIELDS}\nKIT_START_EFFECT = ${c.DEMO_START_EFFECT}\nKIT_AUTO_SHOW = ${c.DEMO_AUTO_SHOW}\nKIT_FPS = ${timing.fps}\nKIT_PAL_BASE = ${timing.palBase}\nKIT_PAL_REMAINDER = ${timing.palRemainder}\nKIT_NTSC_BASE = ${timing.ntscBase}\nKIT_NTSC_REMAINDER = ${timing.ntscRemainder}\n`);
  for(const[name,data]of[['static-bitmap.bin',base],['frames.bin',Buffer.concat(frames)],['patches.bin',layout.high],['patch-pointers.inc',pointers.map(p=>'    .word $'+p.toString(16)).join('\n')+'\n'],['music-config.inc',sidConstants(sid)],['music.inc',sid?'':musicTables({lead:c.DEMO_LEAD,bass:c.DEMO_BASS,arp:c.DEMO_ARP})]])fs.writeFileSync(path.join(generated,name),data);
  if(sid)fs.writeFileSync(path.join(generated,'sid-payload.bin'),sid.data);else fs.rmSync(path.join(generated,'sid-payload.bin'),{force:true});
  const prg=path.join(outDir,c.DEMO_NAME+'.prg'),d64=path.join(outDir,c.DEMO_NAME+'.d64');
  execFileSync(compiler,['--cbm-prg','-a','-o',prg,'--labels='+path.join(outDir,'symbols.labels'),'--vice-labels','-L',path.join(outDir,'assembly.list'),entry],{cwd:project,stdio:'inherit'});
  const program=fs.readFileSync(prg);fs.writeFileSync(d64,createD64(program,{diskName:c.DEMO_DISK_NAME,diskId:c.DEMO_DISK_ID,filename:c.DEMO_PRG_NAME}));
- const report={entry,frames:c.DEMO_FRAMES,effects:c.DEMO_COLOR_FIELDS?6:3,startEffect:c.DEMO_START_EFFECT,colorFieldBytes:fieldBytes,programBytes:program.length,patchBytes:layout.low.length+layout.high.length,encodedPatchBytes:layout.total,lowPatchBytes:layout.low.length,highPatchBytes:layout.high.length,highMemoryFree:0xc000-layout.highEnd-fieldBytes,prg,d64,patches:patches.map((p,i)=>({address:pointers[i],continuation:layout.tails[i],bytes:p.bytes.length,writes:p.written,fills:p.fills}))};
+ const report={entry,frames:c.DEMO_FRAMES,fps:c.DEMO_FPS,startupTicks:timing.startupTicks,effects:c.DEMO_COLOR_FIELDS?6:3,startEffect:c.DEMO_START_EFFECT,colorFieldBytes:fieldBytes,programBytes:program.length,patchBytes:layout.low.length+layout.high.length,encodedPatchBytes:layout.total,lowPatchBytes:layout.low.length,highPatchBytes:layout.high.length,highMemoryFree:0xc000-layout.highEnd-fieldBytes,prg,d64,patches:patches.map((p,i)=>({address:pointers[i],continuation:layout.tails[i],bytes:p.bytes.length,writes:p.written,fills:p.fills}))};
  const creditsFile=path.join(outDir,c.DEMO_NAME+'-music-credits.json');
  const noticeFile=path.join(outDir,c.DEMO_NAME+'-credits.txt');
  if(releaseCredits)fs.writeFileSync(noticeFile,releaseCredits);else fs.rmSync(noticeFile,{force:true});

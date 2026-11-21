@@ -1,0 +1,8 @@
+{
+  "mode": "pal",
+  "literal127CrossesPages": true,
+  "fill255CrossesPage": true,
+  "singleByteLiteral": true,
+  "lateDeadlineRecoveryGap": 4,
+  "bitmapAfterRecovery": true
+}

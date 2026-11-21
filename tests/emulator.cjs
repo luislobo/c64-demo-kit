@@ -14,6 +14,7 @@ const fs=require('node:fs'),path=require('node:path'),net=require('node:net');
 const project=path.resolve(__dirname,'..'),root=path.join(project,'build'),mode=process.argv[2]||'pal',port=Number(process.argv[3]||6522);
 const {readSymbols}=require('./vice.cjs');
 const {colorFieldRow}=require('../host/color-fields.cjs');
+const {frameCadence}=require('../host/timing.cjs');
 const {readConfig}=require('../host/config.cjs'); const config=readConfig(path.join(project,'demo.asm'));
 const symbols=Object.fromEntries(fs.readFileSync(path.join(root,'symbols.labels'),'utf8').trim().split(/\r?\n/).map(l=>{const [,a,n]=l.split(/\s+/);return[n.slice(1),parseInt(a,16)];}));
 const h=n=>n.toString(16);
@@ -31,7 +32,8 @@ await m.command(`load "${path.join(root,config.DEMO_NAME+'.prg').replaceAll('\\'
 await m.command('break '+h(symbols.idle));await m.command('g 810');await m.command('delete 1');
 let state=await m.bytes(2,13,'state');
 await m.command('> 28 00'); // Test manual modes without automatic scene changes.
-if(state[7] !== (mode==='pal'?5:6))throw Error('Incorrect refresh detection: '+state[7]);
+const refresh=mode==='pal'?50:60;
+if(state[7] !== Math.floor(refresh/config.DEMO_FPS))throw Error('Incorrect frame base period: '+state[7]);
 const base=fs.readFileSync(path.join(project,'generated/static-bitmap.bin'));
 for(const start of [0x2000,0xe000])if(!(await m.bytes(start,start+7999,'initial-'+h(start))).subarray(0,7680).equals(base.subarray(0,7680)))throw Error('Initial bitmap mismatch');
 const index=(x,y)=>(y>>3)*320+(x>>3)*8+(y&7);
@@ -53,7 +55,8 @@ for(let i=0;i<frameChecks;i++){
  flips.push({phase,tick});
  if(i===3)await m.command(`screenshot "${path.join(root,mode+'-optimized-wave.png').replaceAll('\\','/')}" 2`);
 }
-for(let i=1;i<flips.length;i++)if(((flips[i].tick-flips[i-1].tick)&255)!==(mode==='pal'?5:6))throw Error('Uneven frame timing '+JSON.stringify({times,flips}));
+const expectedIntervals=frameCadence(refresh,config.DEMO_FPS,frameChecks);
+for(let i=1;i<flips.length;i++)if(((flips[i].tick-flips[i-1].tick)&255)!==expectedIntervals[i])throw Error('Uneven frame timing '+JSON.stringify({times,flips}));
 // Queue the same event the IRQ generates on a Space press; verify stop and restart.
 await m.command('> 06 01');await m.until('idle');
 for(const start of [0x2000,0xe000])if(!(await m.bytes(start,start+7999,'restored-'+h(start))).subarray(0,7680).equals(base.subarray(0,7680)))throw Error('Static restore failed');
@@ -107,9 +110,9 @@ for(const effect of [4,5,6]){
   await m.until('flip_record');const state=await m.bytes(2,13,'field-flip');
   const start=state[3]?0xe000:0x2000;
   if(!(await m.bytes(start,start+7359,'field-bitmap')).equals(frames[state[0]].subarray(0,7360)))throw Error('Field corrupted wave bitmap');
-  fieldFlips.push(state[5]);
+  fieldFlips.push({tick:state[5],interval:(await m.bytes(0x2d,0x2d,'frame-interval'))[0]});
  }
- for(let i=1;i<fieldFlips.length;i++)if(((fieldFlips[i]-fieldFlips[i-1])&255)!==(mode==='pal'?5:6))throw Error('Field delayed bitmap flips');
+ for(let i=1;i<fieldFlips.length;i++)if(((fieldFlips[i].tick-fieldFlips[i-1].tick)&255)!==fieldFlips[i].interval)throw Error('Field delayed bitmap flips');
  await m.command(`screenshot "${path.join(root,mode+'-logo-'+['plasma','xor','tunnel'][effect-4]+'.png')}" 2`);
  fieldResults.push({effect,rowsVerified:46,bitmapFramesVerified:config.DEMO_FRAMES+2,phaseWrap:true});
 }
@@ -119,7 +122,8 @@ const sidCalls=(await m.bytes(music.sample_calls,music.sample_calls+1,'call-star
 for(let i=0;i<16;i++)await m.until('irq');
 if((((await m.bytes(7,7,'call-tick-end'))[0]-tick)&255)!==16)throw Error('Raster tick drift');
 if((((await m.bytes(music.sample_calls,music.sample_calls+1,'call-end')).readUInt16LE()-sidCalls)&65535)!==16)throw Error('SID call drift');
-const report={mode,framesVerified:frameChecks+3*(config.DEMO_FRAMES+2),colorFields:fieldResults,sidCallsPer16Refreshes:16,period:mode==='pal'?5:6,decoderCycles:times,flips,stopAndRestart:true,rainbowMode:true,colorOnlyMode:true,psidPlayback:true,scrollingText:true};
+if((await m.bytes(0x23,0x23,'deadline-misses'))[0]!==0)throw Error('Frame deadline was missed');
+const report={mode,nominalFPS:config.DEMO_FPS,deadlineMisses:0,framesVerified:frameChecks+3*(config.DEMO_FRAMES+2),colorFields:fieldResults,sidCallsPer16Refreshes:16,basePeriod:Math.floor(refresh/config.DEMO_FPS),decoderCycles:times,flips,stopAndRestart:true,rainbowMode:true,colorOnlyMode:true,psidPlayback:true,scrollingText:true};
 fs.writeFileSync(path.join(root,'test-'+mode+'.json'),JSON.stringify(report,null,2));
 fs.writeFileSync(path.join(root,'monitor-'+mode+'.txt'),m.log);
 console.log(JSON.stringify(report,null,2));m.socket.end('quit\n');

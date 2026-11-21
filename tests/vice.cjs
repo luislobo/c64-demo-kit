@@ -46,7 +46,16 @@ class Monitor {
     await this.command(`bsave "${file}" 0 ${start.toString(16)} ${(start + length - 1).toString(16)}`);
     return fs.readFileSync(file);
   }
-  write(address, bytes) { return this.command('> ' + address.toString(16) + ' ' + [...bytes].map(b => b.toString(16).padStart(2, '0')).join(' ')); }
+  async write(address, bytes) {
+    if (!Number.isInteger(address) || address < 0 || address + bytes.length > 65536) throw Error('Write exceeds C64 memory');
+    // The text monitor has a short command-line limit. Keep each write below
+    // it, including binary fixtures with 127/255-byte run boundaries.
+    let result;
+    for (let at = 0; at < bytes.length; at += 32) {
+      result = await this.command('> ' + (address + at).toString(16) + ' ' + [...bytes.slice(at, at + 32)].map(b => b.toString(16).padStart(2, '0')).join(' '));
+    }
+    return result;
+  }
 }
 
 async function runVice(mode, name, run) {

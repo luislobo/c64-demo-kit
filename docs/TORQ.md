@@ -3,7 +3,8 @@
 The default application combines the supplied logo, its 16-phase bitmap wave,
 three original foreground color fields, a pixel ticker and Clockwork SID music.
 It starts with plasma and automatically changes modes every eight nominal seconds.
-The wave displays 10 frames per second, completing a cycle in 1.6 seconds.
+The wave targets nominal 12 fps, completing a cycle in about 1.33 seconds.
+[FPS measurements](FPS.md) include the PAL cadence and startup allowance.
 [Capacity measurements](FRAME_CAPACITY.md) cover 8, 16 and 32 phases.
 
 | Key | Result |
@@ -43,6 +44,7 @@ the program. Ready-to-run copies and captures are in [dist](../dist/README.md).
 
 | Setting | Default when omitted | Meaning |
 | --- | --- | --- |
+| `DEMO_FPS` | `10` | Nominal bitmap FPS; supplied demo selects `12` |
 | `DEMO_COLOR_FIELDS` | `0` | `1` enables modes 4..6 and their lookup tables |
 | `DEMO_START_EFFECT` | `1` | Initial mode, within the enabled range |
 | `DEMO_AUTO_SHOW` | `0` | `1` starts the wave and cycles enabled modes every eight seconds |
@@ -111,7 +113,7 @@ The native check requires VICE `x64sc`, 64tass and headless Linux `xvfb-run`.
 It rebuilds music from scratch and checks automatic startup, eight-second
 transitions, wraparound and the Space edge handler on PAL/NTSC. It also compares
 90 displayed bitmap frames per machine, 46 color rows per new mode including
-phase wrap, five/six-refresh flip spacing, text colors, stop/restart, ticker
+phase wrap, refresh-aware flip cadence, zero deadline misses, text colors, stop/restart, ticker
 buffers and one SID play call per refresh. Results and captures go to `build/`.
 Input events/handlers are exercised directly; physical keyboard scanning,
 analog audio quality and real C64 hardware remain untested.

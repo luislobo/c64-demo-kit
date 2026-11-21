@@ -1,6 +1,8 @@
-# TORQ frame capacity
+# TORQ frame capacity at 10 fps
 
-The default now stores 16 wave phases. It passes repeated PAL/NTSC checks at
+This report records the 16-phase implementation at commit `bc26a71`. The current
+12 fps default is documented in [FPS measurements](FPS.md). That earlier build
+passed repeated PAL/NTSC checks at
 the existing nominal 10 displayed frames per second, with plasma, Clockwork
 music and the ticker active. A wave cycle takes 1.6 seconds instead of 0.8.
 More phases reduce the change between consecutive poses; they do not double fps.
@@ -16,7 +18,7 @@ The logo, font, amplitude, wavelength, color fields and music are unchanged.
 | --- | ---: | ---: | ---: | --- |
 | Previous 8 phases, `ddb6307` | 24,415 bytes | 0 | 6,165 bytes | Stable |
 | Updated 8 phases | 19,715 bytes | 0 | 10,865 bytes | Stable |
-| Updated 16 phases | 32,988 bytes | 2,816 bytes | 408 bytes | Stable; new default |
+| Updated 16 phases | 32,988 bytes | 2,816 bytes | 408 bytes | Stable; default at bc26a71 |
 | Updated 32 phases | At least 55,898 bytes | Unallocated | Insufficient | Rejected before assembly |
 
 The high stream/table region is `$4000..$bfff`. Color lookup tables consume
@@ -47,7 +49,7 @@ Five trials per profile and video standard alternate profile order. Each trial
 checks 20 actually displayed bitmaps against host-generated frames, scheduled
 five-refresh PAL/six-refresh NTSC flips, 16 extra SID calls over 16 refreshes and
 the restored CPU memory port. All 30 trials passed with zero errors: 600 bitmap
-frames, including 200 for the 16-phase profile. The final default PRG equals the
+frames, including 200 for the 16-phase profile. The default PRG at that commit equals the
 tested 16-phase profile byte for byte.
 
 The measurement is elapsed emulated CPU cycles between `render` and
@@ -83,7 +85,9 @@ With 64tass, VICE x64sc and headless Linux xvfb-run available:
 TASS64=/path/to/64tass node tests/stress-frames.cjs
 ```
 
-This compares the updated 8/16-phase builds and records 32-phase rejection.
+This compares 8/16-phase builds at an explicitly fixed 10 fps and records
+32-phase rejection. Later decoder changes can alter cycle samples; checkout
+`bc26a71` to reproduce the recorded runtime.
 It restores the default generated assets afterward. For the previous-code
 comparison, first build an isolated copy of the baseline:
 

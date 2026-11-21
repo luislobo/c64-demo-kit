@@ -34,7 +34,7 @@ test('D64 PRG chains and allocation map agree at sector boundaries',()=>{
  }
 });
 test('application is read from assembly literals and SID pitches use the right clock',()=>{
- const c=readConfig(path.join(__dirname,'../demo.asm'));assert.equal(c.DEMO_FRAMES,16);assert.equal(c.DEMO_SID_BUILD,'clockwork');assert.equal(c.DEMO_COLOR_FIELDS,1);
+ const c=readConfig(path.join(__dirname,'../demo.asm'));assert.equal(c.DEMO_FRAMES,16);assert.equal(c.DEMO_FPS,12);assert.equal(c.DEMO_SID_BUILD,'clockwork');assert.equal(c.DEMO_COLOR_FIELDS,1);
  assert(Math.abs(sidFrequency(69,985248)*985248/2**24-440)<0.04);
  assert(Math.abs(sidFrequency(69,1022727)*1022727/2**24-440)<0.04);
 });

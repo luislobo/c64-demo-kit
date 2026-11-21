@@ -10,6 +10,7 @@
  * Detailed guide: docs/ALGORITHMS.md
  */
 const fs=require('node:fs');
+const{timingConfig}=require('./timing.cjs');
 // Read literal DEMO_* assignments only. This deliberately does not execute JS
 // or attempt to interpret arbitrary assembler expressions.
 function readConstants(file){
@@ -22,6 +23,9 @@ function readConstants(file){
 }
 function readConfig(file){
  const config=readConstants(file);
+ if(config.DEMO_FPS===undefined&&/^\s*DEMO_FPS\s*=/m.test(fs.readFileSync(file,'utf8')))throw Error('DEMO_FPS must use an integer literal from 1 to 50');
+ config.DEMO_FPS ??= 10;
+ timingConfig(config.DEMO_FPS);
  config.DEMO_COLOR_FIELDS ??= 0;
  config.DEMO_START_EFFECT ??= 1;
  config.DEMO_AUTO_SHOW ??= 0;

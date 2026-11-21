@@ -1,0 +1,10 @@
+{
+  "mode": "pal",
+  "nominalFPS": 12,
+  "nominalSeconds": 144,
+  "automaticTransitions": 18,
+  "allModes": true,
+  "deadlineMisses": 0,
+  "sidClockVerified": true,
+  "tickerClockVerified": true
+}
