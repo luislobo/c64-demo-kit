@@ -3,7 +3,7 @@
 The default application combines the supplied logo, its 16-phase bitmap wave,
 three original foreground color fields, a pixel ticker and Clockwork SID music.
 It starts with plasma and automatically changes modes every eight nominal seconds.
-The wave targets nominal 12 fps, completing a cycle in about 1.33 seconds.
+The 16-pose wave runs at nominal 12.5 fps on PAL and 15 fps on NTSC.
 [FPS measurements](FPS.md) include the PAL cadence and startup allowance.
 [Capacity measurements](FRAME_CAPACITY.md) cover 8, 16 and 32 phases.
 
@@ -44,7 +44,9 @@ the program. Ready-to-run copies and captures are in [dist](../dist/README.md).
 
 | Setting | Default when omitted | Meaning |
 | --- | --- | --- |
-| `DEMO_FPS` | `10` | Nominal bitmap FPS; supplied demo selects `12` |
+| `DEMO_FPS` | `10` | Nominal bitmap FPS; TORQ selects `15` |
+| `DEMO_PAL_TICKS` | Unset | Fixed PAL period when set; TORQ uses four refreshes |
+| `DEMO_PATCH_PLAN` | `"legacy"` | TORQ selects `"balanced"` for cycle-based patches and pose selection |
 | `DEMO_COLOR_FIELDS` | `0` | `1` enables modes 4..6 and their lookup tables |
 | `DEMO_START_EFFECT` | `1` | Initial mode, within the enabled range |
 | `DEMO_AUTO_SHOW` | `0` | `1` starts the wave and cycles enabled modes every eight seconds |

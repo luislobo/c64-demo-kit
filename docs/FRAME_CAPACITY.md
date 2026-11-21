@@ -1,7 +1,7 @@
 # TORQ frame capacity at 10 fps
 
 This report records the 16-phase implementation at commit `bc26a71`. The current
-12 fps default is documented in [FPS measurements](FPS.md). That earlier build
+frame rate is documented in [FPS measurements](FPS.md). That earlier build
 passed repeated PAL/NTSC checks at
 the existing nominal 10 displayed frames per second, with plasma, Clockwork
 music and the ticker active. A wave cycle takes 1.6 seconds instead of 0.8.

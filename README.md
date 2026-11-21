@@ -82,7 +82,7 @@ The demo starts with a plasma-colored wave and changes effects every eight
 nominal seconds. 1 selects blue wave, 2 rainbow wave, 3 stationary color cycle,
 4 plasma, 5 XOR and 6 tunnel. A number key or Space takes manual control until
 reset. Space starts/stops the wave; M pauses/restarts the music. The wave uses
-16 precomputed phases at nominal 12 fps. The wave cycle is about 1.33 seconds.
+16 precomputed phases at nominal 12.5 fps on PAL and 15 fps on NTSC.
 See [FPS measurements and experiments](docs/FPS.md), [frame capacity](docs/FRAME_CAPACITY.md)
 and the [TORQ integration guide](docs/TORQ.md) for
 configuration, credits and verification.
@@ -207,6 +207,7 @@ The palette has eight non-black foreground colors with a black background.
 | `host/config.cjs` | `readConfig(file)` with bitmap validation; `readConstants(file)` for other scene validators |
 | `host/bitmap.cjs` | `index`, `fitBitmap`, `drawText`, `waveFrames` |
 | `host/patches.cjs` | `encodePatch`, `applyPatch`, `makeDoubleBufferedPatches`, `verifyPatches` |
+| `host/patch-planner.cjs` | Cycle-aware patch selection and cost-balanced poses |
 | `host/patch-memory.cjs` | `allocatePatches` across high/low RAM with command-aligned continuations |
 | `host/timing.cjs` | `timingConfig`, `frameCadence` for refresh-aware frame scheduling |
 | `host/music.cjs` | `sidFrequency`, `musicTables` for PAL/NTSC |

@@ -7,8 +7,12 @@ function polar(x, y) {
   return [Math.round(160 / Math.max(1, Math.hypot(dx, dy))) & 255, Math.round(Math.atan2(dy, dx) * 128 / Math.PI) & 255];
 }
 function colorFieldAssets() {
-  const radius = Buffer.alloc(920), angle = Buffer.alloc(920);
-  for (let y = 0; y < 23; y++) for (let x = 0; x < 40; x++) [radius[y * 40 + x], angle[y * 40 + x]] = polar(x, y);
+  const radius = Buffer.alloc(12 * 40), angle = Buffer.alloc(23 * 40);
+  for (let y = 0; y < 23; y++) for (let x = 0; x < 40; x++) {
+    const [distance, direction] = polar(x, y);
+    if (y < 12) radius[y * 40 + x] = distance;
+    angle[y * 40 + x] = direction;
+  }
   return Buffer.concat([Buffer.from(Array.from({ length: 256 }, (_, i) => sine(i))), radius, angle]);
 }
 function colorFieldRow(mode, phase, row, palette) {

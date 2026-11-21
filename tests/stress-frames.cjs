@@ -73,7 +73,7 @@ const result = { runs, metric: 'VICE elapsed CPU cycles from render entry to ren
       profiles.push(profile(baseline, report, 'baseline-8'));
     }
     for (const count of [8, 16, 32]) {
-      fs.writeFileSync(fixture, source.replace(/^DEMO_FPS = \d+$/m,'DEMO_FPS = 10').replace(/^DEMO_FRAMES = \d+$/m, 'DEMO_FRAMES = ' + count).replace(/^DEMO_NAME = .*$/m, `DEMO_NAME = "frame-stress-${count}"`));
+      fs.writeFileSync(fixture, source.replace(/^DEMO_PAL_TICKS = .*\n/m,'').replace(/^DEMO_PATCH_PLAN = .*\n/m,'').replace(/^DEMO_FPS = \d+$/m,'DEMO_FPS = 10').replace(/^DEMO_FRAMES = \d+$/m, 'DEMO_FRAMES = ' + count).replace(/^DEMO_NAME = .*$/m, `DEMO_NAME = "frame-stress-${count}"`));
       try {
         const report = build({ entry: fixture, outDir: path.join(root, 'build/frame-stress', String(count)) });
         profiles.push(profile(root, report, 'optimized-' + count));

@@ -23,9 +23,13 @@ function readConstants(file){
 }
 function readConfig(file){
  const config=readConstants(file);
- if(config.DEMO_FPS===undefined&&/^\s*DEMO_FPS\s*=/m.test(fs.readFileSync(file,'utf8')))throw Error('DEMO_FPS must use an integer literal from 1 to 50');
+ for(const key of ['DEMO_FPS','DEMO_PAL_TICKS']){
+  if(config[key]===undefined&&new RegExp('^\\s*'+key+'\\s*=','m').test(fs.readFileSync(file,'utf8')))throw Error(key+' must use an integer literal from 1 to 50');
+ }
  config.DEMO_FPS ??= 10;
- timingConfig(config.DEMO_FPS);
+ timingConfig(config.DEMO_FPS,config.DEMO_PAL_TICKS);
+ config.DEMO_PATCH_PLAN ??= 'legacy';
+ if(!['legacy','cycles','balanced'].includes(config.DEMO_PATCH_PLAN))throw Error('DEMO_PATCH_PLAN must be legacy, cycles or balanced');
  config.DEMO_COLOR_FIELDS ??= 0;
  config.DEMO_START_EFFECT ??= 1;
  config.DEMO_AUTO_SHOW ??= 0;

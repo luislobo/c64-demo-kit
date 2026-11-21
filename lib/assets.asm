@@ -31,10 +31,15 @@ patch_low:
 field_sine:
     .binary "../generated/color-fields.bin"
 field_radius = field_sine + 256
-field_angle = field_radius + 920
+field_angle = field_radius + 12 * 40
 field_radius_rows:
     .for row := 0, row < 23, row += 1
-        .word field_radius + row * 40
+        ; Rows equidistant from the middle have identical radii.
+        .if row < 12
+            .word field_radius + row * 40
+        .else
+            .word field_radius + (22 - row) * 40
+        .endif
     .endfor
 field_angle_rows:
     .for row := 0, row < 23, row += 1

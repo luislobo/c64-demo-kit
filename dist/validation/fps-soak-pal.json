@@ -1,6 +1,6 @@
 {
   "mode": "pal",
-  "nominalFPS": 12,
+  "nominalFPS": 12.5,
   "nominalSeconds": 144,
   "automaticTransitions": 18,
   "allModes": true,

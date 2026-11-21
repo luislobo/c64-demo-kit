@@ -24,13 +24,13 @@ idle:
     lda #2
     sta warmup
     lda ticks
-    .if KIT_FPS > 10
+    .if KIT_STARTUP_TICKS
         clc
         adc #1              ; Start the fast frame clock at the next border.
     .endif
     sta deadline
     jsr schedule_frame
-    .if KIT_FPS > 10
+    .if KIT_STARTUP_TICKS
         inc frame_interval
     .endif
 next_frame:

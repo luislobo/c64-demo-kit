@@ -16,7 +16,7 @@ rebuild and explicitly copy new delivery files when publishing an update.
 | `validation/test-pal.json` | Recorded default-demo PAL emulator checks and measured decoder-cycle/tick samples. |
 | `validation/test-ntsc.json` | The corresponding NTSC recording. |
 | `validation/frame-stress.json` | Five interleaved trials per fitting profile and video standard, covering 600 bitmap frames and 32-phase memory rejection. |
-| `validation/fps-stress.json` | Five trials per build/standard, 4,800 bitmap comparisons and unchanged music/ticker clocks at the new 12 fps target. |
+| `validation/fps-stress.json` | Five trials per build/standard, 4,800 bitmap comparisons and music/ticker clock checks at the release cadence. |
 | `validation/fps-probes.json` | Exploratory higher-rate results, including recorded target misses. |
 | `validation/fps-soak-pal.json`, `fps-soak-ntsc.json` | 144-second automatic-show checks with no missed deadlines. |
 | `validation/copy-kernels-pal.json`, `copy-kernels-ntsc.json` | Native copy/fill page boundaries and intentional late-target recovery. |
@@ -35,7 +35,11 @@ and restarts Clockwork. Preserve both credit files when redistributing it.
 eight-second cycles, wraparound and the Space handler's manual takeover.
 Source/configuration details are in [the TORQ guide](../docs/TORQ.md).
 
-The wave has 16 phases at nominal 12 fps, for an approximately 1.33-second cycle.
+The standalone [Entertainer disco SID](music/entertainer-disco.sid) and its
+[audio preview](music/entertainer-disco.mp3) are separate music examples. See
+[the music guide](../examples/music/README.md) for source and credits.
+
+The wave has 16 phases at nominal 12.5 fps on PAL and 15 fps on NTSC.
 [FPS results and proposed experiments](../docs/FPS.md) document this update. The
 [frame-capacity guide](../docs/FRAME_CAPACITY.md) records the compression and
 RAM changes, repeated timings and the limits of the 32-phase experiment.

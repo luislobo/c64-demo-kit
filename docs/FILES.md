@@ -192,6 +192,7 @@ source, missing attribution/licenses and lost commit pins are rejected.
 
 | File | Algorithm, role and reason |
 | --- | --- |
+| [host/patch-planner.cjs](../host/patch-planner.cjs) | Choose cycle-weighted patch streams and refine pose angles against two-buffer transitions. |
 | [host/timing.cjs](../host/timing.cjs) | Validate target FPS and derive integer periods, fractional remainders and reference cadence. |
 | [tests/timing.test.cjs](../tests/timing.test.cjs) | Check prefix timing sums, PAL/NTSC 12 fps intervals, defaults and invalid targets. |
 | [tests/stress-fps.cjs](../tests/stress-fps.cjs) | Compare sequential displayed frames across every moving mode, physical IRQ cadence, music, ticker and static restoration. |

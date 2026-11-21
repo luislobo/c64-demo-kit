@@ -1,8 +1,9 @@
 ; Algorithm: stream sparse commands into the hidden bitmap. 0 ends the stream;
 ; 1..127 skips; $81..$ff copies literals; $80,count,value fills 1..255 bytes.
 ; Why: skips change only the destination pointer, and literal loops use indexed
-; indirect reads/writes. Literal copies count backward with DEY/BPL; fill
-; loops count down in X. Pointers still advance once per whole run.
+; indirect reads/writes. Long literals enter an eight-byte unrolled loop.
+; Fills use a Y countdown through 127 bytes and an X countdown through 255.
+; Pointers still advance once per whole run.
 ; Literal zeros erase old pixels; skips preserve the buffer-specific baseline.
 ; Input A is a valid patch index. Clobbers A/X/Y, flags, src/dst/count and
 ; patch_tail. A low-stream terminator switches source without resetting dst.
@@ -52,7 +53,7 @@ skip_no_carry:
     jmp command
 literal:
     and #$7f
-    beq fill_run
+    beq fill_jump
     sta count
     inc src
     bne literal_begin
@@ -60,11 +61,14 @@ literal:
 literal_begin:
     ldy count
     dey
+    cpy #7
+    bcs literal_long
 literal_loop:
     lda (src),y
     sta (dst),y
     dey
     bpl literal_loop          ; Literals are at most 127 bytes: signed countdown.
+literal_done:
     ldy count
     tya
     clc
@@ -92,6 +96,31 @@ patch_end:
     jmp command
 render_done:
     rts
+fill_jump:
+    jmp fill_run
+
+; Enter the unrolled loop at the instruction for the first partial group.
+; The branch operand is renderer-owned, and IRQs never call render.
+literal_long:
+    tya
+    and #7
+    tax
+    lda literal_entries,x
+    sta literal_entry+1
+literal_entry:
+    bpl literal_group
+literal_group:
+    .rept 8
+        lda (src),y
+        sta (dst),y
+        dey
+    .endrept
+    bpl literal_group
+    jmp literal_done
+literal_entries:
+    .for part := 7, part >= 0, part -= 1
+        .byte literal_group + part * 5 - (literal_entry + 2)
+    .endfor
 
 ; Repeated-byte runs omit source reads inside the loop. Three header bytes
 ; advance the source; the destination advances by count, including page carry.
@@ -102,12 +131,23 @@ fill_run:
     tax
     iny
     lda (src),y
+    ldy count
+    bmi fill_long
+    dey
+fill_short_loop:
+    sta (dst),y
+    dey
+    bpl fill_short_loop
+    ldy count
+    jmp fill_done
+fill_long:
     ldy #0
 fill_loop:
     sta (dst),y
     iny
     dex
     bne fill_loop
+fill_done:
     lda src
     clc
     adc #3

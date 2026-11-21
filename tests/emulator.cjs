@@ -33,7 +33,9 @@ await m.command('break '+h(symbols.idle));await m.command('g 810');await m.comma
 let state=await m.bytes(2,13,'state');
 await m.command('> 28 00'); // Test manual modes without automatic scene changes.
 const refresh=mode==='pal'?50:60;
-if(state[7] !== Math.floor(refresh/config.DEMO_FPS))throw Error('Incorrect frame base period: '+state[7]);
+const basePeriod=frameCadence(refresh,config.DEMO_FPS,1,config.DEMO_PAL_TICKS)[0];
+const nominalFPS=mode==='pal'&&config.DEMO_PAL_TICKS?50/config.DEMO_PAL_TICKS:config.DEMO_FPS;
+if(state[7] !== basePeriod)throw Error('Incorrect frame base period: '+state[7]);
 const base=fs.readFileSync(path.join(project,'generated/static-bitmap.bin'));
 for(const start of [0x2000,0xe000])if(!(await m.bytes(start,start+7999,'initial-'+h(start))).subarray(0,7680).equals(base.subarray(0,7680)))throw Error('Initial bitmap mismatch');
 const index=(x,y)=>(y>>3)*320+(x>>3)*8+(y&7);
@@ -55,7 +57,7 @@ for(let i=0;i<frameChecks;i++){
  flips.push({phase,tick});
  if(i===3)await m.command(`screenshot "${path.join(root,mode+'-optimized-wave.png').replaceAll('\\','/')}" 2`);
 }
-const expectedIntervals=frameCadence(refresh,config.DEMO_FPS,frameChecks);
+const expectedIntervals=frameCadence(refresh,config.DEMO_FPS,frameChecks,config.DEMO_PAL_TICKS);
 for(let i=1;i<flips.length;i++)if(((flips[i].tick-flips[i-1].tick)&255)!==expectedIntervals[i])throw Error('Uneven frame timing '+JSON.stringify({times,flips}));
 // Queue the same event the IRQ generates on a Space press; verify stop and restart.
 await m.command('> 06 01');await m.until('idle');
@@ -123,7 +125,7 @@ for(let i=0;i<16;i++)await m.until('irq');
 if((((await m.bytes(7,7,'call-tick-end'))[0]-tick)&255)!==16)throw Error('Raster tick drift');
 if((((await m.bytes(music.sample_calls,music.sample_calls+1,'call-end')).readUInt16LE()-sidCalls)&65535)!==16)throw Error('SID call drift');
 if((await m.bytes(0x23,0x23,'deadline-misses'))[0]!==0)throw Error('Frame deadline was missed');
-const report={mode,nominalFPS:config.DEMO_FPS,deadlineMisses:0,framesVerified:frameChecks+3*(config.DEMO_FRAMES+2),colorFields:fieldResults,sidCallsPer16Refreshes:16,basePeriod:Math.floor(refresh/config.DEMO_FPS),decoderCycles:times,flips,stopAndRestart:true,rainbowMode:true,colorOnlyMode:true,psidPlayback:true,scrollingText:true};
+const report={mode,nominalFPS,deadlineMisses:0,framesVerified:frameChecks+3*(config.DEMO_FRAMES+2),colorFields:fieldResults,sidCallsPer16Refreshes:16,basePeriod,decoderCycles:times,flips,stopAndRestart:true,rainbowMode:true,colorOnlyMode:true,psidPlayback:true,scrollingText:true};
 fs.writeFileSync(path.join(root,'test-'+mode+'.json'),JSON.stringify(report,null,2));
 fs.writeFileSync(path.join(root,'monitor-'+mode+'.txt'),m.log);
 console.log(JSON.stringify(report,null,2));m.socket.end('quit\n');

@@ -128,7 +128,7 @@ Algorithm: map pixels to VIC cell order, nearest-neighbor-fit a 320x200 source i
 
 [Source](../host/patches.cjs)
 
-Algorithm: use dynamic programming to balance bytes and writes across runs of at most 127 and repeated-byte fills of at most 255. Build two static warm-ups, frame[i-2] -> frame[i] transitions, and a union-based restore. Why: hidden buffers lag by two phases. The restore includes every location that any wave can alter, allowing safe stop/restart from any displayed phase. The JS decoder simulates both buffers for five cycles and checks restoration. Score is 5*encodedBytes + writtenBytes + 2*commands. This keeps fills from overwriting large unchanged areas just to save a header byte. The score is a storage/CPU heuristic, not a claim of globally optimal 6510 execution.
+Algorithm: use dynamic programming to balance bytes and writes across runs of at most 127 and repeated-byte fills of at most 255. Build two static warm-ups, frame[i-2] -> frame[i] transitions, and a union-based restore. Why: hidden buffers lag by two phases. The restore includes every location that any wave can alter, allowing safe stop/restart from any displayed phase. The JS decoder simulates both buffers for five cycles and checks restoration. Score is 5*encodedBytes + writtenBytes + 2*commands. This keeps fills from overwriting large unchanged areas just to save a header byte. That legacy heuristic remains available. The [cycle planner](FPS.md#patch-compiler) also tries several cycle/byte prices and selects a fitting set of streams.
 
 ## host/music.cjs
 
@@ -274,8 +274,9 @@ music or ticker work. IRQ register saves protect a decoder interrupted halfway
 through a literal run. This is cooperative main-thread rendering plus interrupt
 scheduling, not concurrent execution on multiple processors.
 
-The default uses a carried fractional interval for nominal 12 fps: PAL has
-4/5-refresh intervals and NTSC five. Rates above 10 fps start the frame clock
+The default uses a fixed four-refresh interval on both standards, giving
+12.5 fps on PAL and 15 fps on NTSC. Other rates can carry a fractional
+remainder. Rates above 10 fps start the frame clock
 one refresh after the start event so the first decode has a full preparation
 window. An overdue target is counted and resynchronized; frames are never
 skipped. See [FPS measurements and hypotheses](FPS.md). Built-in music, the automatic show and ticker use an accumulator: add 50 each refresh and

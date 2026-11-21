@@ -11,7 +11,7 @@ const palette = [96, 224, 48, 80, 208, 112, 160, 64];
 
 test('logo fields animate all three modes without touching text or backgrounds', () => {
   const assets = colorFieldAssets();
-  assert.equal(assets.length, 256 + 920 * 2);
+  assert.equal(assets.length, 256 + 12 * 40 + 23 * 40);
   const fields = [4, 5, 6].map(mode => Buffer.concat(Array.from({ length: 23 }, (_, row) => colorFieldRow(mode, 17, row, palette))));
   for (let mode = 4; mode <= 6; mode++) {
     assert.equal(fields[mode - 4].length, 920);

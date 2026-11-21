@@ -1,6 +1,6 @@
 {
   "mode": "ntsc",
-  "nominalFPS": 12,
+  "nominalFPS": 15,
   "nominalSeconds": 144,
   "automaticTransitions": 18,
   "allModes": true,

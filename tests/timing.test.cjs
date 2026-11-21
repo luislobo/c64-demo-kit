@@ -23,6 +23,13 @@ test('all supported cadences track nominal time without accumulating drift', () 
 test('invalid frame rates fail before assembly', () => {
   for(const fps of [0,51,12.5,NaN])assert.throws(()=>timingConfig(fps),/FPS/);
 });
+test('a fixed PAL interval leaves NTSC on the requested nominal FPS', () => {
+  assert.equal(timingConfig(15,4).palFPS,12.5);
+  assert.deepEqual(frameCadence(50,15,16,4),Array(16).fill(4));
+  assert.deepEqual(frameCadence(60,15,16,4),Array(16).fill(4));
+  assert.deepEqual(frameCadence(60,13,5,4),frameCadence(60,13,5));
+  assert.throws(()=>timingConfig(15,0),/DEMO_PAL_TICKS/);
+});
 test('explicit unsupported FPS literals cannot silently fall back to 10 fps', () => {
  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'c64-fps-'));
  const file=path.join(directory,'demo.asm'),source=fs.readFileSync(path.join(__dirname,'../demo.asm'),'utf8');
