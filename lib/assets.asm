@@ -25,6 +25,10 @@ patch_low:
     .endif
 * = $2000
     .binary "../generated/static-bitmap.bin"
+    .if KIT_COLOR_FIELDS && KIT_FIRE_PLASMA
+        .include "fire-plasma.asm"
+        .cerror * > $4000, "Fire plasma overlaps high patch region"
+    .endif
 * = $4000
     .binary "../generated/patches.bin"
  .if KIT_COLOR_FIELDS

@@ -1,0 +1,133 @@
+{
+  "effect": "Fire plasma",
+  "soundtrack": "After Hours Roll",
+  "emulator": "VICE x64sc 3.9",
+  "platform": "Linux",
+  "assembler": "64tass 1.59.3120",
+  "frames": 16,
+  "effects": 6,
+  "bitmapComparisons": 2400,
+  "runsPerStandard": 5,
+  "trials": [
+    {
+      "mode": "pal",
+      "trial": 0,
+      "measuredNominalFPS": 12.5,
+      "framesVerified": 240,
+      "missedIntervals": 0,
+      "deadlineMissCounter": 0,
+      "sidCallsPer16Refreshes": 16,
+      "tickerClockVerified": true,
+      "staticRestored": true,
+      "irqCyclesFor16Refreshes": 314495
+    },
+    {
+      "mode": "pal",
+      "trial": 1,
+      "measuredNominalFPS": 12.5,
+      "framesVerified": 240,
+      "missedIntervals": 0,
+      "deadlineMissCounter": 0,
+      "sidCallsPer16Refreshes": 16,
+      "tickerClockVerified": true,
+      "staticRestored": true,
+      "irqCyclesFor16Refreshes": 314495
+    },
+    {
+      "mode": "pal",
+      "trial": 2,
+      "measuredNominalFPS": 12.5,
+      "framesVerified": 240,
+      "missedIntervals": 0,
+      "deadlineMissCounter": 0,
+      "sidCallsPer16Refreshes": 16,
+      "tickerClockVerified": true,
+      "staticRestored": true,
+      "irqCyclesFor16Refreshes": 314495
+    },
+    {
+      "mode": "pal",
+      "trial": 3,
+      "measuredNominalFPS": 12.5,
+      "framesVerified": 240,
+      "missedIntervals": 0,
+      "deadlineMissCounter": 0,
+      "sidCallsPer16Refreshes": 16,
+      "tickerClockVerified": true,
+      "staticRestored": true,
+      "irqCyclesFor16Refreshes": 314495
+    },
+    {
+      "mode": "pal",
+      "trial": 4,
+      "measuredNominalFPS": 12.5,
+      "framesVerified": 240,
+      "missedIntervals": 0,
+      "deadlineMissCounter": 0,
+      "sidCallsPer16Refreshes": 16,
+      "tickerClockVerified": true,
+      "staticRestored": true,
+      "irqCyclesFor16Refreshes": 314495
+    },
+    {
+      "mode": "ntsc",
+      "trial": 0,
+      "measuredNominalFPS": 15,
+      "framesVerified": 240,
+      "missedIntervals": 0,
+      "deadlineMissCounter": 0,
+      "sidCallsPer16Refreshes": 16,
+      "tickerClockVerified": true,
+      "staticRestored": true,
+      "irqCyclesFor16Refreshes": 273523
+    },
+    {
+      "mode": "ntsc",
+      "trial": 1,
+      "measuredNominalFPS": 15,
+      "framesVerified": 240,
+      "missedIntervals": 0,
+      "deadlineMissCounter": 0,
+      "sidCallsPer16Refreshes": 16,
+      "tickerClockVerified": true,
+      "staticRestored": true,
+      "irqCyclesFor16Refreshes": 273523
+    },
+    {
+      "mode": "ntsc",
+      "trial": 2,
+      "measuredNominalFPS": 15,
+      "framesVerified": 240,
+      "missedIntervals": 0,
+      "deadlineMissCounter": 0,
+      "sidCallsPer16Refreshes": 16,
+      "tickerClockVerified": true,
+      "staticRestored": true,
+      "irqCyclesFor16Refreshes": 273523
+    },
+    {
+      "mode": "ntsc",
+      "trial": 3,
+      "measuredNominalFPS": 15,
+      "framesVerified": 240,
+      "missedIntervals": 0,
+      "deadlineMissCounter": 0,
+      "sidCallsPer16Refreshes": 16,
+      "tickerClockVerified": true,
+      "staticRestored": true,
+      "irqCyclesFor16Refreshes": 273523
+    },
+    {
+      "mode": "ntsc",
+      "trial": 4,
+      "measuredNominalFPS": 15,
+      "framesVerified": 240,
+      "missedIntervals": 0,
+      "deadlineMissCounter": 0,
+      "sidCallsPer16Refreshes": 16,
+      "tickerClockVerified": true,
+      "staticRestored": true,
+      "irqCyclesFor16Refreshes": 273523
+    }
+  ]
+}

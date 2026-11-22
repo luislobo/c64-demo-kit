@@ -2,7 +2,7 @@
 // Each field covers only 23 logo rows, retains black backgrounds, and wraps.
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { colorFieldAssets, colorFieldRow } = require('../host/color-fields.cjs');
+const { colorFieldAssets, firePlasmaAssets, colorFieldRow } = require('../host/color-fields.cjs');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -22,6 +22,18 @@ test('logo fields animate all three modes without touching text or backgrounds',
   assert.ok(!fields[0].equals(fields[1])); assert.ok(!fields[1].equals(fields[2]));
   assert.throws(() => colorFieldRow(3, 0, 0, palette), /mode/);
   assert.throws(() => colorFieldRow(4, 0, 23, palette), /row/);
+});
+
+test('fire plasma animates a warmer base and leaves other fields alone', () => {
+  const options = { firePlasma: true };
+  const color = (mode, phase, row) => colorFieldRow(mode, phase, row, palette, options);
+  const assets = firePlasmaAssets();
+  assert.equal(assets.length, 64 + 23);
+  assert.equal(assets[64], 0);
+  assert.equal(assets.at(-1), 127);
+  assert.ok(color(4, 17, 10).every(value => [0x90, 0x20, 0x80, 0xa0, 0x70, 0x10].includes(value)));
+  assert.notDeepEqual(color(4, 17, 10), color(4, 65, 10));
+  for (const mode of [5, 6]) assert.deepEqual(color(mode, 17, 10), colorFieldRow(mode, 17, 10, palette));
 });
 
 test('application flags reject unavailable modes and untrusted music generators', () => {

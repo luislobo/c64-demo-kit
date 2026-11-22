@@ -68,7 +68,11 @@ field_plasma:
     lsr
     lsr
     tay
-    lda field_palette,y
+    .if KIT_FIRE_PLASMA
+        lda fire_palette,y
+    .else
+        lda field_palette,y
+    .endif
 field_store_primary:
     sta $0400,x
 field_store_secondary:
@@ -115,7 +119,11 @@ polar_store_secondary:
     bpl field_polar
     jmp color_row_done
 field_loops:
-    .word field_plasma, field_xor, field_polar
+    .if KIT_FIRE_PLASMA
+        .word field_fire, field_xor, field_polar
+    .else
+        .word field_plasma, field_xor, field_polar
+    .endif
 ; Shift twice in the loop; eight copies per shade replace three more shifts.
 field_palette:
     .for shade := 0, shade < 8, shade += 1

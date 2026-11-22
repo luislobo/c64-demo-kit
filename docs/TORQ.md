@@ -2,7 +2,7 @@
 
 The default application combines the supplied logo, its 16-phase bitmap wave,
 three original foreground color fields, a pixel ticker and After Hours Roll SID music.
-It starts with plasma and automatically changes modes every eight nominal seconds.
+It starts with fire plasma and automatically changes modes every eight nominal seconds.
 The 16-pose wave runs at nominal 12.5 fps on PAL and 15 fps on NTSC.
 [FPS measurements](FPS.md) include the PAL cadence and startup allowance.
 [Capacity measurements](FRAME_CAPACITY.md) cover 8, 16 and 32 phases.
@@ -12,7 +12,7 @@ The 16-pose wave runs at nominal 12.5 fps on PAL and 15 fps on NTSC.
 | 1 | Blue wave |
 | 2 | Rainbow wave |
 | 3 | Stationary logo with cycling color bands |
-| 4 | Wave with sine-sum plasma colors |
+| 4 | Wave with rising fire plasma and an ember-to-yellow palette |
 | 5 | Wave with XOR interference colors |
 | 6 | Wave with polar tunnel colors |
 | Space | Start/stop bitmap motion |
@@ -48,6 +48,7 @@ the program. Ready-to-run copies and captures are in [dist](../dist/README.md).
 | `DEMO_PAL_TICKS` | Unset | Fixed PAL period when set; TORQ uses four refreshes |
 | `DEMO_PATCH_PLAN` | `"legacy"` | TORQ selects `"balanced"` for cycle-based patches and pose selection |
 | `DEMO_COLOR_FIELDS` | `0` | `1` enables modes 4..6 and their lookup tables |
+| `DEMO_FIRE_PLASMA` | `0` | `1` gives mode 4 a rising heat field and fire palette |
 | `DEMO_START_EFFECT` | `1` | Initial mode, within the enabled range |
 | `DEMO_AUTO_SHOW` | `0` | `1` starts the wave and cycles enabled modes every eight seconds |
 | `DEMO_SID_BUILD` | None | `"after-hours"` generates TORQ's original SID before import |
@@ -55,6 +56,7 @@ the program. Ready-to-run copies and captures are in [dist](../dist/README.md).
 
 The supplied application selects fields, initial mode 4 and automatic playback.
 Other bitmap entries retain their three-mode behavior unless they enable fields.
+Set `DEMO_FIRE_PLASMA = 0` in `demo.asm` to restore the original plasma palette.
 Removing the PSID configuration selects the existing built-in note sequencer.
 `DEMO_VOLUME` and `DEMO_NOTE_TICKS` control that sequencer; an imported player
 owns its volume and tempo. See [SID contracts](SID.md) before importing music.
@@ -80,6 +82,9 @@ disjoint from decoder pointers, ticker state and the imported player's allocatio
 
 Plasma adds horizontal and vertical sine samples; XOR combines them with EOR.
 The tunnel adds phase to inverse radius, XORs angle and selects a palette entry.
+Fire plasma mixes a rising sine band with a bottom-to-top heat falloff once
+per row. Its helper and tables fit in the unused bytes at `$3f40..$3fff`,
+outside the visible bitmap.
 The native loops use additions, shifts, table reads and two indexed stores per
 cell. They calculate no trigonometric functions. The IRQ is their only caller,
 which makes the patched screen-store operands safe from reentry.

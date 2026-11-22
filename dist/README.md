@@ -16,21 +16,23 @@ rebuild and explicitly copy new delivery files when publishing an update.
 | `validation/test-pal.json` | Recorded default-demo PAL emulator checks and measured decoder-cycle/tick samples. |
 | `validation/test-ntsc.json` | The corresponding NTSC recording. |
 | `validation/frame-stress.json` | Five interleaved trials per fitting profile and video standard, covering 600 bitmap frames and 32-phase memory rejection. |
-| `validation/after-hours-fps.json` | Five After Hours Roll trials per video standard in Windows VICE, with 2,400 bitmap comparisons. |
+| `validation/fire-plasma-fps.json` | Five fire-plasma trials per video standard in Linux VICE, with 2,400 bitmap comparisons. |
+| `validation/after-hours-fps.json` | Five After Hours Roll trials with the original plasma in Windows VICE. |
 | `validation/fps-stress.json` | Historical Clockwork comparison, with 4,800 bitmap comparisons and music/ticker clock checks. |
 | `validation/fps-probes.json` | Exploratory higher-rate results, including recorded target misses. |
 | `validation/fps-soak-pal.json`, `fps-soak-ntsc.json` | 144-second automatic-show checks with no missed deadlines. |
 | `validation/copy-kernels-pal.json`, `copy-kernels-ntsc.json` | Native copy/fill page boundaries and intentional late-target recovery. |
 
-The After Hours Roll timing, control and automatic-show checks were recorded
-in Windows VICE 3.10. The reports check decoded image memory, frame spacing, restore/restart, effect
+The current fire-plasma timing, control and show checks were recorded in
+Linux VICE. The After Hours Roll timing report preserves the Windows run
+with the original plasma. The reports check decoded image memory, frame spacing, restore/restart, effect
 requests, all new color cells, PSID advancement and matching ticker buffers. Mode requests
 are injected into the runtime's event state; those automated reports do not
 simulate physical key presses. Sequencer advancement does not establish musical
 quality, and emulator checks do not establish compatibility with every real
 C64, SID revision or SD2IEC firmware.
 
-This snapshot starts automatically with plasma, then changes between six effects
+This snapshot starts automatically with fire plasma, then changes between six effects
 every eight nominal seconds. Number keys or Space take manual control; M pauses
 and restarts After Hours Roll. Preserve both credit files when redistributing it.
 `validation/show-pal.json` and `show-ntsc.json` record automatic startup,

@@ -99,7 +99,7 @@ for(const effect of [4,5,6]){
  for(let i=0;i<46;i++){
   await m.until('color_row_done');
   const [row,phase]=await m.bytes(0x19,0x1a,'field-state');
-  const expected=colorFieldRow(effect,phase,row,config.DEMO_PALETTE);
+  const expected=colorFieldRow(effect,phase,row,config.DEMO_PALETTE,{firePlasma:config.DEMO_FIRE_PLASMA===1});
   for(const screen of [0x400,0xc000]){
    if(!(await m.bytes(screen+row*40,screen+row*40+39,'field-row')).equals(expected))throw Error(`Field ${effect} row ${row} phase ${phase} differs`);
   }

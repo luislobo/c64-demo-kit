@@ -47,7 +47,15 @@ one preparation refresh at startup or restart, then follows its steady
 cadence. An overdue frame resynchronizes at the next border and increments
 the deadline counter.
 
-## After Hours Roll release check
+## Fire plasma
+
+Five Linux VICE trials per standard checked 2,400 bitmap frames with fire
+plasma enabled and recorded zero missed deadlines at 12.5 fps PAL and 15 fps
+NTSC. The automatic show ran for 144 nominal seconds on each standard with
+the same music, ticker and mode cadence.
+[Fire-plasma timing report](../dist/validation/fire-plasma-fps.json)
+
+## After Hours Roll release check with original plasma
 
 Windows VICE 3.10 verified the default After Hours Roll build at 12.5 fps on
 PAL and 15 fps on NTSC in all five trials per standard. The run checked

@@ -81,9 +81,9 @@ Ready-to-run copies are also committed under `dist/`, together with a preview
 and the PAL/NTSC validation reports. `assets/reference/` preserves the source
 logo PNGs; the builder consumes the converted `assets/image.bin`.
 
-The demo starts with a plasma-colored wave and changes effects every eight
+The demo starts with a fire-plasma wave and changes effects every eight
 nominal seconds. 1 selects blue wave, 2 rainbow wave, 3 stationary color cycle,
-4 plasma, 5 XOR and 6 tunnel. A number key or Space takes manual control until
+4 fire plasma, 5 XOR and 6 tunnel. A number key or Space takes manual control until
 reset. Space starts/stops the wave; M pauses/restarts the music. The wave uses
 16 precomputed phases at nominal 12.5 fps on PAL and 15 fps on NTSC.
 See [FPS measurements and experiments](docs/FPS.md), [frame capacity](docs/FRAME_CAPACITY.md)
@@ -185,6 +185,7 @@ state let native rendering fit the C64 memory and raster budget.
 | `$0801..$14ff` | BASIC stub, code, font, text and patch/continuation pointers |
 | `$1500..$1fff` | Optional low patch storage, used by the 16-phase demo |
 | `$2000..$3f3f` | Primary bitmap |
+| `$3f40..$3fff` | Optional fire plasma row setup and lookup tables |
 | `$4000..$bfff` | Generated sparse patch streams and optional color-field tables |
 | `$c000..$c3ff` | Secondary color/screen matrix |
 | `$c400..$cfff` | Optional imported SID payload |

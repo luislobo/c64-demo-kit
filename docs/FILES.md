@@ -85,6 +85,7 @@ exercise isolated shell/PowerShell behavior without installing system packages.
 | --- | --- |
 | [host/color-fields.cjs](../host/color-fields.cjs) | Generate sine/inverse-radius/angle tables and mathematical 40-cell logo rows for native comparisons. |
 | [lib/color-fields.asm](../lib/color-fields.asm) | Render one plasma/XOR/polar foreground row in both screen matrices using byte math and patched indexed stores. |
+| [lib/fire-plasma.asm](../lib/fire-plasma.asm) | Mix a rising sine band with a row heat gradient before the shared plasma loop. |
 | [lib/show.asm](../lib/show.asm) | Request enabled modes every 400 logic updates through the existing animation controller. |
 | [assets/torq-credits.txt](../assets/torq-credits.txt) | Release attribution for the original kit/music, PSID format and research references. |
 | [tests/color-fields.test.cjs](../tests/color-fields.test.cjs) | Check color bounds, animation, wrapping and invalid optional application settings. |

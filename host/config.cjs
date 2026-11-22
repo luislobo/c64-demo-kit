@@ -31,6 +31,8 @@ function readConfig(file){
  config.DEMO_PATCH_PLAN ??= 'legacy';
  if(!['legacy','cycles','balanced'].includes(config.DEMO_PATCH_PLAN))throw Error('DEMO_PATCH_PLAN must be legacy, cycles or balanced');
  config.DEMO_COLOR_FIELDS ??= 0;
+ config.DEMO_FIRE_PLASMA ??= 0;
+ if(![0,1].includes(config.DEMO_FIRE_PLASMA))throw Error('DEMO_FIRE_PLASMA must be 0 or 1');
  config.DEMO_START_EFFECT ??= 1;
  config.DEMO_AUTO_SHOW ??= 0;
  if(![0,1].includes(config.DEMO_AUTO_SHOW))throw Error('DEMO_AUTO_SHOW must be 0 or 1');

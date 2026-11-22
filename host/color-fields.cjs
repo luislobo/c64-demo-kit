@@ -15,16 +15,28 @@ function colorFieldAssets() {
   }
   return Buffer.concat([Buffer.from(Array.from({ length: 256 }, (_, i) => sine(i))), radius, angle]);
 }
-function colorFieldRow(mode, phase, row, palette) {
+const firePalette = [0x90, 0x90, 0x20, 0x80, 0xa0, 0x70, 0x70, 0x10];
+const rowHeat = row => Math.floor(row * 127 / 22);
+
+function firePlasmaAssets() {
+  const palette = firePalette.flatMap(color => Array(8).fill(color));
+  const heat = Array.from({ length: 23 }, (_, row) => rowHeat(row));
+  return Buffer.from([...palette, ...heat]);
+}
+
+function colorFieldRow(mode, phase, row, palette, { firePlasma = false } = {}) {
   if (![4, 5, 6].includes(mode)) throw Error('Invalid color field mode');
   if (!Number.isInteger(row) || row < 0 || row >= 23) throw Error('Invalid color field row');
   const result = Buffer.alloc(40);
+  const fire = mode === 4 && firePlasma;
+  const sy = fire ? (sine(8 * row + phase) + rowHeat(row)) >> 1 : sine(8 * row - phase);
+  const colors = fire ? firePalette : palette;
   for (let x = 0; x < 40; x++) {
-    const sx = sine(5 * x + phase), sy = sine(8 * row - phase);
+    const sx = sine(5 * x + phase);
     let shade = mode === 4 ? (sx + sy) >> 5 : (sx ^ sy) >> 4;
     if (mode === 6) { const [radius, angle] = polar(x, row); shade = (((radius + phase) & 255) ^ angle) >> 5; }
-    result[x] = palette[shade];
+    result[x] = colors[shade];
   }
   return result;
 }
-module.exports = { colorFieldAssets, colorFieldRow };
+module.exports = { colorFieldAssets, firePlasmaAssets, colorFieldRow };
