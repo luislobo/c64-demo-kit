@@ -4,7 +4,7 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {build}=require('../build.cjs');
 const {frameCadence}=require('../host/timing.cjs');
-const {runVice,readSymbols}=require('./vice.cjs');
+const {runVice,readSymbols,readMusicSymbols}=require('./vice.cjs');
 const root=path.resolve(__dirname,'..'),source=fs.readFileSync(path.join(root,'demo.asm'),'utf8');
 const fixture=path.join(root,'fps-stress.asm'),output=path.join(root,'build/fps-stress.json');
 let runs=5,rates,baseline,probe=false;
@@ -19,7 +19,7 @@ assert.ok(Number.isInteger(runs)&&runs>=1&&runs<=20);
 for(const fps of rates??[])assert.ok(Number.isInteger(fps)&&fps>=1&&fps<=50);
 function profile(project,report,name){
  const data=fs.readFileSync(path.join(project,'generated/frames.bin'));
- return{name,report,fps:report.fps??10,s:readSymbols(path.join(path.dirname(report.prg),'symbols.labels')),music:readSymbols(path.join(project,'build/example-music/symbols.labels')),base:fs.readFileSync(path.join(project,'generated/static-bitmap.bin')),frames:Array.from({length:16},(_,i)=>data.subarray(i*8000,(i+1)*8000))};
+ return{name,report,fps:report.fps??10,s:readSymbols(path.join(path.dirname(report.prg),'symbols.labels')),music:readMusicSymbols(report,project),base:fs.readFileSync(path.join(project,'generated/static-bitmap.bin')),frames:Array.from({length:16},(_,i)=>data.subarray(i*8000,(i+1)*8000))};
 }
 async function verify(p,mode,trial){
  const hz=mode==='pal'?50:60,expected=frameCadence(hz,p.fps,240,p.report.palTicks);

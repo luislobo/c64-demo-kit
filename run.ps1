@@ -17,7 +17,7 @@ function Find-Executable([string]$Override, [string]$Name) {
 
 function Test-Node([string]$Executable) {
     if (-not $Executable) { return $false }
-    & $Executable -e 'if(Number(process.versions.node.split(".")[0])<18)process.exit(1)' *> $null
+    & $Executable -e 'if(parseInt(process.versions.node,10)<18)process.exit(1)' *> $null
     return $LASTEXITCODE -eq 0
 }
 

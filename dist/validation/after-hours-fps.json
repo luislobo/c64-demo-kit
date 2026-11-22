@@ -1,0 +1,103 @@
+{
+  "soundtrack": "After Hours Roll",
+  "platform": "Windows x64",
+  "emulator": "VICE x64sc 3.10",
+  "assembler": "64tass 1.60.3243",
+  "frames": 16,
+  "effects": 6,
+  "runsPerStandard": 5,
+  "bitmapFramesVerified": 2400,
+  "source": "Windows Test-Torq.ps1 console output",
+  "trials": [
+    {
+      "mode": "pal",
+      "trial": 1,
+      "nominalFPS": 12.5,
+      "intervalMisses": 0,
+      "deadlineResyncs": 0,
+      "bitmapsMusicAndTickerVerified": true,
+      "bitmapFramesVerified": 240
+    },
+    {
+      "mode": "ntsc",
+      "trial": 1,
+      "nominalFPS": 15.0,
+      "intervalMisses": 0,
+      "deadlineResyncs": 0,
+      "bitmapsMusicAndTickerVerified": true,
+      "bitmapFramesVerified": 240
+    },
+    {
+      "mode": "pal",
+      "trial": 2,
+      "nominalFPS": 12.5,
+      "intervalMisses": 0,
+      "deadlineResyncs": 0,
+      "bitmapsMusicAndTickerVerified": true,
+      "bitmapFramesVerified": 240
+    },
+    {
+      "mode": "ntsc",
+      "trial": 2,
+      "nominalFPS": 15.0,
+      "intervalMisses": 0,
+      "deadlineResyncs": 0,
+      "bitmapsMusicAndTickerVerified": true,
+      "bitmapFramesVerified": 240
+    },
+    {
+      "mode": "pal",
+      "trial": 3,
+      "nominalFPS": 12.5,
+      "intervalMisses": 0,
+      "deadlineResyncs": 0,
+      "bitmapsMusicAndTickerVerified": true,
+      "bitmapFramesVerified": 240
+    },
+    {
+      "mode": "ntsc",
+      "trial": 3,
+      "nominalFPS": 15.0,
+      "intervalMisses": 0,
+      "deadlineResyncs": 0,
+      "bitmapsMusicAndTickerVerified": true,
+      "bitmapFramesVerified": 240
+    },
+    {
+      "mode": "pal",
+      "trial": 4,
+      "nominalFPS": 12.5,
+      "intervalMisses": 0,
+      "deadlineResyncs": 0,
+      "bitmapsMusicAndTickerVerified": true,
+      "bitmapFramesVerified": 240
+    },
+    {
+      "mode": "ntsc",
+      "trial": 4,
+      "nominalFPS": 15.0,
+      "intervalMisses": 0,
+      "deadlineResyncs": 0,
+      "bitmapsMusicAndTickerVerified": true,
+      "bitmapFramesVerified": 240
+    },
+    {
+      "mode": "pal",
+      "trial": 5,
+      "nominalFPS": 12.5,
+      "intervalMisses": 0,
+      "deadlineResyncs": 0,
+      "bitmapsMusicAndTickerVerified": true,
+      "bitmapFramesVerified": 240
+    },
+    {
+      "mode": "ntsc",
+      "trial": 5,
+      "nominalFPS": 15.0,
+      "intervalMisses": 0,
+      "deadlineResyncs": 0,
+      "bitmapsMusicAndTickerVerified": true,
+      "bitmapFramesVerified": 240
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 # TORQ X SENDERO demo
 
 The default application combines the supplied logo, its 16-phase bitmap wave,
-three original foreground color fields, a pixel ticker and Clockwork SID music.
+three original foreground color fields, a pixel ticker and After Hours Roll SID music.
 It starts with plasma and automatically changes modes every eight nominal seconds.
 The 16-pose wave runs at nominal 12.5 fps on PAL and 15 fps on NTSC.
 [FPS measurements](FPS.md) include the PAL cadence and startup allowance.
@@ -16,7 +16,7 @@ The 16-pose wave runs at nominal 12.5 fps on PAL and 15 fps on NTSC.
 | 5 | Wave with XOR interference colors |
 | 6 | Wave with polar tunnel colors |
 | Space | Start/stop bitmap motion |
-| M | Pause/restart Clockwork |
+| M | Pause/restart After Hours Roll |
 | Reset | Restart the automatic show |
 
 A number key or Space takes manual control until reset. Space stops bitmap
@@ -30,7 +30,7 @@ silences the master volume. Unmuting initializes the song again.
 node build.cjs
 ```
 
-The same command generates Clockwork from its assembly source, assembles the
+The same command generates After Hours Roll from its assembly source, assembles the
 demo and packages a D64. `TASS64` selects another 64tass executable. No downloaded
 tune, npm dependency or network connection is needed.
 
@@ -50,7 +50,7 @@ the program. Ready-to-run copies and captures are in [dist](../dist/README.md).
 | `DEMO_COLOR_FIELDS` | `0` | `1` enables modes 4..6 and their lookup tables |
 | `DEMO_START_EFFECT` | `1` | Initial mode, within the enabled range |
 | `DEMO_AUTO_SHOW` | `0` | `1` starts the wave and cycles enabled modes every eight seconds |
-| `DEMO_SID_BUILD` | None | `"clockwork"` generates the kit's original SID before import |
+| `DEMO_SID_BUILD` | None | `"after-hours"` generates TORQ's original SID before import |
 | `DEMO_CREDITS_FILE` | None | Text notice copied beside the PRG/D64 |
 
 The supplied application selects fields, initial mode 4 and automatic playback.
@@ -92,8 +92,8 @@ calls, leaving time for compressed-run dispatch, color and music work.
 
 ## Credits
 
-The wave engine, new color fields, PSID adapter and Clockwork are original kit
-implementations. Clockwork's composition/player are by C64 demo kit contributors
+The wave engine, new color fields, PSID adapter and After Hours Roll are original kit
+implementations. After Hours Roll's composition/player are by C64 demo kit contributors
 under CC0 1.0. The [release notice](../assets/torq-credits.txt) preserves these
 credits and the PSID format authors.
 

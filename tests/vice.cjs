@@ -37,7 +37,12 @@ class Monitor {
     if (this.pending) throw Error('VICE commands must be sequential');
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => { this.pending = null; reject(Error('VICE timeout: ' + this.buffer.slice(-500))); }, 15000);
-      this.pending = { resolve, reject, timeout }; this.socket.write(text + '\n'); this.pump();
+      this.pending = { resolve, reject, timeout };
+      // VICE file operands accept forward slashes on Windows.
+      const command = process.platform === 'win32'
+        ? text.replace(/"[^"]*"/g, operand => operand.replaceAll('\\', '/'))
+        : text;
+      this.socket.write(command + '\n'); this.pump();
     });
   }
   until(address) { return this.command('until ' + address.toString(16)); }
@@ -62,7 +67,10 @@ async function runVice(mode, name, run) {
   const directory = path.join(root, 'build/validation', name + '-' + mode);
   fs.mkdirSync(directory, { recursive: true });
   const server = net.createServer();
-  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  await new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', resolve);
+  });
   const port = server.address().port; await new Promise(resolve => server.close(resolve));
   const executable = process.env.VICE_BIN || 'x64sc';
   const args = ['-console', '-warp', '+sound', '-' + mode, '-remotemonitor', '-remotemonitoraddress', 'ip4://127.0.0.1:' + port];
@@ -90,9 +98,21 @@ async function runVice(mode, name, run) {
   } finally {
     if (monitor?.pending) clearTimeout(monitor.pending.timeout);
     clearTimeout(monitor?.quiet); monitor?.socket.destroy();
-    try { process.kill(-child.pid, 'SIGTERM'); } catch (error) { if (error.code !== 'ESRCH') throw error; }
+    try {
+      if (child.pid !== undefined) {
+        if (process.platform === 'win32') child.kill('SIGTERM');
+        else process.kill(-child.pid, 'SIGTERM');
+      }
+    } catch (error) {
+      if (error.code !== 'ESRCH') throw error;
+    }
     fs.closeSync(log);
   }
 }
 
-module.exports = { runVice, readSymbols };
+// Historical baseline build reports predate the soundtrack symbol path.
+function readMusicSymbols(report, project = root) {
+  return readSymbols(report.musicSymbols ?? path.join(project, 'build/example-music/symbols.labels'));
+}
+
+module.exports = { runVice, readSymbols, readMusicSymbols };

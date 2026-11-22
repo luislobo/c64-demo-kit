@@ -12,7 +12,7 @@
  */
 const fs=require('node:fs'),path=require('node:path'),net=require('node:net');
 const project=path.resolve(__dirname,'..'),root=path.join(project,'build'),mode=process.argv[2]||'pal',port=Number(process.argv[3]||6522);
-const {readSymbols}=require('./vice.cjs');
+const {readMusicSymbols}=require('./vice.cjs');
 const {colorFieldRow}=require('../host/color-fields.cjs');
 const {frameCadence}=require('../host/timing.cjs');
 const {readConfig}=require('../host/config.cjs'); const config=readConfig(path.join(project,'demo.asm'));
@@ -22,7 +22,7 @@ class Monitor {
  constructor(){this.buffer='';this.log='';this.socket=net.connect(port,'127.0.0.1',()=>this.socket.write('\n'));this.socket.on('data',d=>{this.buffer+=d;this.log+=d;this.pump();});this.socket.on('error',e=>this.reject?.(e));}
  pump(){clearTimeout(this.quiet);if(this.resolve&&/\(C:\$[0-9a-f]+\)\s*$/i.test(this.buffer)){this.quiet=setTimeout(()=>{if(!this.resolve)return;const r=this.buffer;this.buffer='';const done=this.resolve;this.resolve=null;clearTimeout(this.timeout);done(r);},15);}}
  wait(){return new Promise((resolve,reject)=>{this.resolve=resolve;this.reject=reject;this.timeout=setTimeout(()=>reject(Error('Monitor timeout: '+this.buffer.slice(-500))),15000);this.pump();});}
- async command(c){fs.appendFileSync(path.join(root,'monitor-'+mode+'-live.txt'),c+'\n');const p=this.wait();this.socket.write(c+'\n');return p;}
+ async command(c){if(process.platform==='win32')c=c.replace(/"[^"]*"/g,operand=>operand.replaceAll('\\','/'));fs.appendFileSync(path.join(root,'monitor-'+mode+'-live.txt'),c+'\n');const p=this.wait();this.socket.write(c+'\n');return p;}
  async until(label){return this.command('until '+h(symbols[label]));}
  async bytes(start,end,name){const file=path.join(root,mode+'-'+name+'.bin').replaceAll('\\','/');await this.command(`bsave "${file}" 0 ${h(start)} ${h(end)}`);return fs.readFileSync(file);}
 }
@@ -75,7 +75,7 @@ if(!colors.subarray(0,920).some(v=>v!==0x60))throw Error('Rainbow mode did not c
 if(!colors.subarray(920).every(v=>v===0x10))throw Error('Controls/ticker colors were altered');
 await m.command(`screenshot "${path.join(root,mode+'-rainbow-demo.png').replaceAll('\\','/')}" 2`);
 await m.command('> 10 03');await m.until('idle');
-const music=readSymbols(path.join(root,'example-music/symbols.labels'));
+const music=readMusicSymbols(JSON.parse(fs.readFileSync(path.join(root,'build-report.json'))),project);
 const callsBefore=(await m.bytes(music.sample_calls,music.sample_calls+1,'music-before')).readUInt16LE();
 const before=await m.bytes(0x0f,0x20,'demo-before');
 for(let i=0;i<32;i++)await m.until('scroll_done');

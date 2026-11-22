@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { build } = require('../build.cjs');
-const { runVice, readSymbols } = require('./vice.cjs');
+const { runVice, readSymbols, readMusicSymbols } = require('./vice.cjs');
 const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'demo.asm'), 'utf8');
 const fixture = path.join(root, 'frame-stress.asm');
@@ -30,7 +30,7 @@ function summarize(data) {
 }
 function profile(project, report, name) {
   const bytes = fs.readFileSync(path.join(project, 'generated/frames.bin'));
-  return { name, report, symbols: readSymbols(path.join(path.dirname(report.prg), 'symbols.labels')), music: readSymbols(path.join(project, 'build/example-music/symbols.labels')), frames: Array.from({ length: report.frames }, (_, i) => bytes.subarray(i * 8000, (i + 1) * 8000)) };
+  return { name, report, symbols: readSymbols(path.join(path.dirname(report.prg), 'symbols.labels')), music: readMusicSymbols(report,project), frames: Array.from({ length: report.frames }, (_, i) => bytes.subarray(i * 8000, (i + 1) * 8000)) };
 }
 async function verify(p, mode, trial) {
   const s = p.symbols, period = mode === 'pal' ? 5 : 6;
@@ -62,7 +62,7 @@ async function verify(p, mode, trial) {
     return { profile: p.name, mode, trial, framesVerified: frameChecks, period, elapsedRenderCycles: cycles, flips, sidCallsPer16Refreshes: 16, errors: 0 };
   });
 }
-const result = { runs, metric: 'VICE elapsed CPU cycles from render entry to render_done, including IRQ and VIC stalls', workload: 'same logo/font, plasma color field, Clockwork and ticker active; 20 displayed frames and 16 extra music refreshes per trial', profiles: [], trials: [], errors: 0 };
+const result = { runs, metric: 'VICE elapsed CPU cycles from render entry to render_done, including IRQ and VIC stalls', workload: 'same logo/font, plasma color field, bundled SID and ticker active; 20 displayed frames and 16 extra music refreshes per trial', profiles: [], trials: [], errors: 0 };
 (async () => {
   if(summarizeOnly){const saved=JSON.parse(fs.readFileSync(resultFile));saved.summary=summarize(saved);fs.writeFileSync(resultFile,JSON.stringify(saved,null,2)+'\n');console.log(JSON.stringify(saved.summary,null,2));return;}
   try {

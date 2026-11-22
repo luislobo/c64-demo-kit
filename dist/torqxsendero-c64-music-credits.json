@@ -8,12 +8,12 @@
   "speed": 0,
   "clock": 3,
   "model": 3,
-  "name": "Clockwork",
+  "name": "After Hours Roll",
   "author": "C64 demo kit contributors",
   "released": "2026 CC0-1.0",
   "subtune": 1,
   "zeroPage": [],
-  "credit": "Clockwork player and composition: C64 demo kit contributors",
+  "credit": "After Hours Roll player and composition: C64 demo kit contributors",
   "license": "CC0-1.0; examples/music/README.md",
-  "source": "examples/music/clockwork.asm"
+  "source": "examples/music/after-hours.asm"
 }

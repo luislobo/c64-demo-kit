@@ -45,4 +45,17 @@ The preview is a recording of the arranged SID in VICE.
 
 The PSID loads at `$c400`, requires zero zero-page bytes, and selects pitch
 tables from the machine's video standard. TORQ's default soundtrack is
-Clockwork.
+After Hours Roll.
+
+## After Hours Roll
+
+`after-hours.asm` and `after-hours-score.cjs` implement TORQ's original
+88 BPM rock-and-roll shuffle. The 12-bar E blues uses three triplet
+subdivisions per beat. A pulse lead, triangle walking bass and synthetic
+kick and snare use the three SID voices. The track and player are dedicated
+to the public domain under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+From the kit root, run `node tools/build-example-music.cjs after-hours` to
+generate `generated/after-hours.sid`. The normal TORQ build generates it
+automatically. Clockwork is still the tune in the standalone SID and
+character examples.

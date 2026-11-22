@@ -2,7 +2,7 @@
 
 Reusable 6502/6510 assembly libraries and portable Node.js asset builders.
 **`demo.asm`** presents TORQ X SENDERO with six logo effects, automatic scene
-changes and the original Clockwork SID tune. `sid-demo.asm` and `effects-demo.asm`
+changes and the original After Hours Roll SID tune. `sid-demo.asm` and `effects-demo.asm`
 show separate music and character-scene integrations. The runtime is native C64 machine code; Node.js
 and PowerShell run only on the build computer.
 
@@ -91,7 +91,7 @@ configuration, credits and verification.
 
 `demo.asm` owns all application-specific text, image/font paths, disk names,
 palette, wave geometry, frame count, target FPS, automatic show and music configuration.
-The default generates Clockwork from source during the same build. Applications
+The default generates After Hours Roll from source during the same build. Applications
 without `DEMO_SID_FILE` use three MIDI-note lists, volume and tempo settings.
 It also composes the engine and includes the generated data. No melody or brand
 is embedded in `lib/` or `host/`. Binary artwork/font assets remain separate files.

@@ -3,7 +3,7 @@
 TORQ displays all 16 wave poses at nominal **12.5 fps on PAL** and **15 fps
 on NTSC**. It flips once every four refreshes on both. A wave cycle takes
 1.28 seconds on PAL and about 1.07 seconds on NTSC. The six effects,
-Clockwork SID player, pixel ticker and eight-second mode changes retain
+SID player, pixel ticker and eight-second mode changes retain
 their own clocks.
 
 ## Patch compiler
@@ -47,10 +47,21 @@ one preparation refresh at startup or restart, then follows its steady
 cadence. An overdue frame resynchronizes at the next border and increments
 the deadline counter.
 
-## Emulator results
+## After Hours Roll release check
+
+Windows VICE 3.10 verified the default After Hours Roll build at 12.5 fps on
+PAL and 15 fps on NTSC in all five trials per standard. The run checked
+2,400 bitmaps and recorded zero missed intervals or deadline resynchronizations.
+The 144-second automatic-show check on each standard covered all six effects
+and verified SID calls, score position and ticker timing. See the
+[trial summary](../dist/validation/after-hours-fps.json) and the
+[PAL](../dist/validation/fps-soak-pal.json) and
+[NTSC](../dist/validation/fps-soak-ntsc.json) show reports.
+
+## Clockwork comparison
 
 The [repeated comparison](../dist/validation/fps-stress.json) uses the previous
-12 fps build at `d7b4769` and this build. Five trials per build and standard
+12 fps build at `d7b4769` and the Clockwork release at `cf1f804`. Five trials per build and standard
 alternate profile order. Each trial compares 48 sequential bitmap frames in
 each moving mode, then checks static restoration, music and the ticker.
 Frame rates use guest raster ticks and exclude the one startup refresh.

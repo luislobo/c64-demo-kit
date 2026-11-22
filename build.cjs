@@ -23,9 +23,9 @@ const{planPatches}=require('./host/patch-planner.cjs');
 function build({entry=path.join(__dirname,'demo.asm'),outDir=path.join(__dirname,'build'),compiler=process.env.TASS64||path.join(__dirname,'tools/64tass/64tass.exe')}={}){
  entry=path.resolve(entry);outDir=path.resolve(outDir);const project=path.dirname(entry),c=readConfig(entry),generated=path.join(project,'generated');
  if(c.DEMO_SID_FILE!==undefined&&(typeof c.DEMO_SID_FILE!=='string'||!c.DEMO_SID_FILE.trim()))throw Error('DEMO_SID_FILE must name a PSID file');
- if(c.DEMO_SID_BUILD==='clockwork'){
-  if(project!==__dirname)throw Error('Clockwork source generation requires an entry beside build.cjs');
-  require('./tools/build-example-music.cjs').buildExampleMusic(compiler);
+ if(c.DEMO_SID_BUILD!==undefined){
+  if(project!==__dirname)throw Error('Bundled SID source generation requires an entry beside build.cjs');
+  require('./tools/build-example-music.cjs').buildExampleMusic(compiler,c.DEMO_SID_BUILD);
  }
  const sid=c.DEMO_SID_FILE===undefined?null:prepareSid(parseSid(fs.readFileSync(path.resolve(project,c.DEMO_SID_FILE))),c);
  fs.mkdirSync(generated,{recursive:true});fs.mkdirSync(outDir,{recursive:true});
@@ -56,6 +56,7 @@ function build({entry=path.join(__dirname,'demo.asm'),outDir=path.join(__dirname
  const program=fs.readFileSync(prg);fs.writeFileSync(d64,createD64(program,{diskName:c.DEMO_DISK_NAME,diskId:c.DEMO_DISK_ID,filename:c.DEMO_PRG_NAME}));
  const report={entry,frames:c.DEMO_FRAMES,fps:c.DEMO_FPS,startupTicks:timing.startupTicks,effects:c.DEMO_COLOR_FIELDS?6:3,startEffect:c.DEMO_START_EFFECT,colorFieldBytes:fieldBytes,programBytes:program.length,patchBytes:layout.low.length+layout.high.length,encodedPatchBytes:layout.total,lowPatchBytes:layout.low.length,highPatchBytes:layout.high.length,highMemoryFree:0xc000-layout.highEnd-fieldBytes,prg,d64,patches:patches.map((p,i)=>({address:pointers[i],continuation:layout.tails[i],bytes:p.bytes.length,writes:p.written,fills:p.fills}))};
  const creditsFile=path.join(outDir,c.DEMO_NAME+'-music-credits.json');
+ if(c.DEMO_SID_BUILD)report.musicSymbols=path.join(project,'build',c.DEMO_SID_BUILD==='clockwork'?'example-music':'after-hours','symbols.labels');
  report.palFPS=timing.palFPS;
  report.palTicks=timing.palTicks;
  report.patchPlan=c.DEMO_PATCH_PLAN;

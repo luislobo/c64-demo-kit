@@ -6,5 +6,6 @@
   "allModes": true,
   "deadlineMisses": 0,
   "sidClockVerified": true,
+  "scoreProgressVerified": true,
   "tickerClockVerified": true
 }

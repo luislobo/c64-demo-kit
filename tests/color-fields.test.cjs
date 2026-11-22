@@ -34,7 +34,7 @@ test('application flags reject unavailable modes and untrusted music generators'
     assert.throws(() => read(source.replace('DEMO_COLOR_FIELDS = 1', 'DEMO_COLOR_FIELDS = 0')), /START_EFFECT/);
     assert.throws(() => read(source.replace('DEMO_START_EFFECT = 4', 'DEMO_START_EFFECT = 7')), /START_EFFECT/);
     assert.throws(() => read(source.replace('DEMO_AUTO_SHOW = 1', 'DEMO_AUTO_SHOW = 2')), /AUTO_SHOW/);
-    assert.throws(() => read(source.replace('DEMO_SID_BUILD = "clockwork"', 'DEMO_SID_BUILD = "shell"')), /SID_BUILD/);
+    assert.throws(() => read(source.replace('DEMO_SID_BUILD = "after-hours"', 'DEMO_SID_BUILD = "shell"')), /SID_BUILD/);
     assert.throws(() => read(source.replace('DEMO_CREDITS_FILE = "assets/torq-credits.txt"', 'DEMO_CREDITS_FILE = ""')), /CREDITS_FILE/);
     const minimal = read(source.replace(/^DEMO_(COLOR_FIELDS|START_EFFECT|AUTO_SHOW|SID_BUILD) = .*\n/gm, ''));
     assert.equal(minimal.DEMO_COLOR_FIELDS, 0); assert.equal(minimal.DEMO_START_EFFECT, 1); assert.equal(minimal.DEMO_AUTO_SHOW, 0);

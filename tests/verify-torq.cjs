@@ -7,12 +7,12 @@ const path = require('node:path');
 const { execFile } = require('node:child_process');
 const { promisify } = require('node:util');
 const { build } = require('../build.cjs');
-const { runVice, readSymbols } = require('./vice.cjs');
+const { runVice, readSymbols, readMusicSymbols } = require('./vice.cjs');
 const root = path.resolve(__dirname, '..');
 
 async function automaticShow(mode, report) {
   const s = readSymbols(path.join(root, 'build/symbols.labels'));
-  const music = readSymbols(path.join(root, 'build/example-music/symbols.labels'));
+  const music = readMusicSymbols(report);
   await runVice(mode, 'torq-show', async (m, directory) => {
     await m.command(`load "${report.prg}" 0`);
     await m.command('break ' + s.idle.toString(16)); await m.command('g 810'); await m.command('delete');
@@ -49,11 +49,11 @@ async function automaticShow(mode, report) {
 }
 
 (async () => {
-  fs.rmSync(path.join(root, 'generated/clockwork.sid'), { force: true });
+  fs.rmSync(path.join(root, 'generated/after-hours.sid'), { force: true });
   const report = build(); // One command must regenerate the default music too.
   assert.equal(report.effects, 6); assert.equal(report.startEffect, 4);
   assert.ok(fs.readFileSync(path.join(root, 'assets/torq-credits.txt')).equals(fs.readFileSync(path.join(root, 'build/torqxsendero-c64-credits.txt'))));
-  assert.equal(JSON.parse(fs.readFileSync(path.join(root, 'build/torqxsendero-c64-music-credits.json'))).name, 'Clockwork');
+  assert.equal(JSON.parse(fs.readFileSync(path.join(root, 'build/torqxsendero-c64-music-credits.json'))).name, 'After Hours Roll');
   for (const mode of ['pal', 'ntsc']) {
     await automaticShow(mode, report);
     await runVice(mode, 'torq', async m => {
