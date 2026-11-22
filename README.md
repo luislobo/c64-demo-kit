@@ -81,7 +81,7 @@ Ready-to-run copies are also committed under `dist/`, together with a preview
 and the PAL/NTSC validation reports. `assets/reference/` preserves the source
 logo PNGs; the builder consumes the converted `assets/image.bin`.
 
-The demo starts with a fire-lit TORQ logo above an animated firepit and changes effects every eight
+The demo starts with a fire-lit TORQ logo above an animated firepit with hardware-sprite embers and changes effects every eight
 nominal seconds. 1 selects blue wave, 2 rainbow wave, 3 stationary color cycle,
 4 fire-lit plasma, 5 XOR and 6 tunnel. A number key or Space takes manual control until
 reset. Space starts/stops the wave; M pauses/restarts the music. The wave uses
@@ -181,15 +181,17 @@ state let native rendering fit the C64 memory and raster budget.
 | Range | Use |
 | --- | --- |
 | `$02..$4f`, `$fb..$fe` | Runtime state and pointers; see `state.asm` |
-| `$0400..$07ff` | Primary color/screen matrix |
+| `$0380..$03ff` | Optional primary bank ember sprite shapes |
+| `$0400..$07ff` | Primary color/screen matrix and sprite pointers |
 | `$0801..$14ff` | BASIC stub, code, font, text and patch/continuation pointers |
-| `$1500..$1fff` | Optional low patch storage, used by the 16-phase demo |
+| `$1500..$1fff` | Optional low patch storage |
 | `$2000..$3f3f` | Primary bitmap |
 | `$3f40..$3fff` | Optional fire plasma setup, lookup tables and firepit color loader |
-| `$4000..$bfff` | Generated patch streams, color-field tables, and optional firepit colors and raster handlers |
-| `$c000..$c3ff` | Secondary color/screen matrix |
+| `$4000..$bfff` | Patch streams, color-field tables, and optional firepit palettes, handlers and ember tracks |
+| `$c000..$c3ff` | Secondary color/screen matrix and sprite pointers |
 | `$c400..$cfff` | Optional imported SID payload |
 | `$e000..$ff3f` | Secondary bitmap, RAM under KERNAL ROM |
+| `$ff40..$ffbf` | Optional secondary bank ember sprite shapes |
 | `$fffa..$ffff` | NMI/IRQ vectors |
 
 Entries that do not need low patch storage can use code/font RAM through `$1fff`.
@@ -198,8 +200,8 @@ The assembler enforces the boundary selected by the generated layout.
 The engine takes over VIC-II, SID, the raster IRQ, CIA keyboard ports and the
 low VIC bank-selection bits. It disables CIA interrupts and maps ROMs out with
 `$01=$35`. It is a standalone demo engine, not a BASIC-callable component that
-returns to the OS. Preserve the fixed 320x200 hires layout: logo rows 0..22,
-controls row 23, ticker row 24. `DEMO_LOGO_HEIGHT` may be reduced within that area.
+returns to the OS. The fixed bitmap layout reserves rows 0..22 for the scene,
+row 23 for the controls and row 24 for the ticker. `DEMO_LOGO_HEIGHT` may be reduced within that area.
 Frame counts and built-in song lengths must be powers of two; built-in tune
 voices have equal lengths. Imported music follows the PSID contract.
 The palette has eight non-black foreground colors with a black background.

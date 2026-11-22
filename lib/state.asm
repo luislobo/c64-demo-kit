@@ -49,6 +49,7 @@ frame_remainder = $2b
 frame_accumulator = $2c
 frame_interval = $2d
 patch_tail = $2e
+ember_step = $30
 glyph_rows = $40
 glyph_ptr = $48
 text_ptr = $4a

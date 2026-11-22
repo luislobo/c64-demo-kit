@@ -59,6 +59,7 @@ firepit_colors:
 firepit_color_ram:
         .binary "../generated/campfire-color-ram.bin"
         .include "firepit-split.asm"
+        .include "embers.asm"
     .endif
     .cerror * > $c000, "Patch data overlaps second screen RAM"
 .if DEMO_EXTERNAL_SID

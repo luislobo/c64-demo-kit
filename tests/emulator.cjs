@@ -12,7 +12,9 @@
  */
 const fs=require('node:fs'),path=require('node:path'),net=require('node:net');
 const project=path.resolve(__dirname,'..'),root=path.join(project,'build'),mode=process.argv[2]||'pal',port=Number(process.argv[3]||6522);
+const assert=require('node:assert/strict');
 const {readMusicSymbols}=require('./vice.cjs');
+const {EMBER_STEPS,EMBER_COUNT}=require('../host/embers.cjs');
 const {colorFieldRow}=require('../host/color-fields.cjs');
 const {frameCadence}=require('../host/timing.cjs');
 const {readConfig}=require('../host/config.cjs'); const config=readConfig(path.join(project,'demo.asm'));
@@ -48,6 +50,14 @@ if(pitColorRam.length){
  const actual=await m.bytes(0xd800+logoCells,0xd800+919,'firepit-color-ram');
  if(!actual.every((color,i)=>(color&15)===pitColorRam[i]))throw Error('Firepit color RAM differs');
 }
+if(config.DEMO_FIREPIT){
+ const shapes=fs.readFileSync(path.join(project,'generated/ember-shapes.bin'));
+ for(const [address,screen,firstPointer] of [[0x0380,0x07f8,0x0e],[0xff40,0xc3f8,0xfd]]){
+  assert.deepEqual(await m.bytes(address,address+shapes.length-1,'ember-shapes'),shapes);
+  const pointers=Buffer.from(Array.from({length:EMBER_COUNT},(_,slot)=>firstPointer+((0x49>>slot)&1)));
+  assert.deepEqual(await m.bytes(screen,screen+EMBER_COUNT-1,'ember-pointers'),pointers);
+ }
+}
 for(const start of [0x2000,0xe000])if(!(await m.bytes(start,start+7999,'initial-'+h(start))).subarray(0,7680).equals(base.subarray(0,7680)))throw Error('Initial bitmap mismatch');
 const index=(x,y)=>(y>>3)*320+(x>>3)*8+(y&7);
 const allFrames=fs.readFileSync(path.join(project,'generated/frames.bin'));
@@ -70,6 +80,7 @@ for(let i=0;i<frameChecks;i++){
 }
 const expectedIntervals=frameCadence(refresh,config.DEMO_FPS,frameChecks,config.DEMO_PAL_TICKS);
 for(let i=1;i<flips.length;i++)if(((flips[i].tick-flips[i-1].tick)&255)!==expectedIntervals[i])throw Error('Uneven frame timing '+JSON.stringify({times,flips}));
+let emberStepsVerified=0;
 if(config.DEMO_FIREPIT){
  await m.until('firepit_split_done');
  let registers=await m.bytes(0xd016,0xd016,'firepit-multicolor');
@@ -77,6 +88,28 @@ if(config.DEMO_FIREPIT){
  await m.until('firepit_hires_done');
  registers=await m.bytes(0xd016,0xd016,'hud-hires');
  if(registers[0]&16)throw Error('HUD did not return to hires mode');
+ const tracks=fs.readFileSync(path.join(project,'generated/ember-tracks.bin'));
+ await m.until('ember_tick_done');
+ const startStep=(await m.bytes(0x30,0x30,'ember-step'))[0];
+ const startTick=(await m.bytes(7,7,'ember-start-tick'))[0];
+ for(let i=0;i<EMBER_STEPS;i++){
+  await m.until('ember_tick_done');
+  const step=(startStep+i)%EMBER_STEPS;
+  const positions=await m.bytes(0xd000,0xd010,'ember-positions');
+  const colors=await m.bytes(0xd027,0xd02e,'ember-colors');
+  assert.equal(positions[16],0,'ember X positions stay within one byte');
+  for(let slot=0;slot<EMBER_COUNT;slot++){
+   const offset=slot*3*EMBER_STEPS+step;
+   assert.equal(positions[slot*2],tracks[offset],'ember X');
+   assert.equal(positions[slot*2+1],tracks[offset+EMBER_STEPS],'ember Y');
+   assert.equal(colors[slot]&15,tracks[offset+2*EMBER_STEPS],'ember color');
+  }
+  const mask=(await m.bytes(0xd015,0xd015,'ember-enable'))[0];
+  assert.equal(mask,tracks[tracks.length-EMBER_STEPS+step],'ember visibility');
+  emberStepsVerified++;
+ }
+ const elapsed=((await m.bytes(7,7,'ember-end-tick'))[0]-startTick)&255;
+ assert.ok(Math.abs(elapsed-EMBER_STEPS*refresh/25)<1,'embers advance at 25 Hz');
 }
 // Queue the same event the IRQ generates on a Space press; verify stop and restart.
 await m.command('> 06 01');await m.until('idle');
@@ -100,6 +133,7 @@ const before=await m.bytes(0x0f,0x20,'demo-before');
 for(let i=0;i<32;i++)await m.until('scroll_done');
 const after=await m.bytes(0x0f,0x20,'demo-after');
 if(after[0]!==3)throw Error('Color-only mode was not selected');
+if(config.DEMO_FIREPIT)assert.equal((await m.bytes(0xd015,0xd015,'static-ember-enable'))[0],0,'static mode hides the embers');
 if(callsBefore===(await m.bytes(music.sample_calls,music.sample_calls+1,'music-after')).readUInt16LE())throw Error('SID player did not advance');
 const ticker=await m.bytes(0x3e00,0x3f3f,'ticker');
 if(!ticker.some(v=>v!==0))throw Error('Ticker stayed blank');
@@ -146,7 +180,7 @@ for(let i=0;i<16;i++)await m.until('irq');
 if((((await m.bytes(7,7,'call-tick-end'))[0]-tick)&255)!==16)throw Error('Raster tick drift');
 if((((await m.bytes(music.sample_calls,music.sample_calls+1,'call-end')).readUInt16LE()-sidCalls)&65535)!==16)throw Error('SID call drift');
 if((await m.bytes(0x23,0x23,'deadline-misses'))[0]!==0)throw Error('Frame deadline was missed');
-const report={mode,nominalFPS,deadlineMisses:0,framesVerified:frameChecks+3*(config.DEMO_FRAMES+2),colorFields:fieldResults,sidCallsPer16Refreshes:16,basePeriod,decoderCycles:times,flips,firepitColorsVerified:pitColors.length,stopAndRestart:true,rainbowMode:true,colorOnlyMode:true,psidPlayback:true,scrollingText:true};
+const report={mode,nominalFPS,deadlineMisses:0,framesVerified:frameChecks+3*(config.DEMO_FRAMES+2),colorFields:fieldResults,sidCallsPer16Refreshes:16,basePeriod,decoderCycles:times,flips,firepitColorsVerified:pitColors.length,emberStepsVerified,stopAndRestart:true,rainbowMode:true,colorOnlyMode:true,psidPlayback:true,scrollingText:true};
 fs.writeFileSync(path.join(root,'test-'+mode+'.json'),JSON.stringify(report,null,2));
 fs.writeFileSync(path.join(root,'monitor-'+mode+'.txt'),m.log);
 console.log(JSON.stringify(report,null,2));m.socket.end('quit\n');

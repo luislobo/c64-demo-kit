@@ -40,6 +40,7 @@ at the end of that guide, because they are not versioned source.
 
 | File | Algorithm, role and reason |
 | --- | --- |
+| [host/embers.cjs](../host/embers.cjs) | Generate monochrome sprite shapes and ember motion tracks. |
 | [host/firepit.cjs](../host/firepit.cjs) | Paint the clearing and fire poses, then fit a stable palette to each multicolor bitmap cell. |
 | [host/bitmap.cjs](../host/bitmap.cjs) | Algorithm: map pixels to VIC cell order, nearest-neighbor-fit a 320x200 source into the logo area, stamp 8x8 HUD glyphs, then shift each logo row by round(amplitude * sin(2*pi*y/wavelength + 2*pi*phase/frameCount)). |
 | [host/config.cjs](../host/config.cjs) | Algorithm: recognize literal DEMO_* assignments with a constrained regex, translate assembler hexadecimal numerals outside strings, then JSON-decode. Validate byte ranges, font text, equal voice lengths, and power-of-two masks. |
@@ -89,6 +90,7 @@ exercise isolated shell/PowerShell behavior without installing system packages.
 | [lib/fire-plasma.asm](../lib/fire-plasma.asm) | Mix a rising sine band with a row heat gradient before the shared plasma loop. |
 | [lib/firepit-init.asm](../lib/firepit-init.asm) | Copy the firepit palette to both screen matrices and shared color RAM. |
 | [lib/firepit-split.asm](../lib/firepit-split.asm) | Select multicolor for the scene and restore hires for the controls. |
+| [lib/embers.asm](../lib/embers.asm) | Initialize both banks and advance the hires ember sprites on the ticker clock. |
 | [lib/show.asm](../lib/show.asm) | Request enabled modes every 400 logic updates through the existing animation controller. |
 | [assets/torq-credits.txt](../assets/torq-credits.txt) | Release attribution for the original kit/music, PSID format and research references. |
 | [tests/color-fields.test.cjs](../tests/color-fields.test.cjs) | Check color bounds, animation, wrapping and invalid optional application settings. |

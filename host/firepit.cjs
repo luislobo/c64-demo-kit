@@ -3,7 +3,7 @@
 // while standard bitmap patches change the pixels.
 const WIDTH = 320;
 const HEIGHT = 184;
-const BASE = 160;
+const BASE = 157;
 const TAU = 2 * Math.PI;
 
 // Approximate RGB values are used only to choose colors from the VIC palette.
@@ -38,23 +38,28 @@ function ellipse(pixels, cx, cy, rx, ry, color) {
   }
 }
 
-function trees(pixels, horizon) {
-  // Two depth layers frame an open clearing, leaving the center dark enough
-  // for narrow tongues and sparks to read against the sky.
-  for (const [color, offset] of [[6, 0], [11, 9]]) {
-    for (let i = 0; i < 23; i++) {
-      const cx = 4 + i * 14 + offset;
-      const gap = Math.abs(cx - 160);
-      if (gap < 64 || cx >= WIDTH) continue;
-      const bottom = horizon + (hash(i, offset) % 9);
-      const top = bottom - 25 - (hash(i, 47 + offset) % 39);
-      for (let y = top; y < bottom; y++) {
-        if (y < 0) continue;
-        const depth = (y - top) / (bottom - top);
-        const tier = (y - top) % 12;
-        const half = Math.floor(1 + depth * 11 + tier * 0.48);
+function trees(pixels) {
+  // Overlapping silhouettes with dark branch gaps and occasional edge light.
+  for (const [color, offset, distance] of [[6, 0, 17], [11, 11, 0]]) {
+    for (let i = 0; i < 15; i++) {
+      const cx = 4 + i * 23 + offset;
+      if (Math.abs(cx - 160) < 67 - distance || cx >= WIDTH) continue;
+      const bottom = 149 - distance + (hash(i, offset) % 9);
+      const top = bottom - 26 - (hash(i, 47 + offset) % (47 - distance));
+      for (let y = Math.max(0, top); y < bottom; y++) {
+        const height = y - top;
+        const spread = height / (bottom - top);
+        const tier = (height + i % 5) % 11;
+        const half = Math.floor(spread * (8 + 0.85 * tier) + 1);
         for (let x = Math.max(0, cx - half); x <= Math.min(WIDTH - 1, cx + half); x++) {
-          if ((((x >> 1) + y * 3) & 7) < (color === 6 ? 2 : 3)) pixels[y * WIDTH + x] = color;
+          const edge = Math.abs(cx - x);
+          if (tier < 2 && edge > half - 5 && edge > 2) continue;
+          // Stipple the distant ridge and the sides of foreground branches.
+          // Group pixel pairs so the texture survives multicolor packing.
+          const shade = ((x >> 1) + (y >> 1) * 3 + i) & 3;
+          if (color === 6 && shade > 1) continue;
+          if (color === 11 && edge > half / 2 && shade === 3) continue;
+          pixels[y * WIDTH + x] = color;
         }
       }
     }
@@ -63,82 +68,92 @@ function trees(pixels, horizon) {
 
 function landscape() {
   const pixels = new Uint8Array(WIDTH * HEIGHT);
-  for (let y = 72; y < 136; y++) {
+  for (let y = 74; y < 124; y++) {
     for (let x = 0; x < WIDTH; x++) {
-      if (Math.abs(x - 160) > 40 && hash(x, y) === 231 && hash(y, x + 90) < 96) {
-        pixels[y * WIDTH + x] = hash(x + 28, y) < 58 ? 15 : 6;
+      if (Math.abs(x - 160) > 45 && hash(x >> 1, y) === 231 && hash(y, x >> 1) < 48) {
+        pixels[y * WIDTH + x] = hash(x >> 1, y + 28) < 48 ? 12 : 6;
       }
     }
   }
-  trees(pixels, 143);
-  for (let y = 145; y < HEIGHT; y++) {
+  trees(pixels);
+  for (let y = 147; y < 176; y++) {
     for (let x = 0; x < WIDTH; x++) {
-      const glow = ((x - 160) / 112) ** 2 + ((y - 167) / 22) ** 2;
-      const noise = hash(x >> 1, y);
-      if (glow < 1 && noise < 118 * (1 - glow)) pixels[y * WIDTH + x] = noise < 22 ? 8 : 9;
-      else if (noise < 25 + (y - 145)) pixels[y * WIDTH + x] = 11;
+      const glow = ((x - 160) / 121) ** 2 + ((y - 169) / 28) ** 2;
+      const grain = hash(x >> 2, y + (x >> 4));
+      if (glow < 1 && grain < 180 * (1 - glow)) {
+        pixels[y * WIDTH + x] = glow < 0.48 && grain < 30 ? 8 : 9;
+      } else if (grain < 43 * (y - 146) / 30) {
+        pixels[y * WIDTH + x] = 11;
+      }
     }
   }
   return pixels;
 }
 
 function stones(pixels, front) {
-  for (let i = 0; i < 16; i++) {
-    const angle = TAU * (i + 0.3) / 16;
-    if ((Math.sin(angle) > 0) !== front) continue;
-    const cx = Math.round(160 + 76 * Math.cos(angle));
-    const cy = Math.round(157 + 12 * Math.sin(angle));
-    const wide = 8 + hash(i, 31) % 5;
-    const tall = 4 + hash(i, 61) % 3;
+  for (let i = 0; i < 13; i++) {
+    const angle = TAU * (i + 0.15) / 13;
+    const depth = Math.sin(angle);
+    if ((depth > 0) !== front) continue;
+    const cx = Math.round(160 + 79 * Math.cos(angle));
+    const cy = Math.round(154 + 14 * depth) + hash(i, 106) % 3 - 1;
+    const wide = 8 + Math.round(Math.abs(depth) * 7) + hash(i, 31) % 5;
+    const tall = 4 + hash(i, 61) % 4;
+    const slope = (hash(i, 98) % 9 - 4) * 0.07;
     for (let y = cy - tall; y <= cy + tall; y++) {
       for (let x = cx - wide; x <= cx + wide; x++) {
-        const vertical = (y - cy) / tall;
         const side = (x - cx) / wide;
-        if (Math.abs(side) + 0.52 * Math.abs(vertical) > 1.16 + (hash(x, y) & 7) / 90 ||
-            Math.abs(vertical) > 1) continue;
-        const grain = hash(x, y);
-        const lit = front ? vertical < -0.25 : vertical > -0.05;
-        let color = y > cy + 2 ? 11 : 12;
-        if (lit) color = Math.abs(x - 160) < 45 && grain < 156 ? 8 : 15;
-        if (grain < 22) color = 11;
+        const face = (y - cy) / tall - side * slope;
+        if (Math.abs(face) > 1 || Math.abs(side) + 0.48 * Math.abs(face) > 1.12) continue;
+        const grain = hash((x + i) >> 1, y);
+        const warm = Math.abs(x - 160) < 54;
+        const facet = face + 0.3 * side;
+        let color = facet > 0.38 ? 11 : 12;
+        if (facet < -0.25) color = warm && (Math.abs(side) < 0.68 || grain > 106) ? 8 : 15;
+        if (facet < -0.42 && warm && grain < 32) color = 15;
+        if (Math.abs(side) > 0.85 || face > 0.78) color = 11;
         pixels[y * WIDTH + x] = color;
       }
     }
   }
 }
 
-function coalBed(pixels) {
-  ellipse(pixels, 160, 164, 64, 11, 9);
-  for (let y = 154; y <= 174; y++) {
-    for (let x = 99; x < 222; x++) {
-      if (((x - 160) / 61) ** 2 + ((y - 164) / 11) ** 2 > 1) continue;
-      const coal = hash(x, y);
-      if (coal < 172) pixels[y * WIDTH + x] = coal < 33 ? 7 : coal < 96 ? 8 : 2;
-    }
+function coalBed(pixels, turn) {
+  ellipse(pixels, 160, 160, 68, 12, 9);
+  for (let i = 0; i < 30; i++) {
+    const cx = 101 + hash(i, 90) % 118;
+    const cy = 155 + hash(i, 97) % 13;
+    if (((cx - 160) / 66) ** 2 + ((cy - 160) / 12) ** 2 > 1) continue;
+    const size = 2 + hash(i, 89) % 6;
+    const heat = Math.sin(TAU * turn + i * 1.8);
+    ellipse(pixels, cx, cy, size, 2, 2);
+    ellipse(pixels, cx - 1, cy - 1, Math.max(1, size - 2), 1, heat > 0.6 ? 7 : 8);
   }
 }
 
 function logs(pixels) {
-  for (const [x1, y1, x2, y2] of [[118, 164, 197, 155], [128, 154, 199, 169]]) {
-    for (let x = x1 - 3; x <= x2 + 3; x++) {
-      const mid = y1 + (y2 - y1) * (x - x1) / (x2 - x1);
-      for (let y = Math.ceil(mid - 4); y <= mid + 4; y++) {
-        const edge = y - mid;
-        const grain = hash(x, y);
-        let color = edge < -2 && grain > 110 ? 8 : edge > 2 ? 11 : 9;
-        if (grain < 31 && x > 143 && x < 176) color = 2;
-        if (x < x1 + 4 || x > x2 - 4) color = edge > 1 ? 9 : 8;
-        pixels[y * WIDTH + x] = color;
+  for (const [x1, y1, x2, y2] of [[108, 159, 188, 156], [136, 154, 205, 165]]) {
+    const radius = 5;
+    for (let x = x1; x < x2; x++) {
+      const middle = y1 + (y2 - y1) * (x - x1) / (x2 - x1);
+      for (let edge = -radius; edge <= radius; edge++) {
+        const grain = hash(x >> 2, edge);
+        let color = edge < -2 ? 8 : edge > 1 || grain < 100 ? 11 : 9;
+        if (x > 142 && x < 179 && edge < 2 && grain < 90) color = 2;
+        pixels[(Math.round(middle) + edge) * WIDTH + x] = color;
       }
     }
-    ellipse(pixels, x2, y2, 3, 4, 8);
-    ellipse(pixels, x2, y2 + 1, 2, 2, 9);
+    ellipse(pixels, x1, y1, 5, radius, 9);
+    ellipse(pixels, x2, y2, 7, radius, 8);
+    ellipse(pixels, x2, y2, 5, radius - 1, 9);
+    ellipse(pixels, x2 - 1, y2 - 1, 3, 2, 8);
+    ellipse(pixels, x2 - 1, y2 - 1, 1, 1, 9);
   }
 }
 
 const tongues = [
-  [119, 42, 12, 0.3], [132, 62, 16, 1.6], [147, 75, 16, 3.5],
-  [158, 82, 19, 0.2], [171, 69, 16, 4.2], [185, 59, 14, 2.1], [198, 39, 11, 5.2]
+  [120, 39, 12, 0.3], [132, 57, 14, 1.6], [147, 75, 16, 3.5],
+  [158, 76, 19, 0.2], [171, 63, 14, 4.2], [185, 52, 13, 2.1], [197, 36, 10, 5.2]
 ];
 
 function flames(pixels, turn, firstY) {
@@ -158,24 +173,11 @@ function flames(pixels, turn, firstY) {
       let heat = 0;
       for (const [center, span] of lobes) heat = Math.max(heat, 1 - Math.abs(x - center) / span);
       if (heat <= 0.01 || (h > 23 && heat < 0.18 && Math.sin(phase + h / 6 - x / 7) < -0.75)) continue;
-      const detail = (hash(x, y) - 128) / 680;
+      const detail = (hash(x >> 1, y >> 1) - 128) / 1660;
       const intensity = heat - h / 135 + detail + 0.05 * Math.sin(phase + x / 7 + h / 6);
-      pixels[y * WIDTH + x] = intensity > 0.87 ? 1 : intensity > 0.47 ? 7 :
-        intensity > 0.16 ? 8 : 2;
+      pixels[y * WIDTH + x] = intensity > 0.89 && h < 14 ? 1 : intensity > 0.61 ? 7 :
+        intensity > 0.22 ? 8 : 2;
     }
-  }
-}
-
-function sparks(pixels, turn, firstY) {
-  for (let i = 0; i < 29; i++) {
-    const age = (turn + hash(i, 83) / 256) % 1;
-    const y = Math.floor(146 - (38 + hash(i, 53) % 35) * age);
-    if (y < firstY || age > 0.89 || (age > 0.55 && hash(i + Math.floor(turn * 16), 72) < 64)) continue;
-    const x = Math.round(112 + hash(i, 21) % 89 + age * 31 + 4 * Math.sin(age * TAU + i));
-    const color = age < 0.31 ? 7 : age < 0.63 ? 8 : 2;
-    pixels[y * WIDTH + x] = color;
-    if (age < 0.45) pixels[y * WIDTH + x + 1] = color;
-    if (age < 0.37 && (i % 3 === 0)) pixels[(y + 1) * WIDTH + x - 1] = 8;
   }
 }
 
@@ -210,20 +212,12 @@ function createFirepit(frameCount, logoHeight) {
   const sceneRows = HEIGHT / 8 - rowStart;
   const background = landscape();
   stones(background, false);
-  coalBed(background);
   const painted = Array.from({ length: frameCount }, (_, frame) => {
     const pixels = background.slice();
-    for (let y = 156; y <= 173; y++) {
-      for (let x = 108; x < 212; x++) {
-        const ember = hash(x, y);
-        if (ember < 9 && ((x - 160) / 55) ** 2 + ((y - 165) / 10) ** 2 < 1) {
-          pixels[y * WIDTH + x] = Math.sin(TAU * frame / frameCount + ember) > 0 ? 7 : 2;
-        }
-      }
-    }
+    const turn = frame / frameCount;
+    coalBed(pixels, turn);
     logs(pixels);
-    flames(pixels, frame / frameCount, logoHeight + 8);
-    sparks(pixels, frame / frameCount, logoHeight + 8);
+    flames(pixels, turn, logoHeight + 8);
     stones(pixels, true);
 
     return pixels;

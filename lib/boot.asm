@@ -111,6 +111,7 @@ text_colors:
 
     .if KIT_FIREPIT
         jsr init_firepit_colors
+        jsr init_embers
     .endif
 
     ; Detect actual raster length, rather than trusting a ROM PAL/NTSC flag.

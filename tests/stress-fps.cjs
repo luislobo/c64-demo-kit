@@ -47,7 +47,12 @@ async function verify(p,mode,trial){
     if(elapsed!==expected[index++])missedIntervals++;
     intervals.push(elapsed);
    }
-   effects.push({effect,framesVerified:48,phaseSequenceVerified:true,missedIntervals,intervalTicks:intervals,renderCycles});
+   const effectResult={effect,framesVerified:48,phaseSequenceVerified:true,missedIntervals,intervalTicks:intervals,renderCycles};
+   if(p.s.ember_tick_done){
+    assert.notEqual((await m.bytes(0xd015,1))[0],0,'ember sprites are enabled in moving modes');
+    effectResult.emberSpritesEnabled=true;
+   }
+   effects.push(effectResult);
   }
   // Verify the application's IRQ clock against real guest CPU cycles while
   // plasma/music/ticker remain active, so a lost raster IRQ cannot inflate FPS.
@@ -57,7 +62,8 @@ async function verify(p,mode,trial){
   for(let i=0;i<16;i++)await m.until(p.s.irq);
   const irqCycles=Number((await m.command('stopwatch')).match(/Stopwatch:\s*(\d+)/i)?.[1]);
   const cyclesPerRefresh=mode==='pal'?19656:17095;
-  assert.ok(Math.abs(irqCycles-16*cyclesPerRefresh)<512,'IRQ cadence must match physical raster refreshes');
+  assert.ok(Math.abs(irqCycles-16*cyclesPerRefresh)<512,
+   `16 ${mode.toUpperCase()} IRQs took ${irqCycles} cycles, expected about ${16*cyclesPerRefresh}`);
   assert.equal(((await m.bytes(p.music.sample_calls,2)).readUInt16LE()-activeCalls)&65535,16);
   const counter=(await m.bytes(0x23,1))[0];
   // Static mode must restore both bitmaps while music and the ticker continue.
@@ -67,6 +73,7 @@ async function verify(p,mode,trial){
   const calls=(await m.bytes(p.music.sample_calls,2)).readUInt16LE(),before=await m.bytes(0x13,9);
   for(let i=0;i<16;i++)await m.until(p.s.irq);
   assert.equal(((await m.bytes(p.music.sample_calls,2)).readUInt16LE()-calls)&65535,16);
+  if(p.s.ember_tick_done)assert.equal((await m.bytes(0xd015,1))[0],0,'static mode hides the ember sprites');
   const after=await m.bytes(0x13,9),updates=Math.floor((before[0]+16*50)/hz);
   assert.equal((after[8]-before[8])&255,Math.floor((updates+(before[1]&1))/2));
   const ticker=await m.bytes(0x3e00,320);assert.ok(ticker.some(Boolean));assert.ok(ticker.equals(await m.bytes(0xfe00,320)));

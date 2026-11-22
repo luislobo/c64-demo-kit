@@ -1,10 +1,10 @@
 {
-  "effect": "Raster-split multicolor firepit",
+  "effect": "Raster-split multicolor firepit with hires sprite embers",
   "soundtrack": "After Hours Roll",
   "emulator": "VICE x64sc 3.9",
   "platform": "Linux",
   "assembler": "64tass 1.59.3120",
-  "prgSha256": "43b269ccccb7111f2ddfdc2d47e43e4b0cdfbf3d46a42cbc57644b14c42fe1e5",
+  "prgSha256": "1571b93be9ba8631323e2d028b05e9c78fdb267ea35f672cbda2093c11ead20b",
   "frames": 16,
   "effects": 6,
   "bitmapComparisons": 2400,
@@ -12,11 +12,17 @@
   "standards": {
     "pal": {
       "nominalFps": 12.5,
-      "paletteCellsVerified": 600
+      "paletteCellsVerified": 600,
+      "emberStepsVerified": 64,
+      "emberUpdatesPerSecond": 25,
+      "automaticShowSeconds": 144
     },
     "ntsc": {
       "nominalFps": 15,
-      "paletteCellsVerified": 600
+      "paletteCellsVerified": 600,
+      "emberStepsVerified": 64,
+      "emberUpdatesPerSecond": 25,
+      "automaticShowSeconds": 144
     }
   },
   "trials": [
@@ -32,9 +38,10 @@
       "deadlineMissCounter": 0,
       "staticRestored": true,
       "sidCallsPer16Refreshes": 16,
-      "irqCyclesFor16Refreshes": 314497,
+      "irqCyclesFor16Refreshes": 314494,
       "cyclesPerRefresh": 19656,
-      "tickerClockVerified": true
+      "tickerClockVerified": true,
+      "emberSpritesEnabledInAllMovingModes": true
     },
     {
       "mode": "pal",
@@ -48,9 +55,10 @@
       "deadlineMissCounter": 0,
       "staticRestored": true,
       "sidCallsPer16Refreshes": 16,
-      "irqCyclesFor16Refreshes": 314497,
+      "irqCyclesFor16Refreshes": 314494,
       "cyclesPerRefresh": 19656,
-      "tickerClockVerified": true
+      "tickerClockVerified": true,
+      "emberSpritesEnabledInAllMovingModes": true
     },
     {
       "mode": "pal",
@@ -64,9 +72,10 @@
       "deadlineMissCounter": 0,
       "staticRestored": true,
       "sidCallsPer16Refreshes": 16,
-      "irqCyclesFor16Refreshes": 314497,
+      "irqCyclesFor16Refreshes": 314494,
       "cyclesPerRefresh": 19656,
-      "tickerClockVerified": true
+      "tickerClockVerified": true,
+      "emberSpritesEnabledInAllMovingModes": true
     },
     {
       "mode": "pal",
@@ -80,9 +89,10 @@
       "deadlineMissCounter": 0,
       "staticRestored": true,
       "sidCallsPer16Refreshes": 16,
-      "irqCyclesFor16Refreshes": 314497,
+      "irqCyclesFor16Refreshes": 314494,
       "cyclesPerRefresh": 19656,
-      "tickerClockVerified": true
+      "tickerClockVerified": true,
+      "emberSpritesEnabledInAllMovingModes": true
     },
     {
       "mode": "pal",
@@ -96,9 +106,10 @@
       "deadlineMissCounter": 0,
       "staticRestored": true,
       "sidCallsPer16Refreshes": 16,
-      "irqCyclesFor16Refreshes": 314497,
+      "irqCyclesFor16Refreshes": 314494,
       "cyclesPerRefresh": 19656,
-      "tickerClockVerified": true
+      "tickerClockVerified": true,
+      "emberSpritesEnabledInAllMovingModes": true
     },
     {
       "mode": "ntsc",
@@ -112,9 +123,10 @@
       "deadlineMissCounter": 0,
       "staticRestored": true,
       "sidCallsPer16Refreshes": 16,
-      "irqCyclesFor16Refreshes": 273524,
+      "irqCyclesFor16Refreshes": 273523,
       "cyclesPerRefresh": 17095,
-      "tickerClockVerified": true
+      "tickerClockVerified": true,
+      "emberSpritesEnabledInAllMovingModes": true
     },
     {
       "mode": "ntsc",
@@ -128,9 +140,10 @@
       "deadlineMissCounter": 0,
       "staticRestored": true,
       "sidCallsPer16Refreshes": 16,
-      "irqCyclesFor16Refreshes": 273524,
+      "irqCyclesFor16Refreshes": 273523,
       "cyclesPerRefresh": 17095,
-      "tickerClockVerified": true
+      "tickerClockVerified": true,
+      "emberSpritesEnabledInAllMovingModes": true
     },
     {
       "mode": "ntsc",
@@ -144,9 +157,10 @@
       "deadlineMissCounter": 0,
       "staticRestored": true,
       "sidCallsPer16Refreshes": 16,
-      "irqCyclesFor16Refreshes": 273524,
+      "irqCyclesFor16Refreshes": 273523,
       "cyclesPerRefresh": 17095,
-      "tickerClockVerified": true
+      "tickerClockVerified": true,
+      "emberSpritesEnabledInAllMovingModes": true
     },
     {
       "mode": "ntsc",
@@ -160,9 +174,10 @@
       "deadlineMissCounter": 0,
       "staticRestored": true,
       "sidCallsPer16Refreshes": 16,
-      "irqCyclesFor16Refreshes": 273524,
+      "irqCyclesFor16Refreshes": 273523,
       "cyclesPerRefresh": 17095,
-      "tickerClockVerified": true
+      "tickerClockVerified": true,
+      "emberSpritesEnabledInAllMovingModes": true
     },
     {
       "mode": "ntsc",
@@ -176,9 +191,10 @@
       "deadlineMissCounter": 0,
       "staticRestored": true,
       "sidCallsPer16Refreshes": 16,
-      "irqCyclesFor16Refreshes": 273524,
+      "irqCyclesFor16Refreshes": 273523,
       "cyclesPerRefresh": 17095,
-      "tickerClockVerified": true
+      "tickerClockVerified": true,
+      "emberSpritesEnabledInAllMovingModes": true
     }
   ]
 }

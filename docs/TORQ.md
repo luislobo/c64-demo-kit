@@ -4,7 +4,7 @@ The default application combines the supplied logo, its 16-phase bitmap wave,
 three original foreground color fields, a pixel ticker and After Hours Roll SID music.
 It starts with fire plasma above a nighttime firepit and changes modes every
 eight nominal seconds. The firepit has a stone ring, glowing coals, moving
-flames and drifting sparks. The landscape keeps a dark clearing behind the flames.
+flames, split logs and drifting sprite embers. The landscape keeps a dark clearing behind the flames.
 The 16-pose wave runs at nominal 12.5 fps on PAL and 15 fps on NTSC.
 [FPS measurements](FPS.md) include the PAL cadence and startup allowance.
 [Capacity measurements](FRAME_CAPACITY.md) cover 8, 16 and 32 phases.
@@ -51,7 +51,7 @@ the program. Ready-to-run copies and captures are in [dist](../dist/README.md).
 | `DEMO_PATCH_PLAN` | `"legacy"` | TORQ selects `"balanced"` for cycle-based patches and pose selection |
 | `DEMO_COLOR_FIELDS` | `0` | `1` enables modes 4..6 and their lookup tables |
 | `DEMO_FIRE_PLASMA` | `0` | `1` gives mode 4 a rising heat field and fire palette |
-| `DEMO_FIREPIT` | `0` | `1` places the animated scene below the logo. Use `DEMO_LOGO_HEIGHT` between 48 and 88, in multiples of eight. |
+| `DEMO_FIREPIT` | `0` | `1` places the animated scene and ember sprites below the logo. Use `DEMO_LOGO_HEIGHT` between 48 and 88, in multiples of eight. |
 | `DEMO_START_EFFECT` | `1` | Initial mode, within the enabled range |
 | `DEMO_AUTO_SHOW` | `0` | `1` starts the wave and cycles enabled modes every eight seconds |
 | `DEMO_SID_BUILD` | None | `"after-hours"` generates TORQ's original SID before import |
@@ -74,10 +74,9 @@ logo rows in the default layout. The firepit, HUD and ticker keep their own
 palettes. This keeps the recognizable logo and its wave visible.
 
 The host prepares a 256-byte sine table, two polar maps and their row-address
-tables, totaling 1,748 bytes. The
-patches fit in high RAM with the tables, scene palettes and raster handlers.
-The default layout leaves 6,538 bytes available in the high patch budget after
-reserving space for those assets. The SID occupies `$c400..$ca93`.
+tables, totaling 1,748 bytes. The patches fit in high RAM with the tables,
+scene palettes, raster handlers and 1,728 bytes of ember sprite shapes and
+tracks. The SID occupies `$c400..$ca93`.
 IRQ scratch `$22`, `$24..$27` and automatic-show state `$28..$2a` are
 disjoint from decoder pointers, ticker state and the imported player's allocation.
 
@@ -92,8 +91,14 @@ colors plus black for each 4×8 multicolor cell across the loop. The two screen
 matrices and shared color RAM receive the scene palette at startup. Two short
 raster interrupts switch to the 160-pixel-wide multicolor scene and back to
 320-pixel-wide hires for the controls. Both switches happen in blank rows.
-The normal bitmap patches carry flame, coal and spark motion. Static mode
-restores the scene's first pose.
+The main IRQ arms the first switch before running the SID and ticker so the
+short split handler can run on time even if the ticker is still updating.
+The normal bitmap patches carry flame and coal motion. Eight hires sprites
+draw single-pixel embers and short streaks over the scene. Both VIC banks have
+identical sprite shapes, so flipping the bitmap needs no extra sprite updates.
+The ticker's 25 Hz clock advances the 64-step ember paths at the same rate on
+PAL and NTSC. Each track changes position and fades from yellow to red as the
+ember rises. Static mode restores the first bitmap pose and hides the sprites.
 The native loops use additions, shifts, table reads and two indexed stores per
 cell. They calculate no trigonometric functions. The IRQ is their only caller,
 which makes the patched screen-store operands safe from reentry.

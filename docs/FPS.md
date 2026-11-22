@@ -53,7 +53,9 @@ VICE x64sc 3.9 on Linux completed five trials per standard at 12.5 fps PAL
 and 15 fps NTSC. It matched 2,400 decoded bitmaps across the five moving
 modes and verified static restoration in mode 3. Each 144-second automatic
 show covered all six effects, checked the SID and ticker clocks, and recorded
-zero missed frame deadlines.
+zero missed frame deadlines. The emulator also verified the sprite shapes
+and pointers in both banks and checked all 64 ember steps at 25 updates per
+second on each standard.
 [Firepit timing report](../dist/validation/firepit-fps.json)
 
 ## Full-screen fire plasma

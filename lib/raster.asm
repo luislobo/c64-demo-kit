@@ -16,6 +16,15 @@ irq:
     tya
     pha
     inc ticks
+    .if KIT_FIREPIT
+        ; Arm the split before the SID and ticker. On NTSC those can still be
+        ; running when the next scene starts. The split IRQs preserve A/X/Y
+        ; and use no shared scratch, so they can interrupt this handler.
+        jsr firepit_schedule_split
+        lda #1
+        sta $d019
+        cli
+    .endif
     jsr scan_keyboard
     lda flip_request
     beq no_flip
@@ -47,16 +56,18 @@ no_flip:
     lda scroll_div
     and #1
     bne irq_done
+    .if KIT_FIREPIT
+        jsr ember_tick
+    .endif
     jsr scroll_tick
     jmp irq_done
 logic_wait:
     sta logic_acc
 irq_done:
-    .if KIT_FIREPIT
-        jsr firepit_schedule_split
+    .if !KIT_FIREPIT
+        lda #1
+        sta $d019
     .endif
-    lda #1
-    sta $d019
     pla
     tay
     pla
