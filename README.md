@@ -58,6 +58,9 @@ uses apt and includes missing C64 ROMs, and Windows uses verified portable
 downloads plus the bundled assembler. See [launcher options](docs/LAUNCHERS.md)
 for building without a display, offline runs and other Linux distributions.
 
+On Windows, run `.\run.bat -Test` to set up the tools and verify TORQ in VICE
+on both PAL and NTSC.
+
 To build manually with Node.js and 64tass already available:
 
 ```console

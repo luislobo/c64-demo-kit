@@ -16,6 +16,18 @@ invoked by an absolute path from another directory. The Windows batch file
 forwards arguments and failure status to PowerShell. Its execution-policy
 setting applies only to that process.
 
+## Test TORQ on Windows
+
+```powershell
+.\run.bat -Test
+```
+
+The launcher installs missing tools and runs the PAL and NTSC VICE checks.
+The tests cover all 16 phases, six effects, SID playback and the automatic show.
+Success ends with `VICE passed 12.5 fps PAL and 15 fps NTSC.` Reports are in
+`build/fps-stress.json`, `build/test-pal.json`, `build/test-ntsc.json` and
+`build/validation/`. Add `-NoInstall` to use existing or cached tools.
+
 ## Build without opening the emulator
 
 ```sh
@@ -59,7 +71,7 @@ TASS64=/path/to/64tass VICE_BIN=/path/to/x64sc bash run.sh --no-install
 
 The PowerShell launcher accepts `NODE_BIN`, `TASS64` and `VICE_BIN` environment
 overrides. It uses the bundled Windows assembler unless TASS64 is set. It
-restores the caller's TASS64 and working directory on exit. No launcher writes
+restores the caller's TASS64, VICE_BIN and working directory on exit. No launcher writes
 to your shell profile or permanently changes PATH.
 
 ## Dependency sources and reuse

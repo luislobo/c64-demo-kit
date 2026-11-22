@@ -1,8 +1,8 @@
 # Bootstrap missing Windows tools into ignored build/tools, verify archive
-# hashes, build from this script's directory and launch VICE. Existing tools and
+# hashes, then build and launch TORQ or run the VICE checks. Existing tools and
 # cached downloads are reused; no package manager or permanent PATH edit is needed.
 [CmdletBinding()]
-param([switch]$BuildOnly, [switch]$NoInstall)
+param([switch]$BuildOnly, [switch]$NoInstall, [switch]$Test)
 $ErrorActionPreference = 'Stop'
 
 function Find-Executable([string]$Override, [string]$Name) {
@@ -75,9 +75,11 @@ function Get-Vice {
 
 if ($env:OS -ne 'Windows_NT') { throw 'Use bash run.sh on macOS or Linux.' }
 if ($env:PROCESSOR_ARCHITECTURE -ne 'AMD64' -and $env:PROCESSOR_ARCHITEW6432 -ne 'AMD64') { throw 'Automatic setup supports Windows x64.' }
+if ($BuildOnly -and $Test) { throw 'Choose either -BuildOnly or -Test.' }
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $toolsDir = Join-Path $PSScriptRoot 'build/tools'
 $previousTass = $env:TASS64
+$previousVice = $env:VICE_BIN
 Push-Location $PSScriptRoot
 try {
     $node = Get-Node
@@ -85,6 +87,11 @@ try {
     if (-not $assembler) { $assembler = Join-Path $PSScriptRoot 'tools/64tass/64tass.exe' }
     $env:TASS64 = Find-Executable $assembler '64tass.exe'
     if (-not $BuildOnly) { $vice = Get-Vice }
+    if ($Test) {
+        $env:VICE_BIN = $vice
+        & (Join-Path $PSScriptRoot 'tests/windows.ps1') -Node $node
+        return
+    }
     Write-Host 'Building TORQ from source...'
     & $node (Join-Path $PSScriptRoot 'build.cjs')
     if ($LASTEXITCODE -ne 0) { throw "Build failed with exit code $LASTEXITCODE" }
@@ -96,5 +103,6 @@ try {
     }
 } finally {
     $env:TASS64 = $previousTass
+    $env:VICE_BIN = $previousVice
     Pop-Location
 }

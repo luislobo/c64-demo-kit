@@ -106,6 +106,29 @@ psTest('PowerShell build failure returns an error', t => {
   assert.notEqual(result.status, 0); assert.match(result.stderr, /Build failed with exit code 9/);
 });
 
+psTest('PowerShell test mode uses the prepared tools and stops on a VICE failure', t => {
+  const f = psFixture(t, { VICE_BIN: 'node' });
+  fs.mkdirSync(path.join(f.directory, 'tests'));
+  fs.copyFileSync(path.join(root, 'tests/windows.ps1'), path.join(f.directory, 'tests/windows.ps1'));
+  for (const [name, exit] of [['stress-fps', 0], ['verify-torq', 7], ['verify-fps-soak', 0]]) {
+    fs.writeFileSync(path.join(f.directory, 'tests', name + '.cjs'), `
+      require('node:assert/strict').equal(process.env.VICE_BIN, process.env.EXPECTED_VICE);
+      require('node:fs').appendFileSync('test.log', '${name}\\n');
+      process.exit(${exit});
+    `);
+  }
+  const result = f.run(`
+    $env:EXPECTED_VICE = (Get-Command node -CommandType Application).Source
+    try { & (Join-Path $env:TEST_ROOT run.ps1) -NoInstall -Test; throw 'Test should fail' }
+    catch { if ($_.Exception.Message -notmatch 'verify-torq failed \\(exit code 7\\)') { throw } }
+    if ($env:VICE_BIN -ne 'node') { throw 'VICE override leaked' }
+    exit 0
+  `);
+  assert.equal(result.status, 0, result.stderr + result.stdout);
+  assert.equal(fs.readFileSync(path.join(f.directory, 'test.log'), 'utf8'), 'stress-fps\nverify-torq\n');
+  assert.equal(f.exists('build.log'), false);
+});
+
 psTest('PowerShell restores the caller directory and compiler override on failure', t => {
   const f = psFixture(t, { TEST_BUILD_FAIL: '1', TASS64: 'node' });
   const result = f.run(`
