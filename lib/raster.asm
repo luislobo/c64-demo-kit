@@ -52,6 +52,9 @@ no_flip:
 logic_wait:
     sta logic_acc
 irq_done:
+    .if KIT_FIREPIT
+        jsr firepit_schedule_split
+    .endif
     lda #1
     sta $d019
     pla

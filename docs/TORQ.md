@@ -2,7 +2,9 @@
 
 The default application combines the supplied logo, its 16-phase bitmap wave,
 three original foreground color fields, a pixel ticker and After Hours Roll SID music.
-It starts with fire plasma and automatically changes modes every eight nominal seconds.
+It starts with fire plasma above a nighttime firepit and changes modes every
+eight nominal seconds. The firepit has a stone ring, glowing coals, moving
+flames and drifting sparks. The landscape keeps a dark clearing behind the flames.
 The 16-pose wave runs at nominal 12.5 fps on PAL and 15 fps on NTSC.
 [FPS measurements](FPS.md) include the PAL cadence and startup allowance.
 [Capacity measurements](FRAME_CAPACITY.md) cover 8, 16 and 32 phases.
@@ -49,6 +51,7 @@ the program. Ready-to-run copies and captures are in [dist](../dist/README.md).
 | `DEMO_PATCH_PLAN` | `"legacy"` | TORQ selects `"balanced"` for cycle-based patches and pose selection |
 | `DEMO_COLOR_FIELDS` | `0` | `1` enables modes 4..6 and their lookup tables |
 | `DEMO_FIRE_PLASMA` | `0` | `1` gives mode 4 a rising heat field and fire palette |
+| `DEMO_FIREPIT` | `0` | `1` places the animated scene below the logo. Use `DEMO_LOGO_HEIGHT` between 48 and 88, in multiples of eight. |
 | `DEMO_START_EFFECT` | `1` | Initial mode, within the enabled range |
 | `DEMO_AUTO_SHOW` | `0` | `1` starts the wave and cycles enabled modes every eight seconds |
 | `DEMO_SID_BUILD` | None | `"after-hours"` generates TORQ's original SID before import |
@@ -57,26 +60,24 @@ the program. Ready-to-run copies and captures are in [dist](../dist/README.md).
 The supplied application selects fields, initial mode 4 and automatic playback.
 Other bitmap entries retain their three-mode behavior unless they enable fields.
 Set `DEMO_FIRE_PLASMA = 0` in `demo.asm` to restore the original plasma palette.
+Disable `DEMO_FIREPIT` and set `DEMO_LOGO_HEIGHT = 184` for the full-screen logo.
 Removing the PSID configuration selects the existing built-in note sequencer.
 `DEMO_VOLUME` and `DEMO_NOTE_TICKS` control that sequencer; an imported player
 owns its volume and tempo. See [SID contracts](SID.md) before importing music.
 
 ## Runtime design
 
-The color fields change only foreground nibbles in the two 40x23 logo screen
+The color fields change only foreground nibbles in the logo rows of the two 40×25 screen
 matrices. Backgrounds remain black. Each IRQ updates one row in both banks, so
-bank flips never select an older copy of that row. The rolling update takes
-23 refreshes; its speed differs between PAL and NTSC. HUD and ticker colors
-remain outside the field. This keeps the recognizable logo and its wave visible.
+bank flips never select an older copy of that row. The rolling update traverses 23 rows per cycle and recolors the eight
+logo rows in the default layout. The firepit, HUD and ticker keep their own
+palettes. This keeps the recognizable logo and its wave visible.
 
-The host prepares a 256-byte sine table plus two 920-byte polar maps. Their
-23-word row-address tables add 92 bytes, for 2,188 bytes total. These follow the
-patch streams, below `$c000`; host and assembler independently reject overlaps.
-The 16-phase build uses repeated-byte patch compression and `$1500..$1fff`
-for low patch storage. A continuation table lets a stream resume in high RAM
-without resetting its destination. Code/font/text/tables fit below `$1500`;
-`$2e..$2f` holds the pending continuation. High patches plus color tables leave
-408 bytes before `$c000`. The SID occupies `$c400..$c5d5`.
+The host prepares a 256-byte sine table, two polar maps and their row-address
+tables, totaling 1,748 bytes. The
+patches fit in high RAM with the tables, scene palettes and raster handlers.
+The default layout leaves 6,538 bytes available in the high patch budget after
+reserving space for those assets. The SID occupies `$c400..$ca93`.
 IRQ scratch `$22`, `$24..$27` and automatic-show state `$28..$2a` are
 disjoint from decoder pointers, ticker state and the imported player's allocation.
 
@@ -85,6 +86,14 @@ The tunnel adds phase to inverse radius, XORs angle and selects a palette entry.
 Fire plasma mixes a rising sine band with a bottom-to-top heat falloff once
 per row. Its helper and tables fit in the unused bytes at `$3f40..$3fff`,
 outside the visible bitmap.
+
+The host paints the landscape and 16 fire poses, then chooses three local
+colors plus black for each 4×8 multicolor cell across the loop. The two screen
+matrices and shared color RAM receive the scene palette at startup. Two short
+raster interrupts switch to the 160-pixel-wide multicolor scene and back to
+320-pixel-wide hires for the controls. Both switches happen in blank rows.
+The normal bitmap patches carry flame, coal and spark motion. Static mode
+restores the scene's first pose.
 The native loops use additions, shifts, table reads and two indexed stores per
 cell. They calculate no trigonometric functions. The IRQ is their only caller,
 which makes the patched screen-store operands safe from reentry.

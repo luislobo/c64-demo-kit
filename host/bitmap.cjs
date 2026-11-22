@@ -25,13 +25,18 @@ function drawText(bitmap,font,text,x=16,y=184){
  for(let c=0;c<text.length;c++)for(let r=0;r<8;r++)bitmap[index(c*8+x,y+r)]=font[(text.charCodeAt(c)&63)*8+r];
  return bitmap;
 }
-function waveFrames(base,{frames=8,amplitude=8,wavelength=100,height=184,turns}={}){
+function waveFrames(base,{frames=8,amplitude=8,wavelength=100,height=184,turns,scene}={}){
  return Array.from(turns??Array.from({length:frames},(_,i)=>i/frames),turn=>{
   const out=Buffer.from(base);out.fill(0,0,23*320);
   for(let y=0;y<height;y++){
    const shift=Math.round(amplitude*Math.sin(y*2*Math.PI/wavelength+turn*2*Math.PI));
    for(let x=0;x<WIDTH;x++)if(base[index(x,y)]&(128>>(x&7))){const dx=x+shift;if(dx>=0&&dx<WIDTH)out[index(dx,y)]|=128>>(dx&7);}
-  }return out;
+  }
+  if(scene){
+   const phase=(Math.round(turn*frames)+frames)%frames;
+   scene.frames[phase].copy(out,scene.rowStart*WIDTH);
+  }
+  return out;
  });
 }
 module.exports={WIDTH,HEIGHT,BYTES,index,fitBitmap,drawText,waveFrames};

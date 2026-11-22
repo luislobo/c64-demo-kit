@@ -11,6 +11,11 @@
 
 ; Update one eight-pixel-high band per refresh, keeping the IRQ inexpensive.
 color_tick:
+    .if KIT_FIREPIT
+        lda color_row
+        cmp #KIT_FIREPIT_ROW
+        bcs color_row_done
+    .endif
     .if KIT_COLOR_FIELDS
         lda effect
         cmp #4

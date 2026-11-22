@@ -2,8 +2,8 @@ TORQ X SENDERO - C64 demo kit
 https://github.com/luislobo/c64-demo-kit
 
 Logo artwork and application: supplied with Luis Lobo's C64 demo kit.
-Bitmap wave engine, plasma/XOR/polar color fields and asset tools:
-C64 demo kit contributors. The field implementations are original kit code.
+Bitmap wave engine, plasma/XOR/polar color fields, firepit artwork and asset tools:
+C64 demo kit contributors. The field and scene implementations are original kit code.
 
 After Hours Roll composition and three-voice SID player: C64 demo kit contributors.
 Released under CC0 1.0. This grant covers the original player, composition and

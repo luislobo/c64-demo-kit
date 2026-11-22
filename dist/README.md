@@ -9,21 +9,23 @@ rebuild and explicitly copy new delivery files when publishing an update.
 | --- | --- |
 | `torqxsendero-c64.prg` | Two-byte little-endian load address, BASIC launcher, native machine code, bitmap and compressed patch data. This is the assembled result, not source text. |
 | `torqxsendero-c64.d64` | Standard 35-track disk made by `host/d64.cjs`, containing the closed PRG entry. Sector interleave changes disk placement, not the program bytes. |
-| `preview.png` | A captured emulator frame showing the demo. It illustrates one instant; it cannot demonstrate animation, timing or audio. |
+| `preview.png` | A captured emulator frame showing the firepit scene. |
+| `torq-firepit.gif` | A silent PAL capture of all 16 firepit poses. |
 | `torqxsendero-c64-credits.txt` | Release credits for the application, original music, PSID format and research references. |
 | `torqxsendero-c64-music-credits.json` | Original After Hours Roll metadata and CC0 grant reference. |
 | `logo-plasma.png`, `logo-xor.png`, `logo-tunnel.png` | PAL captures of the three new logo color fields. |
 | `validation/test-pal.json` | Recorded default-demo PAL emulator checks and measured decoder-cycle/tick samples. |
 | `validation/test-ntsc.json` | The corresponding NTSC recording. |
 | `validation/frame-stress.json` | Five interleaved trials per fitting profile and video standard, covering 600 bitmap frames and 32-phase memory rejection. |
-| `validation/fire-plasma-fps.json` | Five fire-plasma trials per video standard in Linux VICE, with 2,400 bitmap comparisons. |
+| `validation/firepit-fps.json` | Five multicolor firepit trials per video standard in Linux VICE, with 2,400 bitmap comparisons. |
+| `validation/fire-plasma-fps.json` | Historical timing for the full-screen fire plasma logo. |
 | `validation/after-hours-fps.json` | Five After Hours Roll trials with the original plasma in Windows VICE. |
 | `validation/fps-stress.json` | Historical Clockwork comparison, with 4,800 bitmap comparisons and music/ticker clock checks. |
 | `validation/fps-probes.json` | Exploratory higher-rate results, including recorded target misses. |
 | `validation/fps-soak-pal.json`, `fps-soak-ntsc.json` | 144-second automatic-show checks with no missed deadlines. |
 | `validation/copy-kernels-pal.json`, `copy-kernels-ntsc.json` | Native copy/fill page boundaries and intentional late-target recovery. |
 
-The current fire-plasma timing, control and show checks were recorded in
+The multicolor firepit timing, control and show checks were recorded in
 Linux VICE. The After Hours Roll timing report preserves the Windows run
 with the original plasma. The reports check decoded image memory, frame spacing, restore/restart, effect
 requests, all new color cells, PSID advancement and matching ticker buffers. Mode requests
@@ -32,7 +34,7 @@ simulate physical key presses. Sequencer advancement does not establish musical
 quality, and emulator checks do not establish compatibility with every real
 C64, SID revision or SD2IEC firmware.
 
-This snapshot starts automatically with fire plasma, then changes between six effects
+This snapshot starts with a fire-lit logo above an animated firepit, then changes between six effects
 every eight nominal seconds. Number keys or Space take manual control; M pauses
 and restarts After Hours Roll. Preserve both credit files when redistributing it.
 `validation/show-pal.json` and `show-ntsc.json` record automatic startup,

@@ -27,8 +27,11 @@ patch_low:
     .binary "../generated/static-bitmap.bin"
     .if KIT_COLOR_FIELDS && KIT_FIRE_PLASMA
         .include "fire-plasma.asm"
-        .cerror * > $4000, "Fire plasma overlaps high patch region"
+        .endif
+    .if KIT_FIREPIT
+        .include "firepit-init.asm"
     .endif
+    .cerror * > $4000, "Firepit setup overlaps high patch region"
 * = $4000
     .binary "../generated/patches.bin"
  .if KIT_COLOR_FIELDS
@@ -50,6 +53,13 @@ field_angle_rows:
         .word field_angle + row * 40
     .endfor
  .endif
+    .if KIT_FIREPIT
+firepit_colors:
+        .binary "../generated/campfire-screen.bin"
+firepit_color_ram:
+        .binary "../generated/campfire-color-ram.bin"
+        .include "firepit-split.asm"
+    .endif
     .cerror * > $c000, "Patch data overlaps second screen RAM"
 .if DEMO_EXTERNAL_SID
 * = SID_LOAD

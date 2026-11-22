@@ -109,6 +109,10 @@ text_colors:
     dex
     bpl text_colors
 
+    .if KIT_FIREPIT
+        jsr init_firepit_colors
+    .endif
+
     ; Detect actual raster length, rather than trusting a ROM PAL/NTSC flag.
     ; PAL exceeds line 287; standard NTSC variants finish before that.
     ldx #6                   ; Marker 6 identifies an NTSC-length raster.

@@ -32,6 +32,8 @@ function readConfig(file){
  if(!['legacy','cycles','balanced'].includes(config.DEMO_PATCH_PLAN))throw Error('DEMO_PATCH_PLAN must be legacy, cycles or balanced');
  config.DEMO_COLOR_FIELDS ??= 0;
  config.DEMO_FIRE_PLASMA ??= 0;
+ config.DEMO_FIREPIT ??= 0;
+ if(![0,1].includes(config.DEMO_FIREPIT))throw Error('DEMO_FIREPIT must be 0 or 1');
  if(![0,1].includes(config.DEMO_FIRE_PLASMA))throw Error('DEMO_FIRE_PLASMA must be 0 or 1');
  config.DEMO_START_EFFECT ??= 1;
  config.DEMO_AUTO_SHOW ??= 0;
@@ -58,6 +60,7 @@ function readConfig(file){
  if(!Number.isInteger(config.DEMO_VOLUME)||config.DEMO_VOLUME<0||config.DEMO_VOLUME>15)throw Error('Volume must be 0..15');
  if(!Number.isInteger(config.DEMO_NOTE_TICKS)||config.DEMO_NOTE_TICKS<2||config.DEMO_NOTE_TICKS>255)throw Error('Note ticks must be 2..255');
  if(!Number.isInteger(config.DEMO_LOGO_HEIGHT)||config.DEMO_LOGO_HEIGHT<8||config.DEMO_LOGO_HEIGHT>184)throw Error('Logo height must be 8..184');
+ if(config.DEMO_FIREPIT&&(config.DEMO_LOGO_HEIGHT<48||config.DEMO_LOGO_HEIGHT>88||config.DEMO_LOGO_HEIGHT%8))throw Error('DEMO_FIREPIT needs a logo height from 48 to 88 in eight-pixel rows');
  if(!Number.isFinite(config.DEMO_WAVE_LENGTH)||config.DEMO_WAVE_LENGTH<=0||!Number.isFinite(config.DEMO_WAVE_AMPLITUDE)||config.DEMO_WAVE_AMPLITUDE<0||config.DEMO_WAVE_AMPLITUDE>40)throw Error('Invalid wave geometry');
  if(config.DEMO_HUD.length>38)throw Error('HUD exceeds the 38-column inset');
  for(const k of ['HUD','SCROLL_TEXT'])if(!/^[\x20-\x5f]+$/.test(config['DEMO_'+k]))throw Error('DEMO_'+k+' must use uppercase C64 font characters');

@@ -47,7 +47,16 @@ one preparation refresh at startup or restart, then follows its steady
 cadence. An overdue frame resynchronizes at the next border and increments
 the deadline counter.
 
-## Fire plasma
+## Multicolor firepit
+
+VICE x64sc 3.9 on Linux completed five trials per standard at 12.5 fps PAL
+and 15 fps NTSC. It matched 2,400 decoded bitmaps across the five moving
+modes and verified static restoration in mode 3. Each 144-second automatic
+show covered all six effects, checked the SID and ticker clocks, and recorded
+zero missed frame deadlines.
+[Firepit timing report](../dist/validation/firepit-fps.json)
+
+## Full-screen fire plasma
 
 Five Linux VICE trials per standard checked 2,400 bitmap frames with fire
 plasma enabled and recorded zero missed deadlines at 12.5 fps PAL and 15 fps
@@ -62,9 +71,7 @@ PAL and 15 fps on NTSC in all five trials per standard. The run checked
 2,400 bitmaps and recorded zero missed intervals or deadline resynchronizations.
 The 144-second automatic-show check on each standard covered all six effects
 and verified SID calls, score position and ticker timing. See the
-[trial summary](../dist/validation/after-hours-fps.json) and the
-[PAL](../dist/validation/fps-soak-pal.json) and
-[NTSC](../dist/validation/fps-soak-ntsc.json) show reports.
+[Windows trial summary](../dist/validation/after-hours-fps.json).
 
 ## Clockwork comparison
 

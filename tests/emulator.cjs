@@ -37,6 +37,17 @@ const basePeriod=frameCadence(refresh,config.DEMO_FPS,1,config.DEMO_PAL_TICKS)[0
 const nominalFPS=mode==='pal'&&config.DEMO_PAL_TICKS?50/config.DEMO_PAL_TICKS:config.DEMO_FPS;
 if(state[7] !== basePeriod)throw Error('Incorrect frame base period: '+state[7]);
 const base=fs.readFileSync(path.join(project,'generated/static-bitmap.bin'));
+const pitColors=config.DEMO_FIREPIT?fs.readFileSync(path.join(project,'generated/campfire-screen.bin')):Buffer.alloc(0);
+const logoCells=920-pitColors.length;
+const pitColorRam=config.DEMO_FIREPIT?fs.readFileSync(path.join(project,'generated/campfire-color-ram.bin')):Buffer.alloc(0);
+if(pitColors.length)for(const screen of [0x400,0xc000]){
+ const colors=await m.bytes(screen+logoCells,screen+919,'firepit-screen');
+ if(!colors.equals(pitColors))throw Error('Firepit colors were not initialized in both banks');
+}
+if(pitColorRam.length){
+ const actual=await m.bytes(0xd800+logoCells,0xd800+919,'firepit-color-ram');
+ if(!actual.every((color,i)=>(color&15)===pitColorRam[i]))throw Error('Firepit color RAM differs');
+}
 for(const start of [0x2000,0xe000])if(!(await m.bytes(start,start+7999,'initial-'+h(start))).subarray(0,7680).equals(base.subarray(0,7680)))throw Error('Initial bitmap mismatch');
 const index=(x,y)=>(y>>3)*320+(x>>3)*8+(y&7);
 const allFrames=fs.readFileSync(path.join(project,'generated/frames.bin'));
@@ -59,6 +70,14 @@ for(let i=0;i<frameChecks;i++){
 }
 const expectedIntervals=frameCadence(refresh,config.DEMO_FPS,frameChecks,config.DEMO_PAL_TICKS);
 for(let i=1;i<flips.length;i++)if(((flips[i].tick-flips[i-1].tick)&255)!==expectedIntervals[i])throw Error('Uneven frame timing '+JSON.stringify({times,flips}));
+if(config.DEMO_FIREPIT){
+ await m.until('firepit_split_done');
+ let registers=await m.bytes(0xd016,0xd016,'firepit-multicolor');
+ if(!(registers[0]&16))throw Error('Firepit did not select multicolor bitmap mode');
+ await m.until('firepit_hires_done');
+ registers=await m.bytes(0xd016,0xd016,'hud-hires');
+ if(registers[0]&16)throw Error('HUD did not return to hires mode');
+}
 // Queue the same event the IRQ generates on a Space press; verify stop and restart.
 await m.command('> 06 01');await m.until('idle');
 for(const start of [0x2000,0xe000])if(!(await m.bytes(start,start+7999,'restored-'+h(start))).subarray(0,7680).equals(base.subarray(0,7680)))throw Error('Static restore failed');
@@ -71,7 +90,7 @@ await m.command(`screenshot "${path.join(root,mode+'-optimized-static.png').repl
 await m.command('> 10 02');
 for(let i=0;i<12;i++)await m.until('flip_record');
 const colors=await m.bytes(0x400,0x7e7,'rainbow-colors');
-if(!colors.subarray(0,920).some(v=>v!==0x60))throw Error('Rainbow mode did not color the logo');
+if(!colors.subarray(0,logoCells).some(v=>v!==0x60))throw Error('Rainbow mode did not color the logo');
 if(!colors.subarray(920).every(v=>v===0x10))throw Error('Controls/ticker colors were altered');
 await m.command(`screenshot "${path.join(root,mode+'-rainbow-demo.png').replaceAll('\\','/')}" 2`);
 await m.command('> 10 03');await m.until('idle');
@@ -88,7 +107,7 @@ if(!(await m.bytes(0xfe00,0xff3f,'ticker-secondary')).equals(ticker))throw Error
 await m.command(`screenshot "${path.join(root,mode+'-full-demo.png').replaceAll('\\','/')}" 2`);
 await m.command('> 10 01');
 for(let i=0;i<8;i++)await m.until('flip_record');
-if(!(await m.bytes(0x400,0x797,'blue-colors')).every(v=>v===0x60))throw Error('Blue mode did not restore colors');
+if(!(await m.bytes(0x400,0x400+logoCells-1,'blue-colors')).every(v=>v===0x60))throw Error('Blue mode did not restore colors');
 // Compare every native color cell in all new modes, including a phase wrap.
 const fieldResults=[];
 for(const effect of [4,5,6]){
@@ -99,13 +118,15 @@ for(const effect of [4,5,6]){
  for(let i=0;i<46;i++){
   await m.until('color_row_done');
   const [row,phase]=await m.bytes(0x19,0x1a,'field-state');
-  const expected=colorFieldRow(effect,phase,row,config.DEMO_PALETTE,{firePlasma:config.DEMO_FIRE_PLASMA===1});
+  const cell=row*40;
+  const expected=cell>=logoCells?pitColors.subarray(cell-logoCells,cell-logoCells+40):
+   colorFieldRow(effect,phase,row,config.DEMO_PALETTE,{firePlasma:config.DEMO_FIRE_PLASMA===1});
   for(const screen of [0x400,0xc000]){
    if(!(await m.bytes(screen+row*40,screen+row*40+39,'field-row')).equals(expected))throw Error(`Field ${effect} row ${row} phase ${phase} differs`);
   }
   seenRows.add(row);
  }
- if(seenRows.size!==23)throw Error('Field did not cover every logo row');
+ if(seenRows.size!==23)throw Error('Field did not cover every body row');
  for(const screen of [0x400,0xc000])if(!(await m.bytes(screen+920,screen+999,'field-hud')).every(v=>v===0x10))throw Error('Field altered text colors');
  const fieldFlips=[];
  for(let i=0;i<config.DEMO_FRAMES+2;i++){
@@ -125,7 +146,7 @@ for(let i=0;i<16;i++)await m.until('irq');
 if((((await m.bytes(7,7,'call-tick-end'))[0]-tick)&255)!==16)throw Error('Raster tick drift');
 if((((await m.bytes(music.sample_calls,music.sample_calls+1,'call-end')).readUInt16LE()-sidCalls)&65535)!==16)throw Error('SID call drift');
 if((await m.bytes(0x23,0x23,'deadline-misses'))[0]!==0)throw Error('Frame deadline was missed');
-const report={mode,nominalFPS,deadlineMisses:0,framesVerified:frameChecks+3*(config.DEMO_FRAMES+2),colorFields:fieldResults,sidCallsPer16Refreshes:16,basePeriod,decoderCycles:times,flips,stopAndRestart:true,rainbowMode:true,colorOnlyMode:true,psidPlayback:true,scrollingText:true};
+const report={mode,nominalFPS,deadlineMisses:0,framesVerified:frameChecks+3*(config.DEMO_FRAMES+2),colorFields:fieldResults,sidCallsPer16Refreshes:16,basePeriod,decoderCycles:times,flips,firepitColorsVerified:pitColors.length,stopAndRestart:true,rainbowMode:true,colorOnlyMode:true,psidPlayback:true,scrollingText:true};
 fs.writeFileSync(path.join(root,'test-'+mode+'.json'),JSON.stringify(report,null,2));
 fs.writeFileSync(path.join(root,'monitor-'+mode+'.txt'),m.log);
 console.log(JSON.stringify(report,null,2));m.socket.end('quit\n');
